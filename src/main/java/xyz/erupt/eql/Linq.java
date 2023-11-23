@@ -35,14 +35,6 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy {
         return linq;
     }
 
-    //TODO 可能没有意义
-//    public static Linq from(String... t) {
-//        return new Linq() {{
-//            this.source = Arrays.asList(t);
-//        }};
-//    }
-
-
     @Override
     public Linq distinct() {
         this.dql.setDistinct(true);

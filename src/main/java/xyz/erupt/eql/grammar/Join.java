@@ -2,8 +2,6 @@ package xyz.erupt.eql.grammar;
 
 import xyz.erupt.eql.Linq;
 import xyz.erupt.eql.consts.JoinMethod;
-import xyz.erupt.eql.fun.LambdaInfo;
-import xyz.erupt.eql.fun.LambdaReflect;
 import xyz.erupt.eql.fun.SFunction;
 import xyz.erupt.eql.schema.Column;
 
@@ -22,8 +20,8 @@ public interface Join {
         return this.join(joinMethod, target, (t1, t2) -> t1.get(l).equals(t2.get(r)));
     }
 
-//    default <T> Linq leftJoin(Collection<T> t, SFunction<T, Object> lon, SFunction<Source, Object> ron) {
-//        return this.join(JoinMethod.LEFT, t, lon, ron);
-//    }
+    default <L, R> Linq leftJoin(Collection<L> t, SFunction<L, Object> lon, SFunction<R, Object> ron) {
+        return this.join(JoinMethod.LEFT, t, lon, ron);
+    }
 
 }
