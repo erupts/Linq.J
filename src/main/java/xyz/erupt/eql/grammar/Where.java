@@ -66,7 +66,7 @@ public interface Where<SOURCE> {
     }
 
     default <R> Linq<SOURCE> isNotNull(SFunction<R, ?> column) {
-        Column c = Column.fromLambda(column);
+        Column<R> c = Column.fromLambda(column);
         return condition(Column.of(column), (f) -> f.get(c) != null);
     }
 
@@ -75,6 +75,6 @@ public interface Where<SOURCE> {
         return condition(Column.of(column), (f) -> f.get(c) != null && !f.get(c).toString().trim().isEmpty());
     }
 
-    <R> Linq<SOURCE> condition(Column column, Function<Map<Column, ?>, Boolean> fun);
+    <R> Linq<SOURCE> condition(Column<R> column, Function<Map<Column<R>, ?>, Boolean> fun);
 
 }

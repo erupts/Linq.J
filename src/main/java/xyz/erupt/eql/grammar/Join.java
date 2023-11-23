@@ -13,12 +13,12 @@ import java.util.function.BiFunction;
 
 public interface Join<Source> {
 
-    <T> Linq<Source> join(JoinMethod joinMethod, Collection<T> target, BiFunction<Map<Column, ?>, Map<Column, ?>, Boolean> on);
+    <T> Linq<Source> join(JoinMethod joinMethod, Collection<T> target, BiFunction<Map<Column<T>, ?>, Map<Column<?>, ?>, Boolean> on);
 
 
     default <T, S> Linq<Source> join(JoinMethod joinMethod, Collection<T> target, SFunction<T, Object> onL, SFunction<S, Object> onR) {
-        Column l = Column.fromLambda(onL);
-        Column r = Column.fromLambda(onR);
+        Column<T> l = Column.fromLambda(onL);
+        Column<S> r = Column.fromLambda(onR);
         return this.join(joinMethod, target, (t1, t2) -> t1.get(l).equals(t2.get(r)));
     }
 

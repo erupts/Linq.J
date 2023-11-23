@@ -7,9 +7,9 @@ import xyz.erupt.eql.fun.SFunction;
 import java.util.Collection;
 import java.util.Map;
 
-public class Column {
+public class Column<T> {
 
-    private Class<?> table;
+    private Class<T> table;
 
     private String field;
 
@@ -18,7 +18,7 @@ public class Column {
     public Column() {
     }
 
-    public Column(Class<?> table, String field, String alias) {
+    public Column(Class<T> table, String field, String alias) {
         this.table = table;
         this.field = field;
         this.alias = alias;
@@ -28,7 +28,7 @@ public class Column {
         return table;
     }
 
-    public void setTable(Class<?> table) {
+    public void setTable(Class<T> table) {
         this.table = table;
     }
 
@@ -48,9 +48,9 @@ public class Column {
         this.alias = alias;
     }
 
-    public static Column fromLambda(SFunction<?, ?> fun, String alias) {
-        LambdaInfo lambdaInfo = LambdaReflect.getInfo(fun);
-        Column column = new Column();
+    public static <T> Column<T> fromLambda(SFunction<T, ?> fun, String alias) {
+        LambdaInfo<T> lambdaInfo = LambdaReflect.getInfo(fun);
+        Column<T> column = new Column<>();
         column.table = lambdaInfo.getClazz();
         column.field = lambdaInfo.getField();
         if (null == alias) {
@@ -61,69 +61,50 @@ public class Column {
         return column;
     }
 
-    public static Column fromLambda(SFunction<?, ?> fun) {
+    public static <T> Column<T> fromLambda(SFunction<T, ?> fun) {
         return Column.fromLambda(fun, null);
     }
 
-    public static <R> Column all(Class<R> r) {
-        Column column = new Column();
+    public static <R> Column<R> all(Class<R> r) {
+        Column<R> column = new Column<R>();
         column.setTable(r);
         return column;
     }
 
-    public static <R> Column of(SFunction<R, ?> fun) {
+    public static <R> Column<R> of(SFunction<R, ?> fun) {
         return Column.fromLambda(fun);
     }
 
-    public static <R> Column of(Collection<R> r, SFunction<R, ?> fun) {
-        return Column.fromLambda(fun);
-    }
-
-    public static <R> Column of(Collection<R> r, SFunction<R, ?> fun, String alias) {
+    public static <R> Column<R> of(SFunction<R, ?> fun, String alias) {
         return Column.fromLambda(fun, alias);
     }
 
-    public static Column of(SFunction<Map<String, ?>, ?> fun, String alias) {
+    public static Column<?> ofs(SFunction<Map<String, ?>, ?> fun, String alias) {
         return Column.fromLambda(fun, alias);
     }
 
-    public static <R> Column max(SFunction<R, ?> fun, String alias) {
+    public static <R> Column<R> max(SFunction<R, ?> fun, String alias) {
         return Column.fromLambda(fun, alias);
     }
 
-    public static <R> Column max(Collection<R> r, SFunction<R, ?> fun, String alias) {
+    //
+    public static <R> Column<R> count(SFunction<R, ?> fun, String alias) {
         return Column.fromLambda(fun, alias);
     }
 
-    public static <R> Column count(SFunction<R, ?> fun, String alias) {
+    //
+//
+    public static <R> Column<R> min(SFunction<R, ?> fun, String alias) {
         return Column.fromLambda(fun, alias);
     }
 
-    public static <R> Column count(Collection<R> r, SFunction<R, ?> fun, String alias) {
+
+    public static <R> Column<R> avg(SFunction<R, ?> fun, String alias) {
         return Column.fromLambda(fun, alias);
     }
 
-    public static <R> Column min(SFunction<R, ?> fun, String alias) {
-        return Column.fromLambda(fun, alias);
-    }
 
-    public static <R> Column min(Collection<R> r, SFunction<R, ?> fun, String alias) {
-        return Column.fromLambda(fun, alias);
-    }
-
-    public static <R> Column avg(SFunction<R, ?> fun, String alias) {
-        return Column.fromLambda(fun, alias);
-    }
-
-    public static <R> Column avg(Collection<R> r, SFunction<R, ?> fun, String alias) {
-        return Column.fromLambda(fun, alias);
-    }
-
-    public static <R> Column sum(SFunction<R, ?> fun, String alias) {
-        return Column.fromLambda(fun, alias);
-    }
-
-    public static <R> Column sum(Collection<R> r, SFunction<R, ?> fun, String alias) {
+    public static <R> Column<R> sum(SFunction<R, ?> fun, String alias) {
         return Column.fromLambda(fun, alias);
     }
 

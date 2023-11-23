@@ -33,8 +33,8 @@ public class LinqTest {
                         Column.max(Master::getAge, "max"),
                         Column.min(Table2::getName, "min"),
                         Column.count(Table2::getName, "count"),
-//                        Column.of(Master::getAge),
-                        Column.of(m -> m.get("xx"), "xxx"),
+                        Column.of(Master::getAge),
+                        Column.ofs(m -> m.get("xx"), "xxx"),
                         Column.all(Master.class)
                 )
                 .distinct()

@@ -10,7 +10,7 @@ public class Dql {
     private boolean distinct = false;
 
     //列信息
-    private List<Column> columns = new ArrayList<>();
+    private List<Column<?>> columns = new ArrayList<>();
 
     //关联信息
     private List<JoinSchema<?, ?>> joinSchemas = new ArrayList<>();
@@ -19,7 +19,7 @@ public class Dql {
     private List<Function<?, ?>> conditions = new ArrayList<>();
 
     //分组信息
-    private List<Column> groupBys = new ArrayList<>();
+    private List<Column<?>> groupBys = new ArrayList<>();
 
     public boolean isDistinct() {
         return distinct;
@@ -29,11 +29,11 @@ public class Dql {
         this.distinct = distinct;
     }
 
-    public List<Column> getColumns() {
+    public List<Column<?>> getColumns() {
         return columns;
     }
 
-    public void setColumns(List<Column> columns) {
+    public void setColumns(List<Column<?>> columns) {
         this.columns = columns;
     }
 
@@ -53,11 +53,11 @@ public class Dql {
         this.joinSchemas = joinSchemas;
     }
 
-    public List<Column> getGroupBys() {
+    public List<Column<?>> getGroupBys() {
         return groupBys;
     }
 
-    public void setGroupBys(List<Column> groupBys) {
+    public void setGroupBys(List<Column<?>> groupBys) {
         this.groupBys = groupBys;
     }
 }

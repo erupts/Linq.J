@@ -1,17 +1,17 @@
 package xyz.erupt.eql.fun;
 
-public class LambdaInfo {
+public class LambdaInfo<T> {
 
-    private final Class<?> clazz;
+    private final Class<T> clazz;
 
     private final String field;
 
-    public LambdaInfo(Class<?> clazz, String field) {
+    public LambdaInfo(Class<T> clazz, String field) {
         this.clazz = clazz;
         this.field = field;
     }
 
-    public Class<?> getClazz() {
+    public Class<T> getClazz() {
         return clazz;
     }
 

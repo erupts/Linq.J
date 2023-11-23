@@ -49,12 +49,12 @@ public class Linq<SOURCE> implements Select<SOURCE>, Join<SOURCE>, Where<SOURCE>
     }
 
     public Linq<SOURCE> select(Column... columns) {
-        List<Column> cols = new ArrayList<>();
-        for (Column column : columns) {
+        List<Column<?>> cols = new ArrayList<>();
+        for (Column<?> column : columns) {
             if (column.getField() == null) {
                 // Column.All → select *
                 for (Field field : column.getTable().getDeclaredFields()) {
-                    cols.add(new Column(column.getTable(), field.getName(), field.getName()));
+                    cols.add(new Column<>(column.getTable(), field.getName(), field.getName()));
                 }
             } else {
                 cols.add(column);
@@ -66,7 +66,7 @@ public class Linq<SOURCE> implements Select<SOURCE>, Join<SOURCE>, Where<SOURCE>
 
     @Override
     public <T> Linq<SOURCE> join(JoinMethod joinMethod, Collection<T> target,
-                                 BiFunction<Map<Column, ?>, Map<Column, ?>, Boolean> on) {
+                                 BiFunction<Map<Column<T>, ?>, Map<Column<?>, ?>, Boolean> on) {
         return this;
     }
 
@@ -76,7 +76,7 @@ public class Linq<SOURCE> implements Select<SOURCE>, Join<SOURCE>, Where<SOURCE>
     }
 
     @Override
-    public <R> Linq<SOURCE> condition(Column column, Function<Map<Column, ?>, Boolean> fun) {
+    public <R> Linq<SOURCE> condition(Column<R> column, Function<Map<Column<R>, ?>, Boolean> fun) {
         this.dql.getConditions().add(fun);
         return this;
     }
