@@ -3,11 +3,11 @@ package xyz.erupt.eql.grammar;
 import xyz.erupt.eql.Linq;
 import xyz.erupt.eql.schema.Column;
 
-public interface Select<Source> {
+public interface Select {
 
-    Linq<Source> distinct();
+    Linq distinct();
 
-    Linq<Source> select(Column... column);
+    Linq select(Column<?>... column);
 
 
 }

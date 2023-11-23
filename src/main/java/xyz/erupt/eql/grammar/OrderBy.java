@@ -3,12 +3,12 @@ package xyz.erupt.eql.grammar;
 import xyz.erupt.eql.Linq;
 import xyz.erupt.eql.fun.SFunction;
 
-public interface OrderBy<Source> {
+public interface OrderBy {
 
-    <R> Linq<Source> orderBy(SFunction<R, ?> column, Direction direction);
+    <R> Linq orderBy(SFunction<R, ?> column, Direction direction);
 
 
-    default <R> Linq<Source> orderBy(SFunction<R, ?> column) {
+    default <R> Linq orderBy(SFunction<R, ?> column) {
         return orderBy(column, Direction.ASC);
     }
 

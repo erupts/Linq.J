@@ -11,19 +11,19 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-public interface Join<Source> {
+public interface Join {
 
-    <T> Linq<Source> join(JoinMethod joinMethod, Collection<T> target, BiFunction<Map<Column<T>, ?>, Map<Column<?>, ?>, Boolean> on);
+    <T> Linq join(JoinMethod joinMethod, Collection<T> target, BiFunction<Map<Column<T>, ?>, Map<Column<?>, ?>, Boolean> on);
 
 
-    default <T, S> Linq<Source> join(JoinMethod joinMethod, Collection<T> target, SFunction<T, Object> onL, SFunction<S, Object> onR) {
+    default <T, S> Linq join(JoinMethod joinMethod, Collection<T> target, SFunction<T, Object> onL, SFunction<S, Object> onR) {
         Column<T> l = Column.fromLambda(onL);
         Column<S> r = Column.fromLambda(onR);
         return this.join(joinMethod, target, (t1, t2) -> t1.get(l).equals(t2.get(r)));
     }
 
-    default <T> Linq<Source> leftJoin(Collection<T> t, SFunction<T, Object> lon, SFunction<Source, Object> ron) {
-        return this.join(JoinMethod.LEFT, t, lon, ron);
-    }
+//    default <T> Linq leftJoin(Collection<T> t, SFunction<T, Object> lon, SFunction<Source, Object> ron) {
+//        return this.join(JoinMethod.LEFT, t, lon, ron);
+//    }
 
 }

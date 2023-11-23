@@ -11,15 +11,16 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class Linq<SOURCE> implements Select<SOURCE>, Join<SOURCE>, Where<SOURCE>, GroupBy<SOURCE>, OrderBy<SOURCE> {
+public class Linq implements Select, Join, Where, GroupBy, OrderBy {
 
-    public Collection<SOURCE> source;
+    private Linq() {
+    }
 
     private final Dql dql = new Dql();
 
     public <T> List<T> write(T t) {
         Map<String, Void> alias = new HashMap<>();
-        for (Column column : this.dql.getColumns()) {
+        for (Column<?> column : this.dql.getColumns()) {
             if (alias.containsKey(column.getAlias())) {
                 throw new RuntimeException("Column '" + column.getAlias() + "' is ambiguous");
             }
@@ -28,27 +29,28 @@ public class Linq<SOURCE> implements Select<SOURCE>, Join<SOURCE>, Where<SOURCE>
         return null;
     }
 
-    public static <T> Linq<T> from(Collection<T> table) {
-        return new Linq<T>() {{
-            this.source = table;
-        }};
+    public static <T> Linq from(Collection<T> table) {
+        Linq linq = new Linq();
+        linq.dql.setSource(table);
+        return linq;
     }
 
     //TODO 可能没有意义
-    public static Linq<String> from(String... t) {
-        return new Linq<String>() {{
-            this.source = Arrays.asList(t);
-        }};
-    }
+//    public static Linq from(String... t) {
+//        return new Linq() {{
+//            this.source = Arrays.asList(t);
+//        }};
+//    }
 
 
     @Override
-    public Linq<SOURCE> distinct() {
+    public Linq distinct() {
         this.dql.setDistinct(true);
         return this;
     }
 
-    public Linq<SOURCE> select(Column... columns) {
+    @Override
+    public Linq select(Column<?>... columns) {
         List<Column<?>> cols = new ArrayList<>();
         for (Column<?> column : columns) {
             if (column.getField() == null) {
@@ -65,39 +67,39 @@ public class Linq<SOURCE> implements Select<SOURCE>, Join<SOURCE>, Where<SOURCE>
     }
 
     @Override
-    public <T> Linq<SOURCE> join(JoinMethod joinMethod, Collection<T> target,
-                                 BiFunction<Map<Column<T>, ?>, Map<Column<?>, ?>, Boolean> on) {
+    public <T> Linq join(JoinMethod joinMethod, Collection<T> target,
+                         BiFunction<Map<Column<T>, ?>, Map<Column<?>, ?>, Boolean> on) {
         return this;
     }
 
     @Override
-    public <R> Linq<SOURCE> orderBy(SFunction<R, ?> column, Direction direction) {
+    public <R> Linq orderBy(SFunction<R, ?> column, Direction direction) {
         return this;
     }
 
     @Override
-    public <R> Linq<SOURCE> condition(Column<R> column, Function<Map<Column<R>, ?>, Boolean> fun) {
+    public <R> Linq condition(Column<R> column, Function<Map<Column<R>, ?>, Boolean> fun) {
         this.dql.getConditions().add(fun);
         return this;
     }
 
 
     @Override
-    public <R> Linq<SOURCE> groupBy(Column... column) {
+    public <R> Linq groupBy(Column<?>... column) {
         this.dql.getGroupBys().addAll(Arrays.asList(column));
         return this;
     }
 
     @Override
-    public Linq<SOURCE> having() {
+    public Linq having() {
         return this;
     }
 
-    public Linq<SOURCE> limit(int size) {
+    public Linq limit(int size) {
         return this;
     }
 
-    public Linq<SOURCE> offset(int size) {
+    public Linq offset(int size) {
         return this;
     }
 

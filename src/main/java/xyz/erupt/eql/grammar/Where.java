@@ -7,74 +7,74 @@ import xyz.erupt.eql.schema.Column;
 import java.util.Map;
 import java.util.function.Function;
 
-public interface Where<SOURCE> {
+public interface Where {
 
 
-    default <R> Linq<SOURCE> between(SFunction<R, ?> column, Object start, Object end) {
+    default <R> Linq between(SFunction<R, ?> column, Object start, Object end) {
         return null;
     }
 
     //equals
-    default <R> Linq<SOURCE> eq(SFunction<R, ?> column, Object value) {
+    default <R> Linq eq(SFunction<R, ?> column, Object value) {
         return null;
     }
 
     //not equals
-    default <R> Linq<SOURCE> ne(SFunction<R, ?> column, Object value) {
+    default <R> Linq ne(SFunction<R, ?> column, Object value) {
         return null;
     }
 
     // >=
-    default <R> Linq<SOURCE> ge(SFunction<R, ?> column, Object value) {
+    default <R> Linq ge(SFunction<R, ?> column, Object value) {
         return null;
     }
 
     // <=
-    default <R> Linq<SOURCE> le(SFunction<R, ?> column, Object value) {
+    default <R> Linq le(SFunction<R, ?> column, Object value) {
         return null;
     }
 
     // >
-    default <R> Linq<SOURCE> gt(SFunction<R, ?> column, Object value) {
+    default <R> Linq gt(SFunction<R, ?> column, Object value) {
         return null;
     }
 
     // <
-    default <R> Linq<SOURCE> lt(SFunction<R, ?> column, Object value) {
+    default <R> Linq lt(SFunction<R, ?> column, Object value) {
         return null;
     }
 
-    default <R> Linq<SOURCE> like(SFunction<R, ?> column, Object value) {
+    default <R> Linq like(SFunction<R, ?> column, Object value) {
         return null;
     }
 
     //in
-    default <R> Linq<SOURCE> in(SFunction<R, ?> column, Object... value) {
+    default <R> Linq in(SFunction<R, ?> column, Object... value) {
         return null;
     }
 
 
     //not in
-    default <R> Linq<SOURCE> notIn(SFunction<R, ?> column, Object... value) {
+    default <R> Linq notIn(SFunction<R, ?> column, Object... value) {
         return null;
     }
 
 
-    default <R> Linq<SOURCE> isNull(SFunction<R, ?> column) {
+    default <R> Linq isNull(SFunction<R, ?> column) {
         Column c = Column.fromLambda(column);
         return condition(Column.of(column), (f) -> f.get(c) == null);
     }
 
-    default <R> Linq<SOURCE> isNotNull(SFunction<R, ?> column) {
+    default <R> Linq isNotNull(SFunction<R, ?> column) {
         Column<R> c = Column.fromLambda(column);
         return condition(Column.of(column), (f) -> f.get(c) != null);
     }
 
-    default <R> Linq<SOURCE> isNotBlank(SFunction<R, ?> column) {
+    default <R> Linq isNotBlank(SFunction<R, ?> column) {
         Column c = Column.fromLambda(column);
         return condition(Column.of(column), (f) -> f.get(c) != null && !f.get(c).toString().trim().isEmpty());
     }
 
-    <R> Linq<SOURCE> condition(Column<R> column, Function<Map<Column<R>, ?>, Boolean> fun);
+    <R> Linq condition(Column<R> column, Function<Map<Column<R>, ?>, Boolean> fun);
 
 }

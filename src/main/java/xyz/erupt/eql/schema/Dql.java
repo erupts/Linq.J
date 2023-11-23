@@ -1,6 +1,7 @@
 package xyz.erupt.eql.schema;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
@@ -9,6 +10,7 @@ public class Dql {
     //去重
     private boolean distinct = false;
 
+    private Collection<?> source;
     //列信息
     private List<Column<?>> columns = new ArrayList<>();
 
@@ -24,6 +26,15 @@ public class Dql {
     public boolean isDistinct() {
         return distinct;
     }
+
+    public Collection<?> getSource() {
+        return source;
+    }
+
+    public void setSource(Collection<?> source) {
+        this.source = source;
+    }
+
 
     public void setDistinct(boolean distinct) {
         this.distinct = distinct;

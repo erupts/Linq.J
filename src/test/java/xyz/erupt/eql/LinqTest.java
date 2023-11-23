@@ -22,7 +22,7 @@ public class LinqTest {
         List<Table2> t3 = new ArrayList<>();
 
         Linq.from(master)
-                .leftJoin(t2, Table2::getAge, Master::getAge)
+//                .leftJoin(t2, Table2::getAge, Master::getAge)
 //                .leftJoin(t3, (a, b) -> Objects.equals(a.getAge(), b.getAge()))
                 .between(Table2::getAge, new Date(), new Date())
                 .ne(Table2::getAge, 1)

@@ -3,9 +3,9 @@ package xyz.erupt.eql.grammar;
 import xyz.erupt.eql.Linq;
 import xyz.erupt.eql.schema.Column;
 
-public interface GroupBy<Source> {
+public interface GroupBy {
 
-    <R> Linq<Source> groupBy(Column... column);
+    <R> Linq groupBy(Column<?>... column);
 
-    Linq<Source> having();
+    Linq having();
 }
