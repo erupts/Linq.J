@@ -1,4 +1,4 @@
-package xyz.erupt.linq.fun;
+package xyz.erupt.eql.fun;
 
 public class LambdaInfo {
 

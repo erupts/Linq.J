@@ -1,11 +1,11 @@
-package xyz.erupt.linq.fun;
+package xyz.erupt.eql.fun;
 
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
 
 public class LambdaReflect {
 
-    public static <T, R> LambdaInfo getFieldName(SFunction<T, R> func) {
+    public static <T, R> LambdaInfo getInfo(SFunction<T, R> func) {
         try {
             Method method = func.getClass().getDeclaredMethod("writeReplace");
             method.setAccessible(true);

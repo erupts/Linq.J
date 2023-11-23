@@ -1,4 +1,4 @@
-package xyz.erupt.linq.schema;
+package xyz.erupt.eql.schema;
 
 import java.util.ArrayList;
 import java.util.List;

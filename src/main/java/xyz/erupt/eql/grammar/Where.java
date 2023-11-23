@@ -1,8 +1,8 @@
-package xyz.erupt.linq.grammar;
+package xyz.erupt.eql.grammar;
 
-import xyz.erupt.linq.Linq;
-import xyz.erupt.linq.fun.SFunction;
-import xyz.erupt.linq.schema.Column;
+import xyz.erupt.eql.Linq;
+import xyz.erupt.eql.fun.SFunction;
+import xyz.erupt.eql.schema.Column;
 
 import java.util.Map;
 import java.util.function.Function;

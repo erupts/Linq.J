@@ -1,8 +1,8 @@
-package xyz.erupt.linq.schema;
+package xyz.erupt.eql.schema;
 
-import xyz.erupt.linq.fun.LambdaInfo;
-import xyz.erupt.linq.fun.LambdaReflect;
-import xyz.erupt.linq.fun.SFunction;
+import xyz.erupt.eql.fun.LambdaInfo;
+import xyz.erupt.eql.fun.LambdaReflect;
+import xyz.erupt.eql.fun.SFunction;
 
 import java.util.Collection;
 import java.util.Map;
@@ -49,7 +49,7 @@ public class Column {
     }
 
     public static Column fromLambda(SFunction<?, ?> fun, String alias) {
-        LambdaInfo lambdaInfo = LambdaReflect.getFieldName(fun);
+        LambdaInfo lambdaInfo = LambdaReflect.getInfo(fun);
         Column column = new Column();
         column.table = lambdaInfo.getClazz();
         column.field = lambdaInfo.getField();

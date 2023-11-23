@@ -1,17 +1,15 @@
-package xyz.erupt.linq;
+package xyz.erupt.eql;
 
-import xyz.erupt.linq.consts.JoinMethod;
-import xyz.erupt.linq.fun.SFunction;
-import xyz.erupt.linq.grammar.*;
-import xyz.erupt.linq.schema.Dql;
-import xyz.erupt.linq.schema.JoinSchema;
-import xyz.erupt.linq.schema.Column;
+import xyz.erupt.eql.consts.JoinMethod;
+import xyz.erupt.eql.fun.SFunction;
+import xyz.erupt.eql.grammar.*;
+import xyz.erupt.eql.schema.Column;
+import xyz.erupt.eql.schema.Dql;
 
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class Linq<SOURCE> implements Select<SOURCE>, Join<SOURCE>, Where<SOURCE>, GroupBy<SOURCE>, OrderBy<SOURCE> {
 
@@ -67,6 +65,12 @@ public class Linq<SOURCE> implements Select<SOURCE>, Join<SOURCE>, Where<SOURCE>
     }
 
     @Override
+    public <T> Linq<SOURCE> join(JoinMethod joinMethod, Collection<T> target,
+                                 BiFunction<Map<Column, ?>, Map<Column, ?>, Boolean> on) {
+        return this;
+    }
+
+    @Override
     public <R> Linq<SOURCE> orderBy(SFunction<R, ?> column, Direction direction) {
         return this;
     }
@@ -75,17 +79,6 @@ public class Linq<SOURCE> implements Select<SOURCE>, Join<SOURCE>, Where<SOURCE>
     public <R> Linq<SOURCE> condition(Column column, Function<Map<Column, ?>, Boolean> fun) {
         this.dql.getConditions().add(fun);
         return this;
-    }
-
-    @Override
-    public <T1, T2> Linq<SOURCE> join(JoinMethod method, Class<T1> t1, Collection<T2> t2, BiFunction<T1, T2, Boolean> on) {
-        this.dql.getJoinSchemas().add(new JoinSchema<>(method, null, t2, on));
-        return null;
-    }
-
-    @Override
-    public <T1> Linq<SOURCE> join(JoinMethod method, Collection<T1> t1, BiFunction<T1, SOURCE, Boolean> on) {
-        return null;
     }
 
 

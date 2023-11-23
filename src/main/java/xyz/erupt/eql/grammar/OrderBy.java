@@ -1,7 +1,7 @@
-package xyz.erupt.linq.grammar;
+package xyz.erupt.eql.grammar;
 
-import xyz.erupt.linq.Linq;
-import xyz.erupt.linq.fun.SFunction;
+import xyz.erupt.eql.Linq;
+import xyz.erupt.eql.fun.SFunction;
 
 public interface OrderBy<Source> {
 

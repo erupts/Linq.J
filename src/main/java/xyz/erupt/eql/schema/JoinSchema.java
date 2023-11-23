@@ -1,6 +1,6 @@
-package xyz.erupt.linq.schema;
+package xyz.erupt.eql.schema;
 
-import xyz.erupt.linq.consts.JoinMethod;
+import xyz.erupt.eql.consts.JoinMethod;
 
 import java.util.Collection;
 import java.util.function.BiFunction;

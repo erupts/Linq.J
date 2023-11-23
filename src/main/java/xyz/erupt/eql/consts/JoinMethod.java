@@ -1,4 +1,4 @@
-package xyz.erupt.linq.consts;
+package xyz.erupt.eql.consts;
 
 public enum JoinMethod {
 
