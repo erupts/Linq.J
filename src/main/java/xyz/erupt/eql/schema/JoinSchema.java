@@ -2,55 +2,42 @@ package xyz.erupt.eql.schema;
 
 import xyz.erupt.eql.consts.JoinMethod;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.BiFunction;
 
-public class JoinSchema<S, T> {
+public class JoinSchema<T> {
 
-    private JoinMethod joinMethod;
+    private final JoinMethod joinMethod;
 
-    private Collection<S> source;
+    private final Collection<T> target;
 
-    private Collection<T> target;
+    private final Class<T> clazz;
 
-    private BiFunction<S, T, Boolean> on;
+    private BiFunction<Map<Column<T>, ?>, Map<Column<?>, ?>, Boolean> on;
 
-    public JoinSchema(JoinMethod joinMethod, Collection<S> source, Collection<T> target, BiFunction<S, T, Boolean> on) {
+    public JoinSchema(JoinMethod joinMethod, Collection<T> target, BiFunction<Map<Column<T>, ?>, Map<Column<?>, ?>, Boolean> on) {
         this.joinMethod = joinMethod;
-        this.source = source;
         this.target = target;
         this.on = on;
+        ParameterizedType parameterizedType = (ParameterizedType) target.getClass().getGenericSuperclass();
+        this.clazz = (Class<T>) parameterizedType.getActualTypeArguments()[0].getClass();
     }
 
     public JoinMethod getJoinMethod() {
         return joinMethod;
     }
 
-    public void setJoinMethod(JoinMethod joinMethod) {
-        this.joinMethod = joinMethod;
-    }
-
-    public Collection<S> getSource() {
-        return source;
-    }
-
-    public void setSource(Collection<S> source) {
-        this.source = source;
-    }
-
     public Collection<T> getTarget() {
         return target;
     }
 
-    public void setTarget(Collection<T> target) {
-        this.target = target;
-    }
-
-    public BiFunction<S, T, Boolean> getOn() {
+    public BiFunction<Map<Column<T>, ?>, Map<Column<?>, ?>, Boolean> getOn() {
         return on;
     }
 
-    public void setOn(BiFunction<S, T, Boolean> on) {
-        this.on = on;
+    public Class<T> getClazz() {
+        return clazz;
     }
 }

@@ -61,7 +61,7 @@ public interface Where {
 
 
     default <R> Linq isNull(SFunction<R, ?> column) {
-        Column c = Column.fromLambda(column);
+        Column<R> c = Column.fromLambda(column);
         return condition(Column.of(column), (f) -> f.get(c) == null);
     }
 
@@ -71,7 +71,7 @@ public interface Where {
     }
 
     default <R> Linq isNotBlank(SFunction<R, ?> column) {
-        Column c = Column.fromLambda(column);
+        Column<R> c = Column.fromLambda(column);
         return condition(Column.of(column), (f) -> f.get(c) != null && !f.get(c).toString().trim().isEmpty());
     }
 

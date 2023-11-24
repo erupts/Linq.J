@@ -1,30 +1,26 @@
 package xyz.erupt.eql;
 
 import org.junit.Test;
+import xyz.erupt.eql.consts.JoinMethod;
 import xyz.erupt.eql.data.Master;
 import xyz.erupt.eql.data.Table2;
+import xyz.erupt.eql.fun.SFunction;
 import xyz.erupt.eql.schema.Column;
 import xyz.erupt.eql.fun.LambdaReflect;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class LinqTest {
 
     @Test
     public void simple() {
-        List<Table2> result = new ArrayList<>();
 
         List<Master> master = new ArrayList<>();
-        List<Table2> t2 = new ArrayList<>();
-        List<Table2> t3 = new ArrayList<>();
-
-        Linq.from(master)
-                .leftJoin(t2, Table2::getAge, Master::getAge)
-                .between(Table2::getAge, new Date(), new Date())
-                .ne(Table2::getAge, 1)
+        List<Table2> table = new ArrayList<>();
+        List<Master> result = Linq.from(master)
+//                .leftJoin(table, Table2::getAge, Master::getAge)
+                .join(JoinMethod.LEFT, table, (l, r) -> l.get(Column.of(Table2::getAge)).equals(r.get(Column.of(Master::getAge))))
+                .isNull(Table2::getAge)
                 .groupBy(Column.of(Master::getAge), Column.of(Master::getName))
                 .having()
                 .orderBy(Master::getAge)
@@ -32,15 +28,14 @@ public class LinqTest {
                         Column.max(Master::getAge, "max"),
                         Column.min(Table2::getName, "min"),
                         Column.count(Table2::getName, "count"),
-                        Column.of(Master::getAge),
                         Column.ofs(m -> m.get("xx"), "xxx"),
                         Column.all(Master.class)
                 )
                 .distinct()
                 .limit(10)
                 .offset(10)
-                .write(result);
-        ;
+                .write(Master.class);
+        System.out.println(result);
     }
 
     @Test

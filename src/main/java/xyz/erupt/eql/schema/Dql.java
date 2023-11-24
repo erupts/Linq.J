@@ -10,18 +10,26 @@ public class Dql {
     //去重
     private boolean distinct = false;
 
+    private Long limit = null;
+
+    private Long offset = null;
+
     private Collection<?> source;
+
+    private Class<?> target;
     //列信息
     private List<Column<?>> columns = new ArrayList<>();
 
     //关联信息
-    private List<JoinSchema<?, ?>> joinSchemas = new ArrayList<>();
+    private List<JoinSchema<?>> joinSchemas = new ArrayList<>();
 
     //条件信息
     private List<Function<?, ?>> conditions = new ArrayList<>();
 
     //分组信息
     private List<Column<?>> groupBys = new ArrayList<>();
+
+
 
     public boolean isDistinct() {
         return distinct;
@@ -56,11 +64,11 @@ public class Dql {
         this.conditions = conditions;
     }
 
-    public List<JoinSchema<?, ?>> getJoinSchemas() {
+    public List<JoinSchema<?>> getJoinSchemas() {
         return joinSchemas;
     }
 
-    public void setJoinSchemas(List<JoinSchema<?, ?>> joinSchemas) {
+    public void setJoinSchemas(List<JoinSchema<?>> joinSchemas) {
         this.joinSchemas = joinSchemas;
     }
 
@@ -70,5 +78,29 @@ public class Dql {
 
     public void setGroupBys(List<Column<?>> groupBys) {
         this.groupBys = groupBys;
+    }
+
+    public Long getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Long limit) {
+        this.limit = limit;
+    }
+
+    public Long getOffset() {
+        return offset;
+    }
+
+    public void setOffset(Long offset) {
+        this.offset = offset;
+    }
+
+    public Class<?> getTarget() {
+        return target;
+    }
+
+    public void setTarget(Class<?> target) {
+        this.target = target;
     }
 }
