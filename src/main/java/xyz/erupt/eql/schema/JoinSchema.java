@@ -1,6 +1,7 @@
 package xyz.erupt.eql.schema;
 
 import xyz.erupt.eql.consts.JoinMethod;
+import xyz.erupt.eql.util.ReflectUtil;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
@@ -21,8 +22,7 @@ public class JoinSchema<T> {
         this.joinMethod = joinMethod;
         this.target = target;
         this.on = on;
-        ParameterizedType parameterizedType = (ParameterizedType) target.getClass().getGenericSuperclass();
-        this.clazz = (Class<T>) parameterizedType.getActualTypeArguments()[0].getClass();
+        this.clazz = (Class<T>) ReflectUtil.getActualType(target, 0);
     }
 
     public JoinMethod getJoinMethod() {

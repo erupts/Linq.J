@@ -14,11 +14,10 @@ public class LinqTest {
 
     @Test
     public void simple() {
-
         List<Master> master = new ArrayList<>();
         List<Table2> table = new ArrayList<>();
         List<Master> result = Linq.from(master)
-//                .leftJoin(table, Table2::getAge, Master::getAge)
+                .leftJoin(table, Table2::getAge, Master::getAge)
                 .join(JoinMethod.LEFT, table, (l, r) -> l.getName().equals(r.get(Column.of(Master::getAge))))
                 .isNull(Table2::getAge)
                 .groupBy(Column.of(Master::getAge), Column.of(Master::getName))
