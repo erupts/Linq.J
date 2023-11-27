@@ -1,4 +1,4 @@
-package xyz.erupt.eql.fun;
+package xyz.erupt.eql.lambda;
 
 import java.io.Serializable;
 import java.util.function.Function;

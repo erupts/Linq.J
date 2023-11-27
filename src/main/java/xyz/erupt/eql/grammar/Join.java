@@ -2,7 +2,7 @@ package xyz.erupt.eql.grammar;
 
 import xyz.erupt.eql.Linq;
 import xyz.erupt.eql.consts.JoinMethod;
-import xyz.erupt.eql.fun.SFunction;
+import xyz.erupt.eql.lambda.SFunction;
 import xyz.erupt.eql.schema.Column;
 import xyz.erupt.eql.schema.JoinSchema;
 import xyz.erupt.eql.util.ReflectUtil;

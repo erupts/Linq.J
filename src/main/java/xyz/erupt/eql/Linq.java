@@ -1,7 +1,7 @@
 package xyz.erupt.eql;
 
 import xyz.erupt.eql.exception.EqlException;
-import xyz.erupt.eql.fun.SFunction;
+import xyz.erupt.eql.lambda.SFunction;
 import xyz.erupt.eql.grammar.*;
 import xyz.erupt.eql.schema.Column;
 import xyz.erupt.eql.schema.Dql;

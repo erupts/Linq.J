@@ -1,10 +1,9 @@
 package xyz.erupt.eql.schema;
 
-import xyz.erupt.eql.fun.LambdaInfo;
-import xyz.erupt.eql.fun.LambdaReflect;
-import xyz.erupt.eql.fun.SFunction;
+import xyz.erupt.eql.lambda.LambdaInfo;
+import xyz.erupt.eql.lambda.LambdaReflect;
+import xyz.erupt.eql.lambda.SFunction;
 
-import java.util.Collection;
 import java.util.Map;
 
 public class Column<T> {

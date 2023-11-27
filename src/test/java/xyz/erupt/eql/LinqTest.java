@@ -4,9 +4,8 @@ import org.junit.Test;
 import xyz.erupt.eql.consts.JoinMethod;
 import xyz.erupt.eql.data.Master;
 import xyz.erupt.eql.data.Table2;
-import xyz.erupt.eql.fun.SFunction;
 import xyz.erupt.eql.schema.Column;
-import xyz.erupt.eql.fun.LambdaReflect;
+import xyz.erupt.eql.lambda.LambdaReflect;
 
 import java.util.*;
 

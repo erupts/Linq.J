@@ -1,4 +1,4 @@
-package xyz.erupt.eql.fun;
+package xyz.erupt.eql.lambda;
 
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
