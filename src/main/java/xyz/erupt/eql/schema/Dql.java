@@ -10,10 +10,6 @@ public class Dql {
     //去重
     private boolean distinct = false;
 
-    private Long limit = null;
-
-    private Long offset = null;
-
     private Collection<?> source;
 
     private Class<?> target;
@@ -29,6 +25,9 @@ public class Dql {
     //分组信息
     private List<Column<?>> groupBys = new ArrayList<>();
 
+    private Long limit = null;
+
+    private Long offset = null;
 
 
     public boolean isDistinct() {

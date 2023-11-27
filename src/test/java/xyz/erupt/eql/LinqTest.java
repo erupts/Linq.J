@@ -19,7 +19,7 @@ public class LinqTest {
         List<Table2> table = new ArrayList<>();
         List<Master> result = Linq.from(master)
 //                .leftJoin(table, Table2::getAge, Master::getAge)
-                .join(JoinMethod.LEFT, table, (l, r) -> l.get(Column.of(Table2::getAge)).equals(r.get(Column.of(Master::getAge))))
+                .join(JoinMethod.LEFT, table, (l, r) -> l.getName().equals(r.get(Column.of(Master::getAge))))
                 .isNull(Table2::getAge)
                 .groupBy(Column.of(Master::getAge), Column.of(Master::getName))
                 .having()

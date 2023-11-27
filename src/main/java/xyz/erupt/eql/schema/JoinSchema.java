@@ -15,9 +15,9 @@ public class JoinSchema<T> {
 
     private final Class<T> clazz;
 
-    private BiFunction<Map<Column<T>, ?>, Map<Column<?>, ?>, Boolean> on;
+    private final BiFunction<T, Map<Column<?>, ?>, Boolean> on;
 
-    public JoinSchema(JoinMethod joinMethod, Collection<T> target, BiFunction<Map<Column<T>, ?>, Map<Column<?>, ?>, Boolean> on) {
+    public JoinSchema(JoinMethod joinMethod, Collection<T> target, BiFunction<T, Map<Column<?>, ?>, Boolean> on) {
         this.joinMethod = joinMethod;
         this.target = target;
         this.on = on;
@@ -33,11 +33,11 @@ public class JoinSchema<T> {
         return target;
     }
 
-    public BiFunction<Map<Column<T>, ?>, Map<Column<?>, ?>, Boolean> getOn() {
-        return on;
-    }
-
     public Class<T> getClazz() {
         return clazz;
+    }
+
+    public BiFunction<T, Map<Column<?>, ?>, Boolean> getOn() {
+        return on;
     }
 }

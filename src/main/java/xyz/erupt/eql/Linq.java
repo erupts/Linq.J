@@ -1,6 +1,5 @@
 package xyz.erupt.eql;
 
-import xyz.erupt.eql.consts.JoinMethod;
 import xyz.erupt.eql.exception.EqlException;
 import xyz.erupt.eql.fun.SFunction;
 import xyz.erupt.eql.grammar.*;
@@ -10,7 +9,6 @@ import xyz.erupt.eql.schema.JoinSchema;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class Linq implements Select, Join, Where, GroupBy, OrderBy {
