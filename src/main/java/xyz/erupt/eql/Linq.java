@@ -19,7 +19,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy {
     private final Dql dql = new Dql();
 
     public <T> List<T> write(Class<T> clazz) {
-        this.dql.setTarget(clazz);
+//        this.dql.setTarget(clazz);
         return null;
     }
 
@@ -76,7 +76,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy {
     }
 
     @Override
-    public <R> Linq condition(Column<R> column, Function<Map<Column<R>, ?>, Boolean> fun) {
+    public <R> Linq condition(Column<R> column, Function<Map<Column<?>, ?>, Boolean> fun) {
         this.dql.getConditions().add(fun);
         return this;
     }

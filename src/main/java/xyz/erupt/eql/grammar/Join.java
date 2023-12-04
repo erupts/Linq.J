@@ -5,6 +5,7 @@ import xyz.erupt.eql.consts.JoinMethod;
 import xyz.erupt.eql.lambda.SFunction;
 import xyz.erupt.eql.schema.Column;
 import xyz.erupt.eql.schema.JoinSchema;
+import xyz.erupt.eql.util.Columns;
 import xyz.erupt.eql.util.ReflectUtil;
 
 import java.util.Collection;
@@ -21,8 +22,8 @@ public interface Join {
     }
 
     default <T, S> Linq join(JoinMethod joinMethod, Collection<T> target, SFunction<T, Object> onL, SFunction<S, Object> onR) {
-        Column<T> l = Column.fromLambda(onL);
-        Column<S> r = Column.fromLambda(onR);
+        Column<T> l = Columns.fromLambda(onL);
+        Column<S> r = Columns.fromLambda(onR);
         return join(new JoinSchema<>(joinMethod, target, (t1, t2) -> {
             Object lv = ReflectUtil.getFieldValue(t1, l.getField());
             Object rv = t2.get(r);

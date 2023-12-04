@@ -3,6 +3,7 @@ package xyz.erupt.eql.grammar;
 import xyz.erupt.eql.Linq;
 import xyz.erupt.eql.lambda.SFunction;
 import xyz.erupt.eql.schema.Column;
+import xyz.erupt.eql.util.Columns;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -61,20 +62,20 @@ public interface Where {
 
 
     default <R> Linq isNull(SFunction<R, ?> column) {
-        Column<R> c = Column.fromLambda(column);
-        return condition(Column.of(column), (f) -> f.get(c) == null);
+        Column<R> c = Columns.fromLambda(column);
+        return condition(Columns.of(column), (f) -> f.get(c) == null);
     }
 
     default <R> Linq isNotNull(SFunction<R, ?> column) {
-        Column<R> c = Column.fromLambda(column);
-        return condition(Column.of(column), (f) -> f.get(c) != null);
+        Column<R> c = Columns.fromLambda(column);
+        return condition(Columns.of(column), (f) -> f.get(c) != null);
     }
 
     default <R> Linq isNotBlank(SFunction<R, ?> column) {
-        Column<R> c = Column.fromLambda(column);
-        return condition(Column.of(column), (f) -> f.get(c) != null && !f.get(c).toString().trim().isEmpty());
+        Column<R> c = Columns.fromLambda(column);
+        return condition(Columns.of(column), (f) -> f.get(c) != null && !f.get(c).toString().trim().isEmpty());
     }
 
-    <R> Linq condition(Column<R> column, Function<Map<Column<R>, ?>, Boolean> fun);
+    <R> Linq condition(Column<R> column, Function<Map<Column<?>, ?>, Boolean> fun);
 
 }

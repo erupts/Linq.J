@@ -6,4 +6,7 @@ public class EqlException extends RuntimeException {
         super(message);
     }
 
+    public EqlException(Throwable cause) {
+        super(cause);
+    }
 }

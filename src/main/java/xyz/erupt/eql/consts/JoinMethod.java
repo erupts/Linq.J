@@ -4,6 +4,7 @@ public enum JoinMethod {
 
     LEFT,
     RIGHT,
-    INNER
+    INNER,
+    FULL
 
 }

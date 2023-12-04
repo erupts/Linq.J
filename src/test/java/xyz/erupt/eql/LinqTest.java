@@ -6,6 +6,7 @@ import xyz.erupt.eql.data.Master;
 import xyz.erupt.eql.data.Table2;
 import xyz.erupt.eql.schema.Column;
 import xyz.erupt.eql.lambda.LambdaReflect;
+import xyz.erupt.eql.util.Columns;
 
 import java.util.*;
 
@@ -17,17 +18,17 @@ public class LinqTest {
         List<Table2> table = new ArrayList<>();
         List<Master> result = Linq.from(master)
                 .leftJoin(table, Table2::getAge, Master::getAge)
-                .join(JoinMethod.LEFT, table, (l, r) -> l.getName().equals(r.get(Column.of(Master::getAge))))
+                .join(JoinMethod.LEFT, table, (l, r) -> l.getName().equals(r.get(Columns.of(Master::getAge))))
                 .isNull(Table2::getAge)
-                .groupBy(Column.of(Master::getAge), Column.of(Master::getName))
+                .groupBy(Columns.of(Master::getAge), Columns.of(Master::getName))
                 .having()
                 .orderBy(Master::getAge)
                 .select(
-                        Column.max(Master::getAge, "max"),
-                        Column.min(Table2::getName, "min"),
-                        Column.count(Table2::getName, "count"),
-                        Column.ofs(m -> m.get("xx"), "xxx"),
-                        Column.all(Master.class)
+                        Columns.max(Master::getAge, "max"),
+                        Columns.min(Table2::getName, "min"),
+                        Columns.count(Table2::getName, "count"),
+                        Columns.ofs(m -> m.get("xx"), "xxx"),
+                        Columns.all(Master.class)
                 )
                 .distinct()
                 .limit(10)

@@ -3,6 +3,7 @@ package xyz.erupt.eql.schema;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public class Dql {
@@ -12,7 +13,6 @@ public class Dql {
 
     private Collection<?> source;
 
-    private Class<?> target;
     //列信息
     private List<Column<?>> columns = new ArrayList<>();
 
@@ -20,7 +20,7 @@ public class Dql {
     private List<JoinSchema<?>> joinSchemas = new ArrayList<>();
 
     //条件信息
-    private List<Function<?, ?>> conditions = new ArrayList<>();
+    private List<Function<Map<Column<?>, ?>, Boolean>> conditions = new ArrayList<>();
 
     //分组信息
     private List<Column<?>> groupBys = new ArrayList<>();
@@ -55,11 +55,11 @@ public class Dql {
         this.columns = columns;
     }
 
-    public List<Function<?, ?>> getConditions() {
+    public List<Function<Map<Column<?>, ?>, Boolean>> getConditions() {
         return conditions;
     }
 
-    public void setConditions(List<Function<?, ?>> conditions) {
+    public void setConditions(List<Function<Map<Column<?>, ?>, Boolean>> conditions) {
         this.conditions = conditions;
     }
 
@@ -95,11 +95,4 @@ public class Dql {
         this.offset = offset;
     }
 
-    public Class<?> getTarget() {
-        return target;
-    }
-
-    public void setTarget(Class<?> target) {
-        this.target = target;
-    }
 }
