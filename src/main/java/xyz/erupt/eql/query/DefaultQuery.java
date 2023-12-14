@@ -12,9 +12,15 @@ public class DefaultQuery extends Query {
     @Override
     public <T> Collection<T> dql(Dql dql, Class<T> target) {
         List<Map<Column<?>, ?>> table = LambdaInfo.objectToLambdaInfos(dql.getSource());
-        //join process
+        // join process
         if (!dql.getJoinSchemas().isEmpty()) {
             for (JoinSchema<?> joinSchema : dql.getJoinSchemas()) {
+                switch (joinSchema.getJoinExchange()) {
+                    case HASH:
+                        break;
+                    case NESTED_LOOP:
+                        break;
+                }
                 for (Map<Column<?>, ?> map : table) {
                     for (Object t : joinSchema.getTarget()) {
                         //是否关联
@@ -62,7 +68,7 @@ public class DefaultQuery extends Query {
                 for (Column<?> dqlColumn : dql.getColumns()) {
                     if (target == Map.class) {
 
-                    }else{
+                    } else {
                         if (dqlColumn == column) {
                             map.put(dqlColumn, t.get(dqlColumn));
                         }
