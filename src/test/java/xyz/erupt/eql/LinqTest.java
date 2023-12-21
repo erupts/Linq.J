@@ -63,7 +63,7 @@ public class LinqTest {
 
     @Test
     public void conditionEqTest() {
-        Linq.from(source).eq(Master::getName, "d").write(null);
+        Linq.from(source).ne(Master::getName, 1).write(null);
     }
 
     @Test
@@ -81,11 +81,26 @@ public class LinqTest {
         Linq.from(source).like(Master::getName, 'a').write(null);
     }
 
+    @Test
+    public void conditionLtTest() {
+        Linq.from(source).gt(Master::getName, "bb").write(null);
+    }
+
 
     @Test
     public void eqTest() {
         Date date = new Date();
+        Float a = 1.11F;
+        Float b = 1.01F;
+        System.out.println(a.hashCode() > b.hashCode());
         assert eq(date, date);
+    }
+
+    @Test
+    public void compareTest() {
+        Date date = new Date();
+        Date date2 = new Date();
+        System.out.println(null instanceof Comparable);
     }
 
     private boolean eq(Object a, Object b) {

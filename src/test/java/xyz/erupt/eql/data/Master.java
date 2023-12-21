@@ -26,6 +26,14 @@ public class Master {
         this.name = name;
     }
 
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     public Master(Integer age, String name, Date date) {
         this.age = age;
         this.name = name;

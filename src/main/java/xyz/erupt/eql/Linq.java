@@ -18,9 +18,14 @@ import java.util.function.Function;
 
 public class Linq implements Select, Join, Where, GroupBy, OrderBy {
 
-    private final Query query = new DefaultQuery();
+    private final Query query;
 
     private Linq() {
+        this.query = new DefaultQuery();
+    }
+
+    private Linq(Query query) {
+        this.query = query;
     }
 
     private final Dql dql = new Dql();

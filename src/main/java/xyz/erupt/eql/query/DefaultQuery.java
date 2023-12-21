@@ -1,6 +1,8 @@
 package xyz.erupt.eql.query;
 
+import xyz.erupt.eql.consts.JoinExchange;
 import xyz.erupt.eql.consts.JoinMethod;
+import xyz.erupt.eql.exception.EqlException;
 import xyz.erupt.eql.lambda.LambdaInfo;
 import xyz.erupt.eql.schema.Column;
 import xyz.erupt.eql.schema.Dql;
@@ -20,50 +22,45 @@ public class DefaultQuery extends Query {
             for (JoinSchema<?> joinSchema : dql.getJoinSchemas()) {
                 Column<?> lon = Columns.fromLambda(joinSchema.getLon());
                 Column<?> ron = Columns.fromLambda(joinSchema.getRon());
-                switch (joinSchema.getJoinExchange()) {
-                    case HASH:
-                        switch (joinSchema.getJoinMethod()) {
-                            case LEFT:
-                            case INNER:
-                                Map<Object, Map<Column<?>, ?>> rightMap = new HashMap<>();
-                                for (Map<Column<?>, Object> tm : LambdaInfo.objectToLambdaInfos(joinSchema.getTarget())) {
-                                    rightMap.put(tm.get(lon), tm);
+                if (joinSchema.getJoinExchange() == JoinExchange.HASH) {
+                    switch (joinSchema.getJoinMethod()) {
+                        case LEFT:
+                        case INNER:
+                        case FULL:
+                            Map<Object, Map<Column<?>, ?>> rightMap = new HashMap<>();
+                            List<Map<Column<?>, Object>> targetList = LambdaInfo.objectToLambdaInfos(joinSchema.getTarget());
+                            for (Map<Column<?>, Object> tm : targetList) {
+                                rightMap.put(tm.get(lon), tm);
+                            }
+                            for (Map<Column<?>, Object> map : table) {
+                                if (rightMap.containsKey(map.get(ron))) {
+                                    Map<Column<?>, ?> m = rightMap.get(map.get(ron));
+                                    map.putAll(m);
                                 }
-                                for (Map<Column<?>, Object> map : table) {
-                                    if (rightMap.containsKey(map.get(ron))) {
-                                        Map<Column<?>, ?> m = rightMap.get(map.get(ron));
-                                        map.putAll(m);
-                                    }
+                            }
+                            if (JoinMethod.INNER == joinSchema.getJoinMethod()) {
+                                table.removeIf(it -> !it.containsKey(lon));
+                            } else if (JoinMethod.FULL == joinSchema.getJoinMethod()) {
+                                //TODO
+                            }
+                            break;
+                        case RIGHT:
+                            Map<Object, Map<Column<?>, ?>> leftMap = new HashMap<>();
+                            for (Map<Column<?>, ?> tm : table) {
+                                leftMap.put(tm.get(ron), tm);
+                            }
+                            table.clear();
+                            for (Map<Column<?>, Object> map : LambdaInfo.objectToLambdaInfos(joinSchema.getTarget())) {
+                                table.add(map);
+                                if (leftMap.containsKey(map.get(lon))) {
+                                    Map<Column<?>, ?> m = leftMap.get(map.get(lon));
+                                    map.putAll(m);
                                 }
-                                if (JoinMethod.INNER == joinSchema.getJoinMethod()) {
-                                    table.removeIf(it -> !it.containsKey(lon));
-                                }
-                                break;
-                            case RIGHT:
-                                Map<Object, Map<Column<?>, ?>> leftMap = new HashMap<>();
-                                for (Map<Column<?>, ?> tm : table) {
-                                    leftMap.put(tm.get(ron), tm);
-                                }
-                                table.clear();
-                                for (Map<Column<?>, Object> map : LambdaInfo.objectToLambdaInfos(joinSchema.getTarget())) {
-                                    table.add(map);
-                                    if (leftMap.containsKey(map.get(lon))) {
-                                        Map<Column<?>, ?> m = leftMap.get(map.get(lon));
-                                        map.putAll(m);
-                                    }
-                                }
-                                break;
-                        }
-                        break;
-                    case NESTED_LOOP:
-//                        for (Map<Column<?>, ?> map : table) {
-//                            for (Object t : joinSchema.getTarget()) {
-//                                是否关联
-//                                if (joinSchema.getOn().apply(t, map)) {
-//                                }
-//                            }
-//                        }
-                        break;
+                            }
+                            break;
+                    }
+                } else {
+                    throw new EqlException(joinSchema.getJoinExchange().name() + " is not supported yet");
                 }
             }
         }
@@ -80,7 +77,7 @@ public class DefaultQuery extends Query {
         System.out.println(table);
 
         // group process
-        Map<List<String>, List<Map<Column<?>, ?>>> abc;
+        Map<List<Column<?>>, List<Map<Column<?>, ?>>> abc;
         for (Column<?> groupBy : dql.getGroupBys()) {
             //联动 select
         }
