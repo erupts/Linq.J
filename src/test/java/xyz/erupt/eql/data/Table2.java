@@ -6,6 +6,11 @@ public class Table2 {
 
     private String name;
 
+    public Table2(Integer age, String name) {
+        this.age = age;
+        this.name = name;
+    }
+
     public Integer getAge() {
         return age;
     }

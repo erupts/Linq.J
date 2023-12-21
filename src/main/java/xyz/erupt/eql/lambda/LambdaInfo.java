@@ -40,8 +40,8 @@ public class LambdaInfo<T> {
         return columnObjectMap;
     }
 
-    public static List<Map<Column<?>, ?>> objectToLambdaInfos(Collection<?> objects) {
-        List<Map<Column<?>, ?>> list = new ArrayList<>();
+    public static List<Map<Column<?>, Object>> objectToLambdaInfos(Collection<?> objects) {
+        List<Map<Column<?>, Object>> list = new ArrayList<>();
         for (Object object : objects) {
             list.add(objectToColumnMap(object));
         }

@@ -6,6 +6,8 @@ import xyz.erupt.eql.exception.EqlException;
 import xyz.erupt.eql.grammar.*;
 import xyz.erupt.eql.lambda.LambdaReflect;
 import xyz.erupt.eql.lambda.SFunction;
+import xyz.erupt.eql.query.DefaultQuery;
+import xyz.erupt.eql.query.Query;
 import xyz.erupt.eql.schema.Column;
 import xyz.erupt.eql.schema.Dql;
 import xyz.erupt.eql.schema.JoinSchema;
@@ -16,12 +18,15 @@ import java.util.function.Function;
 
 public class Linq implements Select, Join, Where, GroupBy, OrderBy {
 
+    private final Query query = new DefaultQuery();
+
     private Linq() {
     }
 
     private final Dql dql = new Dql();
 
     public <T> List<T> write(Class<T> clazz) {
+        query.dql(this.dql, clazz);
 //        this.dql.setTarget(clazz);
         return null;
     }
@@ -49,7 +54,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy {
             if (column.getField() == null) {
                 // Column.All → select *
                 for (Field field : column.getTable().getDeclaredFields()) {
-                    cols.add(new Column<>(column.getTable(), field.getName(), field.getName()));
+                    cols.add(new Column<>(column.getTable(), field.getType(), field.getName(), field.getName()));
                 }
             } else {
                 cols.add(column);

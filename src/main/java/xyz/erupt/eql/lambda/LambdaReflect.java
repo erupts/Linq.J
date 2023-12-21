@@ -5,17 +5,22 @@ import java.lang.reflect.Method;
 
 public class LambdaReflect {
 
+    private static final String GET = "get";
+
+    private static final String IS = "is";
+
+
     public static <T, R> LambdaInfo<T> getInfo(SFunction<T, R> func) {
         try {
             Method method = func.getClass().getDeclaredMethod("writeReplace");
             method.setAccessible(true);
             SerializedLambda serializedLambda = (SerializedLambda) method.invoke(func);
             String fieldName = serializedLambda.getImplMethodName();
-            if (fieldName.startsWith("get")) {
-                fieldName = fieldName.substring(3);
+            if (fieldName.startsWith(GET)) {
+                fieldName = fieldName.substring(GET.length());
             }
-            if (fieldName.startsWith("is")) {
-                fieldName = fieldName.substring(2);
+            if (fieldName.startsWith(IS)) {
+                fieldName = fieldName.substring(IS.length());
             }
             return new LambdaInfo<>(
                     (Class<T>) Class.forName(serializedLambda.getImplClass().replace("/", ".")),

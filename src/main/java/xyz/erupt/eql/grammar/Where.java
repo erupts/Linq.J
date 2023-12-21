@@ -5,6 +5,8 @@ import xyz.erupt.eql.lambda.SFunction;
 import xyz.erupt.eql.schema.Column;
 import xyz.erupt.eql.util.Columns;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -17,7 +19,8 @@ public interface Where {
 
     //equals
     default <R> Linq eq(SFunction<R, ?> column, Object value) {
-        return null;
+        Column<R> c = Columns.fromLambda(column);
+        return condition(Columns.of(column), (f) -> value.equals(f.get(c)));
     }
 
     //not equals
@@ -46,18 +49,28 @@ public interface Where {
     }
 
     default <R> Linq like(SFunction<R, ?> column, Object value) {
-        return null;
+        Column<R> c = Columns.fromLambda(column);
+        return condition(Columns.of(column), (f) -> f.get(c) != null && value != null && f.get(c).toString().contains(value.toString()));
     }
 
     //in
     default <R> Linq in(SFunction<R, ?> column, Object... value) {
-        return null;
+        Column<R> c = Columns.fromLambda(column);
+        return condition(Columns.of(column), (f) -> f.get(c) != null && Arrays.stream(value).anyMatch(it -> null != it && it.equals(f.get(c))));
     }
 
+    default <R> Linq in(SFunction<R, ?> column, List<Object> value) {
+        return in(column, value.toArray());
+    }
 
     //not in
     default <R> Linq notIn(SFunction<R, ?> column, Object... value) {
-        return null;
+        Column<R> c = Columns.fromLambda(column);
+        return condition(Columns.of(column), (f) -> f.get(c) != null && Arrays.stream(value).noneMatch(it -> null != it && it.equals(f.get(c))));
+    }
+
+    default <R> Linq notIn(SFunction<R, ?> column, List<Object> value) {
+        return notIn(column, value.toArray());
     }
 
 
@@ -69,6 +82,11 @@ public interface Where {
     default <R> Linq isNotNull(SFunction<R, ?> column) {
         Column<R> c = Columns.fromLambda(column);
         return condition(Columns.of(column), (f) -> f.get(c) != null);
+    }
+
+    default <R> Linq isBlank(SFunction<R, ?> column) {
+        Column<R> c = Columns.fromLambda(column);
+        return condition(Columns.of(column), (f) -> f.get(c) == null || f.get(c).toString().trim().isEmpty());
     }
 
     default <R> Linq isNotBlank(SFunction<R, ?> column) {

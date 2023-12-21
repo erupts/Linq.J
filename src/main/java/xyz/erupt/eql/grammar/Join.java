@@ -15,8 +15,7 @@ public interface Join {
     <T> Linq join(JoinSchema<T> joinSchema);
 
 
-    <T, S> Linq join(JoinMethod joinMethod, Collection<T> target, SFunction<T, Object> onL, SFunction<S, Object> onR) ;
-
+    <T, S> Linq join(JoinMethod joinMethod, Collection<T> target, SFunction<T, Object> onL, SFunction<S, Object> onR);
 
 
     default <T> Linq join(JoinMethod joinMethod, Collection<T> target, BiFunction<T, Map<Column<?>, ?>, Boolean> on) {
@@ -39,8 +38,16 @@ public interface Join {
 //        }));
 //    }
 
+    default <L, R> Linq innerJoin(Collection<L> t, SFunction<L, Object> lon, SFunction<R, Object> ron) {
+        return this.join(JoinMethod.INNER, t, lon, ron);
+    }
+
     default <L, R> Linq leftJoin(Collection<L> t, SFunction<L, Object> lon, SFunction<R, Object> ron) {
         return this.join(JoinMethod.LEFT, t, lon, ron);
+    }
+
+    default <L, R> Linq rightJoin(Collection<L> t, SFunction<L, Object> lon, SFunction<R, Object> ron) {
+        return this.join(JoinMethod.RIGHT, t, lon, ron);
     }
 
 }
