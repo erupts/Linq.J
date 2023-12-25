@@ -36,6 +36,10 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy {
         return null;
     }
 
+    public <T> T writeOne(Class<T> clazz) {
+        return null;
+    }
+
     public List<Map<String, Object>> writeToMap() {
         return null;
     }
@@ -121,12 +125,12 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy {
         return this;
     }
 
-    public Linq limit(long size) {
+    public Linq limit(int size) {
         this.dql.setLimit(size);
         return this;
     }
 
-    public Linq offset(long size) {
+    public Linq offset(int size) {
         this.dql.setOffset(size);
         return this;
     }

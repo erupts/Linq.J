@@ -50,4 +50,8 @@ public interface Join {
         return this.join(JoinMethod.RIGHT, t, lon, ron);
     }
 
+    default <L, R> Linq fullJoin(Collection<L> t, SFunction<L, Object> lon, SFunction<R, Object> ron) {
+        return this.join(JoinMethod.FULL, t, lon, ron);
+    }
+
 }

@@ -11,6 +11,7 @@ import xyz.erupt.eql.util.Columns;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DefaultQuery extends Query {
 
@@ -27,35 +28,26 @@ public class DefaultQuery extends Query {
                         case LEFT:
                         case INNER:
                         case FULL:
-                            Map<Object, Map<Column<?>, ?>> rightMap = new HashMap<>();
-                            List<Map<Column<?>, Object>> targetList = LambdaInfo.objectToLambdaInfos(joinSchema.getTarget());
-                            for (Map<Column<?>, Object> tm : targetList) {
-                                rightMap.put(tm.get(lon), tm);
-                            }
+                            List<Map<Column<?>, Object>> targetData = LambdaInfo.objectToLambdaInfos(joinSchema.getTarget());
+                            Map<Object, Map<Column<?>, ?>> rightMap = targetData.stream().collect(Collectors.toMap(map -> map.get(lon), map -> map));
                             for (Map<Column<?>, Object> map : table) {
-                                if (rightMap.containsKey(map.get(ron))) {
-                                    Map<Column<?>, ?> m = rightMap.get(map.get(ron));
-                                    map.putAll(m);
-                                }
+                                if (rightMap.containsKey(map.get(ron))) map.putAll(rightMap.get(map.get(ron)));
                             }
-                            if (JoinMethod.INNER == joinSchema.getJoinMethod()) {
+                            if (JoinMethod.INNER == joinSchema.getJoinMethod())
                                 table.removeIf(it -> !it.containsKey(lon));
-                            } else if (JoinMethod.FULL == joinSchema.getJoinMethod()) {
-                                //TODO
+                            if (JoinMethod.FULL == joinSchema.getJoinMethod()) {
+                                Map<Object, Map<Column<?>, ?>> leftMap = table.stream().collect(Collectors.toMap(map -> map.get(ron), map -> map));
+                                for (Map<Column<?>, Object> tmap : targetData) {
+                                    if (!leftMap.containsKey(tmap.get(lon))) table.add(tmap);
+                                }
                             }
                             break;
                         case RIGHT:
-                            Map<Object, Map<Column<?>, ?>> leftMap = new HashMap<>();
-                            for (Map<Column<?>, ?> tm : table) {
-                                leftMap.put(tm.get(ron), tm);
-                            }
+                            Map<Object, Map<Column<?>, ?>> leftMap = table.stream().collect(Collectors.toMap(map -> map.get(ron), map -> map));
                             table.clear();
                             for (Map<Column<?>, Object> map : LambdaInfo.objectToLambdaInfos(joinSchema.getTarget())) {
                                 table.add(map);
-                                if (leftMap.containsKey(map.get(lon))) {
-                                    Map<Column<?>, ?> m = leftMap.get(map.get(lon));
-                                    map.putAll(m);
-                                }
+                                if (leftMap.containsKey(map.get(lon))) map.putAll(leftMap.get(map.get(lon)));
                             }
                             break;
                     }
@@ -64,23 +56,30 @@ public class DefaultQuery extends Query {
                 }
             }
         }
-
         // condition process
         table.removeIf(it -> {
-            boolean remove = false;
             for (Function<Map<Column<?>, ?>, Boolean> condition : dql.getConditions()) {
-                if (!condition.apply(it)) remove = true;
+                if (!condition.apply(it)) return true;
             }
-            return remove;
+            return false;
         });
-
-        System.out.println(table);
-
         // group process
-        Map<List<Column<?>>, List<Map<Column<?>, ?>>> abc;
+        Map<String, List<Map<Column<?>, ?>>> abc;
         for (Column<?> groupBy : dql.getGroupBys()) {
             //联动 select
         }
+
+        // order by process
+
+        // limit
+        if (null != dql.getOffset()) {
+            table = dql.getOffset() > table.size() ? new ArrayList<>(0) : table.subList(dql.getOffset(), table.size());
+        }
+        if (null != dql.getLimit()) {
+            table = table.subList(0, dql.getLimit() > table.size() ? table.size() : dql.getLimit());
+        }
+
+        System.out.println(table);
 
         List<T> result = new ArrayList<>();
         // select process
@@ -97,7 +96,6 @@ public class DefaultQuery extends Query {
                     }
                 }
             }
-//            result.add(map);
         }
         return result;
     }

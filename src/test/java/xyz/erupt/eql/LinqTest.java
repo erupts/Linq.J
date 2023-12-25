@@ -23,7 +23,7 @@ public class LinqTest {
         source.add(new Master(1, "a", new Date()));
         source.add(new Master(2, "bb", new Date()));
         source.add(new Master(3, "cc", new Date()));
-        source.add(new Master(4, "aa", new Date()));
+        source.add(new Master(null, null, new Date()));
 
         target.add(new Table2(1, "a"));
         target.add(new Table2(2, "c"));
@@ -34,9 +34,10 @@ public class LinqTest {
     public void simple() {
         List<Master> result = Linq.from(source)
 //                .leftJoin(target, Table2::getAge, Master::getAge)
-                .rightJoin(target, Table2::getAge, Master::getAge)
+                .fullJoin(target, Table2::getAge, Master::getAge)
 //                .join(JoinMethod.LEFT, target, (l, r) -> l.getName().equals(r.get(Columns.of(Master::getAge))))
-                .isNotBlank(Table2::getAge)
+                .eq(Table2::getName, "a")
+                .gt(Table2::getAge, 1)
                 .groupBy(Columns.of(Master::getAge), Columns.of(Master::getName))
                 .having()
                 .orderBy(Master::getAge)
@@ -48,8 +49,8 @@ public class LinqTest {
                         Columns.all(Master.class)
                 )
                 .distinct()
-                .limit(10)
-                .offset(10)
+                .limit(9)
+                .offset(0)
                 .write(Master.class);
         System.out.println(result);
     }

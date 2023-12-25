@@ -25,9 +25,9 @@ public class Dql {
     //分组信息
     private List<Column<?>> groupBys = new ArrayList<>();
 
-    private Long limit = null;
+    private Integer limit = null;
 
-    private Long offset = null;
+    private Integer offset = null;
 
 
     public boolean isDistinct() {
@@ -79,19 +79,19 @@ public class Dql {
         this.groupBys = groupBys;
     }
 
-    public Long getLimit() {
+    public Integer getLimit() {
         return limit;
     }
 
-    public void setLimit(Long limit) {
+    public void setLimit(Integer limit) {
         this.limit = limit;
     }
 
-    public Long getOffset() {
+    public Integer getOffset() {
         return offset;
     }
 
-    public void setOffset(Long offset) {
+    public void setOffset(Integer offset) {
         this.offset = offset;
     }
 
