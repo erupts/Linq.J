@@ -5,7 +5,7 @@ import xyz.erupt.eql.schema.Column;
 
 public interface GroupBy {
 
-    Linq groupBy(Column<?>... column);
+    Linq groupBy(Column<?>... columns);
 
     Linq having();
 }

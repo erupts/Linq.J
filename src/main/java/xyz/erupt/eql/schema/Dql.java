@@ -19,11 +19,14 @@ public class Dql {
     //关联信息
     private List<JoinSchema<?>> joinSchemas = new ArrayList<>();
 
-    //条件信息
+    //条件过滤控制
     private List<Function<Map<Column<?>, ?>, Boolean>> conditions = new ArrayList<>();
 
-    //分组信息
+    //分组控制
     private List<Column<?>> groupBys = new ArrayList<>();
+
+    //排序控制
+    private List<Column<?>> orderBys = new ArrayList<>();
 
     private Integer limit = null;
 
@@ -95,4 +98,11 @@ public class Dql {
         this.offset = offset;
     }
 
+    public List<Column<?>> getOrderBys() {
+        return orderBys;
+    }
+
+    public void setOrderBys(List<Column<?>> orderBys) {
+        this.orderBys = orderBys;
+    }
 }

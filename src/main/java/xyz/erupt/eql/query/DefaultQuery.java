@@ -18,7 +18,7 @@ public class DefaultQuery extends Query {
     @Override
     public <T> Collection<T> dql(Dql dql, Class<T> target) {
         List<Map<Column<?>, Object>> table = LambdaInfo.objectToLambdaInfos(dql.getSource());
-        // join process
+        // x join process
         if (!dql.getJoinSchemas().isEmpty()) {
             for (JoinSchema<?> joinSchema : dql.getJoinSchemas()) {
                 Column<?> lon = Columns.fromLambda(joinSchema.getLon());
@@ -63,10 +63,39 @@ public class DefaultQuery extends Query {
             }
             return false;
         });
-        // group process
-        Map<String, List<Map<Column<?>, ?>>> abc;
-        for (Column<?> groupBy : dql.getGroupBys()) {
-            //联动 select
+        // group by process
+        if (null != dql.getGroupBys()) {
+            Map<String, List<Map<Column<?>, ?>>> groupMap = new HashMap<>();
+            for (Map<Column<?>, Object> columns : table) {
+                StringBuilder key = new StringBuilder();
+                for (Column<?> groupBy : dql.getGroupBys()) {
+                    if (null != groupBy.getValueConvertFun()) {
+                        key.append(groupBy.getValueConvertFun().apply(columns.get(groupBy)));
+                    } else {
+                        key.append(columns.get(groupBy));
+                    }
+                }
+                if (!groupMap.containsKey(key.toString())) {
+                    groupMap.put(key.toString(), new ArrayList<>());
+                }
+                groupMap.get(key.toString()).add(columns);
+            }
+            table.clear();
+            for (Map.Entry<String, List<Map<Column<?>, ?>>> entry : groupMap.entrySet()) {
+                Map<Column<?>, Object> values = new HashMap<>(dql.getColumns().size());
+                table.add(values);
+                for (Column<?> column : dql.getColumns()) {
+                    Object val = null;
+                    if (null != column.getGroupByFun()) {
+                        val = column.getGroupByFun().apply(entry.getValue());
+                    } else {
+                        if (!entry.getValue().isEmpty()) {
+                            val = entry.getValue().get(0).get(column);
+                        }
+                    }
+                    values.put(column, val);
+                }
+            }
         }
 
         // order by process
@@ -96,6 +125,10 @@ public class DefaultQuery extends Query {
                     }
                 }
             }
+        }
+        // distinct process
+        if (dql.isDistinct()) {
+            result = result.stream().distinct().collect(Collectors.toList());
         }
         return result;
     }

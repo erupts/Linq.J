@@ -1,6 +1,9 @@
 package xyz.erupt.eql.schema;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 public class Column<T> {
 
@@ -11,6 +14,12 @@ public class Column<T> {
     private String field;
 
     private String alias;
+
+    //列值转换处理逻辑
+    private Function<Object, Object> valueConvertFun;
+
+    //列在分组场景的处理函数
+    private Function<List<Map<Column<?>, ?>>, Object> groupByFun;
 
     public Column() {
     }
@@ -65,5 +74,26 @@ public class Column<T> {
 
     public void setFieldType(Class<?> fieldType) {
         this.fieldType = fieldType;
+    }
+
+    public Column(Function<Object, Object> valueConvertFun, Function<List<Map<Column<?>, ?>>, Object> groupByFun) {
+        this.valueConvertFun = valueConvertFun;
+        this.groupByFun = groupByFun;
+    }
+
+    public Function<List<Map<Column<?>, ?>>, Object> getGroupByFun() {
+        return groupByFun;
+    }
+
+    public void setGroupByFun(Function<List<Map<Column<?>, ?>>, Object> groupByFun) {
+        this.groupByFun = groupByFun;
+    }
+
+    public Function<Object, Object> getValueConvertFun() {
+        return valueConvertFun;
+    }
+
+    public void setValueConvertFun(Function<Object, Object> valueConvertFun) {
+        this.valueConvertFun = valueConvertFun;
     }
 }

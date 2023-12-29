@@ -34,11 +34,11 @@ public class LinqTest {
     public void simple() {
         List<Master> result = Linq.from(source)
 //                .leftJoin(target, Table2::getAge, Master::getAge)
-                .fullJoin(target, Table2::getAge, Master::getAge)
+                .innerJoin(target, Table2::getAge, Master::getAge)
 //                .join(JoinMethod.LEFT, target, (l, r) -> l.getName().equals(r.get(Columns.of(Master::getAge))))
-                .eq(Table2::getName, "a")
-                .gt(Table2::getAge, 1)
-                .groupBy(Columns.of(Master::getAge), Columns.of(Master::getName))
+//                .eq(Table2::getName, "a")
+//                .gt(Table2::getAge, 1)
+                .groupBy(Columns.of(Master::getName))
                 .having()
                 .orderBy(Master::getAge)
                 .select(
@@ -53,6 +53,21 @@ public class LinqTest {
                 .offset(0)
                 .write(Master.class);
         System.out.println(result);
+    }
+
+
+    @Test
+    public void groupBy() {
+        List<Master> result = Linq.from(source)
+                .innerJoin(target, Table2::getAge, Master::getAge)
+                .groupBy(Columns.of(Master::getName))
+                .select(
+                        Columns.of(Master::getAge),
+                        Columns.sum(Master::getAge, "sum"),
+                        Columns.avg(Master::getAge, "avg"),
+                        Columns.count(Master::getName, "ncount")
+                )
+                .write(Master.class);
     }
 
     @Test
