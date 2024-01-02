@@ -1,5 +1,6 @@
 package xyz.erupt.eql.util;
 
+import xyz.erupt.eql.consts.CompareSymbol;
 import xyz.erupt.eql.lambda.LambdaInfo;
 import xyz.erupt.eql.lambda.LambdaReflect;
 import xyz.erupt.eql.lambda.SFunction;
@@ -77,16 +78,36 @@ public class Columns {
 
     public static <R> Column<R> max(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
-            int i = 0;
+            Object result = null;
+            Object temp = null;
             for (Map<Column<?>, ?> map : list) {
-                if (null != map.get(column)) i++;
+                Object val = map.get(column);
+                if (null != temp) {
+                    if (CompareUtil.compare(val, temp, CompareSymbol.GTE)) {
+                        result = val;
+                    }
+                }
+                temp = val;
             }
-            return i;
+            return result;
         });
     }
 
     public static <R> Column<R> min(SFunction<R, ?> fun, String alias) {
-        return Columns.fromLambda(fun, alias);
+        return groupByProcess(fun, alias, (column, list) -> {
+            Object result = null;
+            Object temp = null;
+            for (Map<Column<?>, ?> map : list) {
+                Object val = map.get(column);
+                if (null != temp) {
+                    if (CompareUtil.compare(val, temp, CompareSymbol.LTE)) {
+                        result = val;
+                    }
+                }
+                temp = val;
+            }
+            return result;
+        });
     }
 
 
