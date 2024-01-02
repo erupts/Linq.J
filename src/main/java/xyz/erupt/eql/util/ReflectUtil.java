@@ -16,9 +16,9 @@ public class ReflectUtil {
         }
     }
 
-    public static Class<?> getActualType(Object o,int index) {
+    public static Class<?> getActualType(Object o, int index) {
         Type clazz = o.getClass().getGenericSuperclass();
-        ParameterizedType pt = (ParameterizedType)clazz;
+        ParameterizedType pt = (ParameterizedType) clazz;
         return pt.getActualTypeArguments()[index].getClass();
     }
 
