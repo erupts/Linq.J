@@ -18,7 +18,7 @@ public class DefaultQuery extends Query {
     @Override
     public <T> Collection<T> dql(Dql dql, Class<T> target) {
         List<Map<Column<?>, Object>> table = LambdaInfo.objectToLambdaInfos(dql.getSource());
-        // x join process
+        // join process
         if (!dql.getJoinSchemas().isEmpty()) {
             for (JoinSchema<?> joinSchema : dql.getJoinSchemas()) {
                 Column<?> lon = Columns.fromLambda(joinSchema.getLon());
@@ -99,6 +99,11 @@ public class DefaultQuery extends Query {
         }
 
         // order by process
+        for (Map<Column<?>, Object> map : table) {
+            for (Column<?> orderBy : dql.getOrderBys()) {
+
+            }
+        }
 
         // limit
         if (null != dql.getOffset()) {
