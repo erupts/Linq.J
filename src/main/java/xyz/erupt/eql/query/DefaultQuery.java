@@ -89,10 +89,10 @@ public class DefaultQuery extends Query {
                 for (Column<?> column : dql.getColumns()) {
                     Object val = null;
                     if (null != column.getGroupByFun()) {
-                        val = column.getRawColumn().getGroupByFun().apply(entry.getValue());
+                        val = column.getGroupByFun().apply(entry.getValue());
                     } else {
                         if (!entry.getValue().isEmpty()) {
-                            val = entry.getValue().get(0).get(column);
+                            val = entry.getValue().get(0).get(column.getRawColumn());
                         }
                     }
                     values.put(column, val);

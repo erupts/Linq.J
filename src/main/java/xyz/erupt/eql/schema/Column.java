@@ -1,11 +1,13 @@
 package xyz.erupt.eql.schema;
 
+import xyz.erupt.eql.util.Columns;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class Column<T> {
+public class Column<T> implements Cloneable {
 
     private Class<T> table;
 
@@ -33,25 +35,10 @@ public class Column<T> {
 
     // Get the original column information
     public Column<?> getRawColumn() {
-        return new Column<>(this.table, this.fieldType, this.field, this.field);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Column<?> column = (Column<?>) o;
-        return Objects.equals(table.getSimpleName(), column.table.getSimpleName()) && Objects.equals(field, column.field) && Objects.equals(alias, column.alias);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(table, field, alias);
-    }
-
-    @Override
-    public String toString() {
-        return table.getSimpleName() + "." + field + " (" + alias + ")";
+        Column<?> column = new Column<>(this.table, this.fieldType, this.field, this.field);
+        column.setGroupByFun(this.getGroupByFun());
+        column.setValueConvertFun(this.getValueConvertFun());
+        return column;
     }
 
     public Class<?> getTable() {
@@ -102,5 +89,25 @@ public class Column<T> {
     public void setValueConvertFun(Function<Object, Object> valueConvertFun) {
         this.valueConvertFun = valueConvertFun;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Column<?> column = (Column<?>) o;
+        return Objects.equals(table.getSimpleName(), column.table.getSimpleName()) && Objects.equals(field, column.field) && Objects.equals(alias, column.alias);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(table, field, alias);
+    }
+
+    @Override
+    public String toString() {
+        return table.getSimpleName() + "." + field + " (" + alias + ")";
+    }
+
 
 }

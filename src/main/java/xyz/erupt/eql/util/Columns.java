@@ -147,7 +147,7 @@ public class Columns {
     //自定义分组处理函数
     public static <R> Column<R> groupByProcess(SFunction<R, ?> fun, String alias, BiFunction<Column<?>, List<Map<Column<?>, ?>>, Object> groupByFun) {
         Column<R> column = Columns.fromLambda(fun, alias);
-        column.setGroupByFun(it -> groupByFun.apply(column, it));
+        column.setGroupByFun(it -> groupByFun.apply(column.getRawColumn(), it));
         return column;
     }
 
