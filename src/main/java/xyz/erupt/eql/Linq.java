@@ -11,6 +11,7 @@ import xyz.erupt.eql.query.Query;
 import xyz.erupt.eql.schema.Column;
 import xyz.erupt.eql.schema.Dql;
 import xyz.erupt.eql.schema.JoinSchema;
+import xyz.erupt.eql.schema.OrderByColumn;
 import xyz.erupt.eql.util.Columns;
 
 import java.lang.reflect.Field;
@@ -94,6 +95,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy {
 
     @Override
     public <R> Linq orderBy(SFunction<R, ?> column, Direction direction) {
+        this.dql.getOrderBys().add(new OrderByColumn(Columns.of(column), direction));
         return this;
     }
 

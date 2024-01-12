@@ -43,7 +43,7 @@ public class Columns {
     }
 
     public static <R> Column<R> all(Class<R> r) {
-        Column<R> column = new Column<R>();
+        Column<R> column = new Column<>();
         column.setTable(r);
         return column;
     }

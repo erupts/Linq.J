@@ -38,4 +38,5 @@ public class Master {
         this.age = age;
         this.name = name;
     }
+
 }

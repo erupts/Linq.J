@@ -18,7 +18,7 @@ public class Column<T> {
     //列值转换处理逻辑
     private Function<Object, Object> valueConvertFun;
 
-    //列在分组场景的处理函数
+    //The handler functions listed in the grouping scenario
     private Function<List<Map<Column<?>, ?>>, Object> groupByFun;
 
     public Column() {
@@ -29,6 +29,11 @@ public class Column<T> {
         this.field = field;
         this.fieldType = fieldType;
         this.alias = alias;
+    }
+
+    // Get the original column information
+    public Column<?> getRawColumn() {
+        return new Column<>(this.table, this.fieldType, this.field, this.field);
     }
 
     @Override
@@ -42,6 +47,11 @@ public class Column<T> {
     @Override
     public int hashCode() {
         return Objects.hash(table, field, alias);
+    }
+
+    @Override
+    public String toString() {
+        return table.getSimpleName() + "." + field + " (" + alias + ")";
     }
 
     public Class<?> getTable() {
@@ -76,10 +86,6 @@ public class Column<T> {
         this.fieldType = fieldType;
     }
 
-    public Column(Function<Object, Object> valueConvertFun, Function<List<Map<Column<?>, ?>>, Object> groupByFun) {
-        this.valueConvertFun = valueConvertFun;
-        this.groupByFun = groupByFun;
-    }
 
     public Function<List<Map<Column<?>, ?>>, Object> getGroupByFun() {
         return groupByFun;
@@ -96,4 +102,5 @@ public class Column<T> {
     public void setValueConvertFun(Function<Object, Object> valueConvertFun) {
         this.valueConvertFun = valueConvertFun;
     }
+
 }

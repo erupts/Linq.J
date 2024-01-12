@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import xyz.erupt.eql.data.Master;
 import xyz.erupt.eql.data.Table2;
+import xyz.erupt.eql.grammar.OrderBy;
 import xyz.erupt.eql.lambda.LambdaReflect;
 import xyz.erupt.eql.util.Columns;
 
@@ -20,9 +21,10 @@ public class LinqTest {
 
     @Before
     public void before() {
-        source.add(new Master(1, "a", new Date()));
         source.add(new Master(2, "bb", new Date()));
-        source.add(new Master(3, "cc", new Date()));
+        source.add(new Master(9, "cc", new Date()));
+        source.add(new Master(2, "cc", new Date()));
+        source.add(new Master(4, "cc", new Date()));
         source.add(new Master(null, null, new Date()));
 
         target.add(new Table2(1, "a"));
@@ -59,14 +61,21 @@ public class LinqTest {
     @Test
     public void groupBy() {
         List<Master> result = Linq.from(source)
-                .innerJoin(target, Table2::getAge, Master::getAge)
                 .groupBy(Columns.of(Master::getName))
                 .select(
-                        Columns.of(Master::getAge),
+                        Columns.of(Master::getAge,"age_xxx"),
                         Columns.sum(Master::getAge, "sum"),
                         Columns.avg(Master::getAge, "avg"),
                         Columns.count(Master::getName, "ncount")
                 )
+                .write(Master.class);
+    }
+
+    @Test
+    public void orderBy() {
+        List<Master> result = Linq.from(source)
+                .orderBy(Master::getAge, OrderBy.Direction.DESC)
+                .orderBy(Master::getName)
                 .write(Master.class);
     }
 
@@ -116,7 +125,7 @@ public class LinqTest {
     public void compareTest() {
         Date date = new Date();
         Date date2 = new Date();
-        System.out.println(null instanceof Comparable);
+        System.out.println(date.compareTo(date));
     }
 
     private boolean eq(Object a, Object b) {

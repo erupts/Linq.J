@@ -26,7 +26,7 @@ public class Dql {
     private List<Column<?>> groupBys = new ArrayList<>();
 
     //排序控制
-    private List<Column<?>> orderBys = new ArrayList<>();
+    private List<OrderByColumn> orderBys = new ArrayList<>();
 
     private Integer limit = null;
 
@@ -98,11 +98,11 @@ public class Dql {
         this.offset = offset;
     }
 
-    public List<Column<?>> getOrderBys() {
+    public List<OrderByColumn> getOrderBys() {
         return orderBys;
     }
 
-    public void setOrderBys(List<Column<?>> orderBys) {
+    public void setOrderBys(List<OrderByColumn> orderBys) {
         this.orderBys = orderBys;
     }
 }

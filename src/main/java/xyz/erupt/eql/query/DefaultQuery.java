@@ -3,10 +3,12 @@ package xyz.erupt.eql.query;
 import xyz.erupt.eql.consts.JoinExchange;
 import xyz.erupt.eql.consts.JoinMethod;
 import xyz.erupt.eql.exception.EqlException;
+import xyz.erupt.eql.grammar.OrderBy;
 import xyz.erupt.eql.lambda.LambdaInfo;
 import xyz.erupt.eql.schema.Column;
 import xyz.erupt.eql.schema.Dql;
 import xyz.erupt.eql.schema.JoinSchema;
+import xyz.erupt.eql.schema.OrderByColumn;
 import xyz.erupt.eql.util.Columns;
 
 import java.util.*;
@@ -64,7 +66,7 @@ public class DefaultQuery extends Query {
             return false;
         });
         // group by process
-        if (null != dql.getGroupBys()) {
+        if (null != dql.getGroupBys() && !dql.getGroupBys().isEmpty()) {
             Map<String, List<Map<Column<?>, ?>>> groupMap = new HashMap<>();
             for (Map<Column<?>, Object> columns : table) {
                 StringBuilder key = new StringBuilder();
@@ -87,7 +89,7 @@ public class DefaultQuery extends Query {
                 for (Column<?> column : dql.getColumns()) {
                     Object val = null;
                     if (null != column.getGroupByFun()) {
-                        val = column.getGroupByFun().apply(entry.getValue());
+                        val = column.getRawColumn().getGroupByFun().apply(entry.getValue());
                     } else {
                         if (!entry.getValue().isEmpty()) {
                             val = entry.getValue().get(0).get(column);
@@ -99,6 +101,25 @@ public class DefaultQuery extends Query {
         }
 
         // order by process
+        if (null != dql.getOrderBys() && !dql.getOrderBys().isEmpty()) {
+            table.sort((a, b) -> {
+                int i = 0;
+                for (OrderByColumn orderBy : dql.getOrderBys()) {
+                    if (a.get(orderBy.getColumn()) instanceof Comparable) {
+                        Comparable<Object> comparable = (Comparable<Object>) a.get(orderBy.getColumn());
+                        i = comparable.compareTo(b.get(orderBy.getColumn()));
+                        if (orderBy.getDirection() == OrderBy.Direction.DESC) {
+                            i = ~i + 1;
+                        }
+                        if (i != 0) return i;
+                    }
+//                    else {
+//                        throw new EqlException(orderBy.getColumn().getTable() + "." + orderBy.getColumn().getField() + " sort does not implement the Comparable interface");
+//                    }
+                }
+                return i;
+            });
+        }
 
         // limit
         if (null != dql.getOffset()) {
@@ -131,14 +152,6 @@ public class DefaultQuery extends Query {
             result = result.stream().distinct().collect(Collectors.toList());
         }
         return result;
-    }
-
-    private boolean eq(Object a, Object b) {
-        if (null == a || null == b) {
-            return false;
-        } else {
-            return a.equals(b);
-        }
     }
 
 }
