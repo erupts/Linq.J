@@ -14,7 +14,6 @@ import xyz.erupt.eql.schema.JoinSchema;
 import xyz.erupt.eql.schema.OrderByColumn;
 import xyz.erupt.eql.util.Columns;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Function;
 
@@ -33,9 +32,11 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy {
     private final Dql dql = new Dql();
 
     public <T> List<T> write(Class<T> clazz) {
-        query.dql(this.dql, clazz);
-//        this.dql.setTarget(clazz);
-        return null;
+        return query.dql(this.dql, clazz);
+    }
+
+    public List<Map> write() {
+        return query.dql(this.dql, Map.class);
     }
 
     public <T> T writeOne(Class<T> clazz) {

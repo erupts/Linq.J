@@ -8,10 +8,7 @@ import xyz.erupt.eql.schema.Column;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -76,18 +73,27 @@ public class Columns {
         });
     }
 
+    public static <R> Column<R> countDistinct(SFunction<R, ?> fun, String alias) {
+        return groupByProcess(fun, alias, (column, list) -> {
+            Map<Object, Void> distinctMap = new HashMap<>();
+            for (Map<Column<?>, ?> map : list) {
+                Optional.ofNullable(map.get(column)).ifPresent(it -> distinctMap.put(it, null));
+            }
+            return distinctMap.size();
+        });
+    }
+
     public static <R> Column<R> max(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             Object result = null;
-            Object temp = null;
             for (Map<Column<?>, ?> map : list) {
                 Object val = map.get(column);
-                if (null != temp) {
-                    if (CompareUtil.compare(val, temp, CompareSymbol.GTE)) {
-                        result = val;
-                    }
+                if (null == result) {
+                    result = val;
                 }
-                temp = val;
+                if (CompareUtil.compare(val, result, CompareSymbol.GT)) {
+                    result = val;
+                }
             }
             return result;
         });
@@ -96,15 +102,14 @@ public class Columns {
     public static <R> Column<R> min(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             Object result = null;
-            Object temp = null;
             for (Map<Column<?>, ?> map : list) {
                 Object val = map.get(column);
-                if (null != temp) {
-                    if (CompareUtil.compare(val, temp, CompareSymbol.LTE)) {
-                        result = val;
-                    }
+                if (null == result) {
+                    result = val;
                 }
-                temp = val;
+                if (CompareUtil.compare(val, result, CompareSymbol.LT)) {
+                    result = val;
+                }
             }
             return result;
         });
@@ -145,7 +150,7 @@ public class Columns {
     }
 
     //自定义分组处理函数
-    public static <R> Column<R> groupByProcess(SFunction<R, ?> fun, String alias, BiFunction<Column<?>, List<Map<Column<?>, ?>>, Object> groupByFun) {
+    public static <R> Column<R> groupByProcess(SFunction<R, ?> fun, String alias, BiFunction<Column<?>, List<Map<Column<?>, Object>>, Object> groupByFun) {
         Column<R> column = Columns.fromLambda(fun, alias);
         column.setGroupByFun(it -> groupByFun.apply(column.getRawColumn(), it));
         return column;

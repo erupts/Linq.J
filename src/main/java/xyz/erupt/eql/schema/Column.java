@@ -21,7 +21,7 @@ public class Column<T> implements Cloneable {
     private Function<Object, Object> valueConvertFun;
 
     //The handler functions listed in the grouping scenario
-    private Function<List<Map<Column<?>, ?>>, Object> groupByFun;
+    private Function<List<Map<Column<?>, Object>>, Object> groupByFun;
 
     public Column() {
     }
@@ -74,11 +74,11 @@ public class Column<T> implements Cloneable {
     }
 
 
-    public Function<List<Map<Column<?>, ?>>, Object> getGroupByFun() {
+    public Function<List<Map<Column<?>, Object>>, Object> getGroupByFun() {
         return groupByFun;
     }
 
-    public void setGroupByFun(Function<List<Map<Column<?>, ?>>, Object> groupByFun) {
+    public void setGroupByFun(Function<List<Map<Column<?>, Object>>, Object> groupByFun) {
         this.groupByFun = groupByFun;
     }
 
@@ -106,7 +106,7 @@ public class Column<T> implements Cloneable {
 
     @Override
     public String toString() {
-        return table.getSimpleName() + "." + field + " (" + alias + ")";
+        return table.getSimpleName() + "." + field + "(" + alias + ")";
     }
 
 

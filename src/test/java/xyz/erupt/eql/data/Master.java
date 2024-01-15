@@ -39,4 +39,6 @@ public class Master {
         this.name = name;
     }
 
+    public Master() {
+    }
 }

@@ -11,6 +11,7 @@ import xyz.erupt.eql.schema.JoinSchema;
 import xyz.erupt.eql.schema.OrderByColumn;
 import xyz.erupt.eql.util.Columns;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -18,9 +19,9 @@ import java.util.stream.Collectors;
 public class DefaultQuery extends Query {
 
     @Override
-    public <T> Collection<T> dql(Dql dql, Class<T> target) {
+    public <T> List<T> dql(Dql dql, Class<T> target) {
         List<Map<Column<?>, Object>> table = LambdaInfo.objectToLambdaInfos(dql.getSource());
-        // x join process
+        // join process
         if (!dql.getJoinSchemas().isEmpty()) {
             for (JoinSchema<?> joinSchema : dql.getJoinSchemas()) {
                 Column<?> lon = Columns.fromLambda(joinSchema.getLon());
@@ -67,7 +68,7 @@ public class DefaultQuery extends Query {
         });
         // group by process
         if (null != dql.getGroupBys() && !dql.getGroupBys().isEmpty()) {
-            Map<String, List<Map<Column<?>, ?>>> groupMap = new HashMap<>();
+            Map<String, List<Map<Column<?>, Object>>> groupMap = new HashMap<>();
             for (Map<Column<?>, Object> columns : table) {
                 StringBuilder key = new StringBuilder();
                 for (Column<?> groupBy : dql.getGroupBys()) {
@@ -83,7 +84,8 @@ public class DefaultQuery extends Query {
                 groupMap.get(key.toString()).add(columns);
             }
             table.clear();
-            for (Map.Entry<String, List<Map<Column<?>, ?>>> entry : groupMap.entrySet()) {
+            // group by select process
+            for (Map.Entry<String, List<Map<Column<?>, Object>>> entry : groupMap.entrySet()) {
                 Map<Column<?>, Object> values = new HashMap<>(dql.getColumns().size());
                 table.add(values);
                 for (Column<?> column : dql.getColumns()) {
@@ -98,6 +100,25 @@ public class DefaultQuery extends Query {
                     values.put(column, val);
                 }
             }
+        } else {
+            // simple select process
+            List<Map<Column<?>, Object>> $table = new ArrayList<>(table.size());
+            boolean existGroupFun = false;
+            for (Map<Column<?>, ?> data : table) {
+                Map<Column<?>, Object> $map = new HashMap<>(dql.getColumns().size());
+                for (Column<?> column : dql.getColumns()) {
+                    if (null != column.getRawColumn().getGroupByFun()) {
+                        existGroupFun = true;
+                        $map.put(column, column.getGroupByFun().apply(table));
+                    } else {
+                        $map.put(column, data.get(column.getRawColumn()));
+                    }
+                }
+                $table.add($map);
+                if (existGroupFun) break;
+            }
+            table.clear();
+            table.addAll($table);
         }
 
         // order by process
@@ -120,7 +141,6 @@ public class DefaultQuery extends Query {
                 return i;
             });
         }
-
         // limit
         if (null != dql.getOffset()) {
             table = dql.getOffset() > table.size() ? new ArrayList<>(0) : table.subList(dql.getOffset(), table.size());
@@ -128,30 +148,38 @@ public class DefaultQuery extends Query {
         if (null != dql.getLimit()) {
             table = table.subList(0, dql.getLimit() > table.size() ? table.size() : dql.getLimit());
         }
-
-        System.out.println(table);
-
-        List<T> result = new ArrayList<>();
-        // select process
-        for (Map<Column<?>, ?> t : table) {
-            Map<Column<?>, Object> map = new HashMap<>();
-            for (Column<?> column : t.keySet()) {
-                for (Column<?> dqlColumn : dql.getColumns()) {
-                    if (target == Map.class) {
-
-                    } else {
-                        if (dqlColumn == column) {
-                            map.put(dqlColumn, t.get(dqlColumn));
-                        }
-                    }
-                }
-            }
+        // result mapping
+        List<T> result = null;
+        if (target.getName().equals(Map.class.getName())) {
+            result = new ArrayList<>();
+            Map<String, Object> $map = new HashMap<>();
+            table.forEach(map -> map.forEach((k, v) -> $map.put(k.getAlias(), v)));
+            result.add((T) $map);
+        } else {
+            result = table.stream().map(it -> convertMapToObject(it, target)).collect(Collectors.toList());
         }
         // distinct process
         if (dql.isDistinct()) {
             result = result.stream().distinct().collect(Collectors.toList());
         }
         return result;
+    }
+
+    private static <T> T convertMapToObject(Map<Column<?>, Object> map, Class<T> clazz) {
+        try {
+            T instance = clazz.getDeclaredConstructor().newInstance();
+            for (Map.Entry<Column<?>, Object> entry : map.entrySet()) {
+                try {
+                    Field field = clazz.getDeclaredField(entry.getKey().getAlias());
+                    field.setAccessible(true);
+                    field.set(instance, entry.getValue());
+                } catch (NoSuchFieldException ignore) {
+                }
+            }
+            return instance;
+        } catch (Exception e) {
+            throw new EqlException(e);
+        }
     }
 
 }

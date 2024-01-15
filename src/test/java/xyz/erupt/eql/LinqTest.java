@@ -11,6 +11,7 @@ import xyz.erupt.eql.util.Columns;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class LinqTest {
 
@@ -22,8 +23,8 @@ public class LinqTest {
     @Before
     public void before() {
         source.add(new Master(2, "bb", new Date()));
-        source.add(new Master(9, "cc", new Date()));
-        source.add(new Master(2, "cc", new Date()));
+        source.add(new Master(99, "cc", new Date()));
+        source.add(new Master(1, "cc", new Date()));
         source.add(new Master(4, "cc", new Date()));
         source.add(new Master(null, null, new Date()));
 
@@ -36,18 +37,21 @@ public class LinqTest {
     public void simple() {
         List<Master> result = Linq.from(source)
 //                .leftJoin(target, Table2::getAge, Master::getAge)
-                .innerJoin(target, Table2::getAge, Master::getAge)
+//                .innerJoin(target, Table2::getAge, Master::getAge)
 //                .join(JoinMethod.LEFT, target, (l, r) -> l.getName().equals(r.get(Columns.of(Master::getAge))))
 //                .eq(Table2::getName, "a")
 //                .gt(Table2::getAge, 1)
-                .groupBy(Columns.of(Master::getName))
-                .having()
+//                .groupBy(Columns.of(Master::getName))
+//                .having()
                 .orderBy(Master::getAge)
                 .select(
+                        Columns.count(Master::getAge, "count"),
+                        Columns.countDistinct(Master::getAge, "countDistinct"),
+                        Columns.sum(Master::getAge, "sum"),
                         Columns.max(Master::getAge, "max"),
-                        Columns.min(Table2::getName, "min"),
-                        Columns.count(Table2::getName, "count"),
-                        Columns.ofs(m -> m.get("xx"), "xxx"),
+                        Columns.min(Master::getAge, "min"),
+//                        Columns.count(Table2::getName, "count"),
+//                        Columns.ofs(m -> m.get("xx"), "xxx"),
                         Columns.all(Master.class)
                 )
                 .distinct()
@@ -60,15 +64,16 @@ public class LinqTest {
 
     @Test
     public void groupBy() {
-        List<Master> result = Linq.from(source)
+        List<Map> result = Linq.from(source)
                 .groupBy(Columns.of(Master::getName))
                 .select(
-                        Columns.of(Master::getAge,"age_xxx"),
+                        Columns.of(Master::getAge, "age_xxx"),
                         Columns.sum(Master::getAge, "sum"),
                         Columns.avg(Master::getAge, "avg"),
                         Columns.count(Master::getName, "ncount")
                 )
-                .write(Master.class);
+                .write();
+        System.out.println(result);
     }
 
     @Test
@@ -77,6 +82,7 @@ public class LinqTest {
                 .orderBy(Master::getAge, OrderBy.Direction.DESC)
                 .orderBy(Master::getName)
                 .write(Master.class);
+        assert result.get(0).getAge() == 99;
     }
 
     @Test
