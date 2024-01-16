@@ -53,14 +53,26 @@ public class Columns {
         return Columns.fromLambda(fun, alias);
     }
 
+    public static <R, A> Column<R> of(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+        return of(fun, LambdaReflect.getInfo(alias).getField());
+    }
+
     public static Column<?> ofs(SFunction<Map<String, ?>, ?> fun, String alias) {
         return Columns.fromLambda(fun, alias);
+    }
+
+    public static <A> Column<?> ofs(SFunction<Map<String, ?>, ?> fun, SFunction<A, ?> alias) {
+        return Columns.fromLambda(fun, LambdaReflect.getInfo(alias).getField());
     }
 
     public static Column<Void> count(String alias) {
         Column<Void> column = new Column<>(null, null, null, alias);
         column.setGroupByFun(List::size);
         return column;
+    }
+
+    public static <A> Column<?> count(SFunction<A, ?> alias) {
+        return count(LambdaReflect.getInfo(alias).getField());
     }
 
     public static <R> Column<R> count(SFunction<R, ?> fun, String alias) {
@@ -73,6 +85,10 @@ public class Columns {
         });
     }
 
+    public static <R, A> Column<R> count(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+        return count(fun, LambdaReflect.getInfo(alias).getField());
+    }
+
     public static <R> Column<R> countDistinct(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             Map<Object, Void> distinctMap = new HashMap<>();
@@ -81,6 +97,10 @@ public class Columns {
             }
             return distinctMap.size();
         });
+    }
+
+    public static <R, A> Column<R> countDistinct(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+        return countDistinct(fun, LambdaReflect.getInfo(alias).getField());
     }
 
     public static <R> Column<R> max(SFunction<R, ?> fun, String alias) {
@@ -99,6 +119,11 @@ public class Columns {
         });
     }
 
+
+    public static <R, A> Column<R> max(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+        return max(fun, LambdaReflect.getInfo(alias).getField());
+    }
+
     public static <R> Column<R> min(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             Object result = null;
@@ -115,6 +140,9 @@ public class Columns {
         });
     }
 
+    public static <R, A> Column<R> min(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+        return min(fun, LambdaReflect.getInfo(alias).getField());
+    }
 
     public static <R> Column<R> avg(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
@@ -135,6 +163,9 @@ public class Columns {
         });
     }
 
+    public static <R, A> Column<R> avg(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+        return avg(fun, LambdaReflect.getInfo(alias).getField());
+    }
 
     public static <R> Column<R> sum(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
@@ -147,6 +178,10 @@ public class Columns {
             }
             return bigDecimal.doubleValue();
         });
+    }
+
+    public static <R, A> Column<R> sum(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+        return sum(fun, LambdaReflect.getInfo(alias).getField());
     }
 
     //自定义分组处理函数

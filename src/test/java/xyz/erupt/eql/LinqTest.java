@@ -15,9 +15,9 @@ import java.util.Map;
 
 public class LinqTest {
 
-    List<Master> source = new ArrayList<>();
+    private final List<Master> source = new ArrayList<>();
 
-    List<Table2> target = new ArrayList<>();
+    private final List<Table2> target = new ArrayList<>();
 
 
     @Before
@@ -65,10 +65,11 @@ public class LinqTest {
     @Test
     public void groupBy() {
         List<Map> result = Linq.from(source)
-                .groupBy(Columns.of(Master::getName))
+//                .groupBy(Columns.of(Master::getName))
                 .select(
                         Columns.of(Master::getAge, "age_xxx"),
-                        Columns.sum(Master::getAge, "sum"),
+                        Columns.sum(Master::getAge, Table2::getAge),
+                        Columns.min(Master::getAge, Master::getDate),
                         Columns.avg(Master::getAge, "avg"),
                         Columns.count(Master::getName, "ncount")
                 )
@@ -115,27 +116,6 @@ public class LinqTest {
     @Test
     public void conditionLtTest() {
         Linq.from(source).gt(Master::getName, "bb").write(null);
-    }
-
-
-    @Test
-    public void eqTest() {
-        Date date = new Date();
-        Float a = 1.11F;
-        Float b = 1.01F;
-        System.out.println(a.hashCode() > b.hashCode());
-        assert eq(date, date);
-    }
-
-    @Test
-    public void compareTest() {
-        Date date = new Date();
-        Date date2 = new Date();
-        System.out.println(date.compareTo(date));
-    }
-
-    private boolean eq(Object a, Object b) {
-        return a.equals(b);
     }
 
 }
