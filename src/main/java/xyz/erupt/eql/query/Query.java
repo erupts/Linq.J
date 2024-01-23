@@ -1,8 +1,10 @@
 package xyz.erupt.eql.query;
 
+import xyz.erupt.eql.schema.Column;
 import xyz.erupt.eql.schema.Dql;
 
 import java.util.List;
+import java.util.Map;
 
 public abstract class Query {
 
@@ -17,6 +19,6 @@ public abstract class Query {
     }
 
 
-    public abstract <T> List<T> dql(Dql dql, Class<T> target);
+    public abstract List<Map<Column<?>, Object>> dql(Dql dql);
 
 }

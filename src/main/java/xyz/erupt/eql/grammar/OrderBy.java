@@ -12,6 +12,14 @@ public interface OrderBy {
         return orderBy(column, Direction.ASC);
     }
 
+    default <R> Linq orderByAsc(SFunction<R, ?> column) {
+        return orderBy(column);
+    }
+
+    default <R> Linq orderByDesc(SFunction<R, ?> column) {
+        return orderBy(column, Direction.DESC);
+    }
+
     public enum Direction {
 
         ASC,

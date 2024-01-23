@@ -10,7 +10,6 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class Columns {
 
@@ -65,15 +64,15 @@ public class Columns {
         return Columns.fromLambda(fun, LambdaReflect.getInfo(alias).getField());
     }
 
-    public static Column<Void> count(String alias) {
-        Column<Void> column = new Column<>(null, null, null, alias);
-        column.setGroupByFun(List::size);
-        return column;
-    }
-
-    public static <A> Column<?> count(SFunction<A, ?> alias) {
-        return count(LambdaReflect.getInfo(alias).getField());
-    }
+//    public static Column<Void> count(String alias) {
+//        Column<Void> column = new Column<>(null, null, null, alias);
+//        column.setGroupByFun(List::size);
+//        return column;
+//    }
+//
+//    public static <A> Column<?> count(SFunction<A, ?> alias) {
+//        return count(LambdaReflect.getInfo(alias).getField());
+//    }
 
     public static <R> Column<R> count(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {

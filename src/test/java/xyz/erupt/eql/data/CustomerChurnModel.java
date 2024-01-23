@@ -2,144 +2,144 @@ package xyz.erupt.eql.data;
 
 public class CustomerChurnModel {
 
-    private Integer RowNumber;
+    private Integer rowNumber;
 
-    private Long CustomerId;
+    private Long customerId;
 
-    private String Surname;
+    private String surname;
 
-    private Integer CreditScore;
+    private Integer creditScore;
 
-    private String Geography;
+    private String geography;
 
-    private String Gender;
+    private String gender;
 
-    private Integer Age;
+    private Integer age;
 
-    private Integer Tenure;
+    private Integer tenure;
 
-    private Float Balance;
+    private Float balance;
 
-    private Integer NumOfProducts;
+    private Integer numOfProducts;
 
-    private Boolean HasCrCard;
+    private Boolean hasCrCard;
 
-    private Boolean IsActiveMember;
+    private Boolean isActiveMember;
 
-    private Float EstimatedSalary;
+    private Float estimatedSalary;
 
-    private Boolean Exited;
+    private Boolean exited;
 
 
     public Integer getRowNumber() {
-        return RowNumber;
+        return rowNumber;
     }
 
     public void setRowNumber(Integer rowNumber) {
-        RowNumber = rowNumber;
+        this.rowNumber = rowNumber;
     }
 
     public Long getCustomerId() {
-        return CustomerId;
+        return customerId;
     }
 
     public void setCustomerId(Long customerId) {
-        CustomerId = customerId;
+        this.customerId = customerId;
     }
 
     public String getSurname() {
-        return Surname;
+        return surname;
     }
 
     public void setSurname(String surname) {
-        Surname = surname;
+        this.surname = surname;
     }
 
     public Integer getCreditScore() {
-        return CreditScore;
+        return creditScore;
     }
 
     public void setCreditScore(Integer creditScore) {
-        CreditScore = creditScore;
+        this.creditScore = creditScore;
     }
 
     public String getGeography() {
-        return Geography;
+        return geography;
     }
 
     public void setGeography(String geography) {
-        Geography = geography;
+        this.geography = geography;
     }
 
     public String getGender() {
-        return Gender;
+        return gender;
     }
 
     public void setGender(String gender) {
-        Gender = gender;
+        this.gender = gender;
     }
 
     public Integer getAge() {
-        return Age;
+        return age;
     }
 
     public void setAge(Integer age) {
-        Age = age;
+        this.age = age;
     }
 
     public Integer getTenure() {
-        return Tenure;
+        return tenure;
     }
 
     public void setTenure(Integer tenure) {
-        Tenure = tenure;
+        this.tenure = tenure;
     }
 
     public Float getBalance() {
-        return Balance;
+        return balance;
     }
 
     public void setBalance(Float balance) {
-        Balance = balance;
+        this.balance = balance;
     }
 
     public Integer getNumOfProducts() {
-        return NumOfProducts;
+        return numOfProducts;
     }
 
     public void setNumOfProducts(Integer numOfProducts) {
-        NumOfProducts = numOfProducts;
+        this.numOfProducts = numOfProducts;
     }
 
     public Boolean getHasCrCard() {
-        return HasCrCard;
+        return hasCrCard;
     }
 
     public void setHasCrCard(Boolean hasCrCard) {
-        HasCrCard = hasCrCard;
+        this.hasCrCard = hasCrCard;
     }
 
     public Boolean getActiveMember() {
-        return IsActiveMember;
+        return isActiveMember;
     }
 
     public void setActiveMember(Boolean activeMember) {
-        IsActiveMember = activeMember;
+        isActiveMember = activeMember;
     }
 
     public Float getEstimatedSalary() {
-        return EstimatedSalary;
+        return estimatedSalary;
     }
 
     public void setEstimatedSalary(Float estimatedSalary) {
-        EstimatedSalary = estimatedSalary;
+        this.estimatedSalary = estimatedSalary;
     }
 
     public Boolean getExited() {
-        return Exited;
+        return exited;
     }
 
     public void setExited(Boolean exited) {
-        Exited = exited;
+        this.exited = exited;
     }
 }

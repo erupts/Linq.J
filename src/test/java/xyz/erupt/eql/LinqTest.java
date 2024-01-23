@@ -64,7 +64,7 @@ public class LinqTest {
 
     @Test
     public void groupBy() {
-        List<Map> result = Linq.from(source)
+        List<Map<String, Object>> result = Linq.from(source)
 //                .groupBy(Columns.of(Master::getName))
                 .select(
                         Columns.of(Master::getAge, "age_xxx"),

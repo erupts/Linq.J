@@ -13,9 +13,11 @@ import xyz.erupt.eql.schema.Dql;
 import xyz.erupt.eql.schema.JoinSchema;
 import xyz.erupt.eql.schema.OrderByColumn;
 import xyz.erupt.eql.util.Columns;
+import xyz.erupt.eql.util.ReflectUtil;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Linq implements Select, Join, Where, GroupBy, OrderBy {
 
@@ -32,11 +34,19 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy {
     private final Dql dql = new Dql();
 
     public <T> List<T> write(Class<T> clazz) {
-        return query.dql(this.dql, clazz);
+        List<Map<Column<?>, Object>> table = query.dql(this.dql);
+        return table.stream().map(it -> ReflectUtil.convertMapToObject(it, clazz)).collect(Collectors.toList());
     }
 
-    public List<Map> write() {
-        return query.dql(this.dql, Map.class);
+    public List<Map<String, Object>> write() {
+        List<Map<Column<?>, Object>> table = query.dql(this.dql);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map<Column<?>, Object> map : table) {
+            Map<String, Object> $map = new HashMap<>();
+            result.add($map);
+            map.forEach((k, v) -> $map.put(k.getAlias(), v));
+        }
+        return result;
     }
 
     public <T> T writeOne(Class<T> clazz) {
@@ -113,10 +123,10 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy {
         return this;
     }
 
-    @Override
-    public Linq having() {
-        return this;
-    }
+//    @Override
+//    public Linq having() {
+//        return this;
+//    }
 
     public Linq limit(int size) {
         this.dql.setLimit(size);

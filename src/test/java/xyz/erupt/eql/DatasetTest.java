@@ -1,40 +1,56 @@
 package xyz.erupt.eql;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.junit.Before;
 import org.junit.Test;
 import xyz.erupt.eql.data.CustomerChurnModel;
+import xyz.erupt.eql.data.CustomerInfo;
+import xyz.erupt.eql.util.Columns;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class DatasetTest {
 
-    private final List<CustomerChurnModel> dataset = new ArrayList<>();
+    private List<CustomerChurnModel> dataset;
+
+    private final List<CustomerInfo> customerInfos = new ArrayList<>();
 
     @Before
     public void before() throws IOException {
-        try (Reader reader = Files.newBufferedReader(Paths.get("/CustomerChurnModelDataSet.csv"));
-             CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT)) {
-            for (CSVRecord record : parser) {
-                CustomerChurnModel obj = new CustomerChurnModel(); // 自定义的类名称
-                String value1 = record.get("columnName1"); // 指定CSV文件中的列名
-                int value2 = Integer.parseInt(record.get("columnName2"));
-                double value3 = Double.parseDouble(record.get("columnName3"));
-                dataset.add(obj);
+        try (InputStream stream = DatasetTest.class.getResourceAsStream("/CustomerChurnModelDataSet.json")) {
+            if (stream != null) {
+                dataset = new Gson().fromJson(new InputStreamReader(stream), new TypeToken<List<CustomerChurnModel>>() {
+                }.getType());
             }
         }
+        customerInfos.add(new CustomerInfo(15634602L, "MM"));
+        customerInfos.add(new CustomerInfo(15634602L, "KK"));
     }
 
     @Test
     public void test() {
-        System.out.println(dataset);
+        List<Map<String, Object>> result = Linq.from(dataset)
+                .distinct()
+                .innerJoin(customerInfos, CustomerInfo::getCustomerId, CustomerChurnModel::getCustomerId)
+                .select(
+                        Columns.of(CustomerChurnModel::getAge),
+                        Columns.of(CustomerChurnModel::getGender),
+                        Columns.of(CustomerInfo::getNickName)
+//                        Columns.sum(CustomerChurnModel::getAge, "sum")
+                )
+//                .like(CustomerChurnModel::getGender, "Male")
+//                .between(CustomerChurnModel::getAge, 10, 20)
+//                .eq(CustomerChurnModel::getExited, true)
+//                .groupBy(Columns.of(CustomerChurnModel::getAge), Columns.of(CustomerChurnModel::getGender))
+                .orderBy(CustomerChurnModel::getAge)
+                .write();
+        System.out.println(result);
     }
 
 }

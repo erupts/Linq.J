@@ -11,15 +11,17 @@ import xyz.erupt.eql.schema.JoinSchema;
 import xyz.erupt.eql.schema.OrderByColumn;
 import xyz.erupt.eql.util.Columns;
 
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DefaultQuery extends Query {
 
     @Override
-    public <T> List<T> dql(Dql dql, Class<T> target) {
+    public List<Map<Column<?>, Object>> dql(Dql dql) {
         List<Map<Column<?>, Object>> table = LambdaInfo.objectToLambdaInfos(dql.getSource());
         // join process
         if (!dql.getJoinSchemas().isEmpty()) {
@@ -32,21 +34,21 @@ public class DefaultQuery extends Query {
                         case INNER:
                         case FULL:
                             List<Map<Column<?>, Object>> targetData = LambdaInfo.objectToLambdaInfos(joinSchema.getTarget());
-                            Map<Object, Map<Column<?>, ?>> rightMap = targetData.stream().collect(Collectors.toMap(map -> map.get(lon), map -> map));
+                            Map<Object, Map<Column<?>, ?>> rightMap = targetData.stream().collect(Collectors.toMap(map -> map.get(lon), map -> map, (a, b) -> a));
                             for (Map<Column<?>, Object> map : table) {
                                 if (rightMap.containsKey(map.get(ron))) map.putAll(rightMap.get(map.get(ron)));
                             }
                             if (JoinMethod.INNER == joinSchema.getJoinMethod())
                                 table.removeIf(it -> !it.containsKey(lon));
                             if (JoinMethod.FULL == joinSchema.getJoinMethod()) {
-                                Map<Object, Map<Column<?>, ?>> leftMap = table.stream().collect(Collectors.toMap(map -> map.get(ron), map -> map));
+                                Map<Object, Map<Column<?>, ?>> leftMap = table.stream().collect(Collectors.toMap(map -> map.get(ron), map -> map, (a, b) -> a));
                                 for (Map<Column<?>, Object> tmap : targetData) {
                                     if (!leftMap.containsKey(tmap.get(lon))) table.add(tmap);
                                 }
                             }
                             break;
                         case RIGHT:
-                            Map<Object, Map<Column<?>, ?>> leftMap = table.stream().collect(Collectors.toMap(map -> map.get(ron), map -> map));
+                            Map<Object, Map<Column<?>, ?>> leftMap = table.stream().collect(Collectors.toMap(map -> map.get(ron), map -> map, (a, b) -> a));
                             table.clear();
                             for (Map<Column<?>, Object> map : LambdaInfo.objectToLambdaInfos(joinSchema.getTarget())) {
                                 table.add(map);
@@ -148,38 +150,10 @@ public class DefaultQuery extends Query {
         if (null != dql.getLimit()) {
             table = table.subList(0, dql.getLimit() > table.size() ? table.size() : dql.getLimit());
         }
-        // result mapping
-        List<T> result = null;
-        if (target.getName().equals(Map.class.getName())) {
-            result = new ArrayList<>();
-            Map<String, Object> $map = new HashMap<>();
-            table.forEach(map -> map.forEach((k, v) -> $map.put(k.getAlias(), v)));
-            result.add((T) $map);
-        } else {
-            result = table.stream().map(it -> convertMapToObject(it, target)).collect(Collectors.toList());
-        }
-        // distinct process
         if (dql.isDistinct()) {
-            result = result.stream().distinct().collect(Collectors.toList());
+            table = table.stream().distinct().collect(Collectors.toList());
         }
-        return result;
-    }
-
-    private static <T> T convertMapToObject(Map<Column<?>, Object> map, Class<T> clazz) {
-        try {
-            T instance = clazz.getDeclaredConstructor().newInstance();
-            for (Map.Entry<Column<?>, Object> entry : map.entrySet()) {
-                try {
-                    Field field = clazz.getDeclaredField(entry.getKey().getAlias());
-                    field.setAccessible(true);
-                    field.set(instance, entry.getValue());
-                } catch (NoSuchFieldException ignore) {
-                }
-            }
-            return instance;
-        } catch (Exception e) {
-            throw new EqlException(e);
-        }
+        return table;
     }
 
 }
