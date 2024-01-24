@@ -41,7 +41,7 @@ public class LambdaInfo<T> {
     }
 
     public static List<Map<Column<?>, Object>> objectToLambdaInfos(Collection<?> objects) {
-        List<Map<Column<?>, Object>> list = new ArrayList<>();
+        List<Map<Column<?>, Object>> list = new ArrayList<>(objects.size());
         for (Object object : objects) {
             Optional.ofNullable(object).ifPresent(it -> list.add(objectToColumnMap(it)));
         }

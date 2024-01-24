@@ -22,15 +22,35 @@ public class LinqTest {
 
     @Before
     public void before() {
-        source.add(new Master(2, "bb", new Date()));
-        source.add(new Master(99, "cc", new Date()));
-        source.add(new Master(1, "cc", new Date()));
-        source.add(new Master(4, "cc", new Date()));
-        source.add(new Master(null, null, new Date()));
+        source.add(new Master(2, "bb", new Date(), new String[]{"a", "b"}));
+        source.add(new Master(4, "cc", new Date(), new String[]{"aa", "bb"}));
+        source.add(new Master(5, "cc", new Date(), new String[]{"aaa", "bbb"}));
+        source.add(new Master(6, "cc", new Date(), new String[]{"ccc", "ccc"}));
+//        source.add(new Master(null, null, new Date()));
 
-        target.add(new Table2(1, "a"));
-        target.add(new Table2(2, "c"));
-        target.add(new Table2(99, "c"));
+        target.add(new Table2(1, "11"));
+        target.add(new Table2(2, "22"));
+        target.add(new Table2(99, "99"));
+    }
+
+    @Test
+    public void joinTest() {
+        List<Map<String, Object>> res = Linq.from(source)
+                .innerJoin(target, Table2::getAge, Master::getAge)
+                .select(
+                        Columns.all(Master.class),
+                        Columns.of(Table2::getName, "t2"),
+                        Columns.sum(Master::getAge, "sum")
+                )
+                .condition(data -> {
+                    Object o = data.get(Columns.fromLambda(Master::getTags));
+                    if (null != o) {
+                        return ((String[]) o)[0].equals("a");
+                    }
+                    return true;
+                })
+                .write();
+        System.out.println(res);
     }
 
     @Test

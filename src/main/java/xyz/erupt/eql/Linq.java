@@ -111,7 +111,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy {
     }
 
     @Override
-    public <R> Linq condition(Column<R> column, Function<Map<Column<?>, ?>, Boolean> fun) {
+    public <R> Linq condition(Function<Map<Column<?>, ?>, Boolean> fun) {
         this.dql.getConditions().add(fun);
         return this;
     }

@@ -11,10 +11,7 @@ import xyz.erupt.eql.schema.JoinSchema;
 import xyz.erupt.eql.schema.OrderByColumn;
 import xyz.erupt.eql.util.Columns;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,31 +26,26 @@ public class DefaultQuery extends Query {
                 Column<?> lon = Columns.fromLambda(joinSchema.getLon());
                 Column<?> ron = Columns.fromLambda(joinSchema.getRon());
                 if (joinSchema.getJoinExchange() == JoinExchange.HASH) {
+                    List<Map<Column<?>, Object>> targetData = LambdaInfo.objectToLambdaInfos(joinSchema.getTarget());
                     switch (joinSchema.getJoinMethod()) {
                         case LEFT:
-                        case INNER:
-                        case FULL:
-                            List<Map<Column<?>, Object>> targetData = LambdaInfo.objectToLambdaInfos(joinSchema.getTarget());
-                            Map<Object, Map<Column<?>, ?>> rightMap = targetData.stream().collect(Collectors.toMap(map -> map.get(lon), map -> map, (a, b) -> a));
-                            for (Map<Column<?>, Object> map : table) {
-                                if (rightMap.containsKey(map.get(ron))) map.putAll(rightMap.get(map.get(ron)));
-                            }
-                            if (JoinMethod.INNER == joinSchema.getJoinMethod())
-                                table.removeIf(it -> !it.containsKey(lon));
-                            if (JoinMethod.FULL == joinSchema.getJoinMethod()) {
-                                Map<Object, Map<Column<?>, ?>> leftMap = table.stream().collect(Collectors.toMap(map -> map.get(ron), map -> map, (a, b) -> a));
-                                for (Map<Column<?>, Object> tmap : targetData) {
-                                    if (!leftMap.containsKey(tmap.get(lon))) table.add(tmap);
-                                }
-                            }
+                            this.crossJoin(table, ron, targetData, lon);
                             break;
                         case RIGHT:
-                            Map<Object, Map<Column<?>, ?>> leftMap = table.stream().collect(Collectors.toMap(map -> map.get(ron), map -> map, (a, b) -> a));
-                            table.clear();
-                            for (Map<Column<?>, Object> map : LambdaInfo.objectToLambdaInfos(joinSchema.getTarget())) {
-                                table.add(map);
-                                if (leftMap.containsKey(map.get(lon))) map.putAll(leftMap.get(map.get(lon)));
+                            this.crossJoin(targetData, lon, table, ron);
+                            table = targetData;
+                            break;
+                        case INNER:
+                            this.crossJoin(table, ron, targetData, lon);
+                            if (JoinMethod.INNER == joinSchema.getJoinMethod()) {
+                                table.removeIf(it -> !it.containsKey(lon));
                             }
+                            break;
+                        case FULL:
+                            this.crossJoin(table, ron, targetData, lon);
+                            this.crossJoin(targetData, lon, table, ron);
+                            targetData.removeIf(it -> it.containsKey(ron));
+                            table.addAll(targetData);
                             break;
                     }
                 } else {
@@ -154,6 +146,36 @@ public class DefaultQuery extends Query {
             table = table.stream().distinct().collect(Collectors.toList());
         }
         return table;
+    }
+
+    //Cartesian product case
+    private void crossJoin(List<Map<Column<?>, Object>> source,
+                           Column<?> sourceColumn,
+                           List<Map<Column<?>, Object>> target,
+                           Column<?> targetColumn) {
+        Map<Object, List<Map<Column<?>, ?>>> rightMap = new HashMap<>();
+        // Cartesian product case processing
+        for (Map<Column<?>, Object> objectMap : target) {
+            if (!rightMap.containsKey(objectMap.get(targetColumn))) {
+                rightMap.put(objectMap.get(targetColumn), new LinkedList<>());
+            }
+            rightMap.get(objectMap.get(targetColumn)).add(objectMap);
+        }
+        ListIterator<Map<Column<?>, Object>> iterator = source.listIterator();
+        while (iterator.hasNext()) {
+            Map<Column<?>, Object> map = iterator.next();
+            if (rightMap.containsKey(map.get(sourceColumn))) {
+                for (int i = rightMap.get(map.get(sourceColumn)).size() - 1; i >= 0; i--) {
+                    if (i == 0) {
+                        map.putAll(rightMap.get(map.get(sourceColumn)).get(i));
+                    } else {
+                        Map<Column<?>, Object> cartesianMap = new HashMap<>(map);
+                        cartesianMap.putAll(rightMap.get(map.get(sourceColumn)).get(i));
+                        iterator.add(cartesianMap);
+                    }
+                }
+            }
+        }
     }
 
 }

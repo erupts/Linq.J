@@ -10,6 +10,8 @@ public class Master {
 
     private Date date;
 
+    private String[] tags;
+
     public Integer getAge() {
         return age;
     }
@@ -34,9 +36,19 @@ public class Master {
         this.date = date;
     }
 
-    public Master(Integer age, String name, Date date) {
+    public String[] getTags() {
+        return tags;
+    }
+
+    public void setTags(String[] tags) {
+        this.tags = tags;
+    }
+
+    public Master(Integer age, String name, Date date, String[] tags) {
         this.age = age;
         this.name = name;
+        this.date = date;
+        this.tags = tags;
     }
 
     public Master() {

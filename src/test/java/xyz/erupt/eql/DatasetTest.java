@@ -37,7 +37,7 @@ public class DatasetTest {
     public void test() {
         List<Map<String, Object>> result = Linq.from(dataset)
                 .distinct()
-                .innerJoin(customerInfos, CustomerInfo::getCustomerId, CustomerChurnModel::getCustomerId)
+                .rightJoin(customerInfos, CustomerInfo::getCustomerId, CustomerChurnModel::getCustomerId)
                 .select(
                         Columns.of(CustomerChurnModel::getAge),
                         Columns.of(CustomerChurnModel::getGender),
