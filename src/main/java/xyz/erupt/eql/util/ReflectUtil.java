@@ -6,6 +6,7 @@ import xyz.erupt.eql.schema.Column;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.Map;
 
 public class ReflectUtil {
@@ -33,7 +34,11 @@ public class ReflectUtil {
                 try {
                     Field field = clazz.getDeclaredField(entry.getKey().getAlias());
                     field.setAccessible(true);
-                    field.set(instance, entry.getValue());
+                    if (entry.getValue() instanceof BigDecimal) {
+                        field.set(instance, bigDecimalConvert((BigDecimal) entry.getValue(), field.getType()));
+                    } else {
+                        field.set(instance, entry.getValue());
+                    }
                 } catch (NoSuchFieldException ignore) {
                 }
             }
@@ -41,6 +46,23 @@ public class ReflectUtil {
         } catch (Exception e) {
             throw new EqlException(e);
         }
+    }
+
+    private static Object bigDecimalConvert(BigDecimal bigDecimal, Class<?> target) {
+        if (Integer.class == target) {
+            return bigDecimal.intValue();
+        } else if (Short.class == target) {
+            return bigDecimal.shortValue();
+        } else if (Float.class == target) {
+            return bigDecimal.floatValue();
+        } else if (Double.class == target) {
+            return bigDecimal.doubleValue();
+        } else if (Byte.class == target) {
+            return bigDecimal.byteValue();
+        } else if (BigDecimal.class == target) {
+            return bigDecimal;
+        }
+        return null;
     }
 
 }

@@ -66,15 +66,14 @@ public class StudentDatasetTest {
         List<StudentScoreAnalysis> studentVos = Linq.from(students)
                 .innerJoin(studentScores, StudentScore::getStudentId, Student::getId)
                 .innerJoin(studentSubjects, StudentSubject::getId, StudentScore::getSubjectId)
-                .groupBy(Columns.of(StudentSubject::getName))
+                .groupBy(Columns.of(Student::getName))
                 .select(
                         Columns.of(Student::getName, StudentScoreAnalysis::getName),
-                        Columns.of(StudentSubject::getName, StudentScoreAnalysis::getSubjectName),
-//                        Columns.avg(StudentScore::getScore, StudentScoreAnalysis::getAvgScore),
+                        Columns.avg(StudentScore::getScore, StudentScoreAnalysis::getAvgScore),
                         Columns.max(StudentScore::getScore, StudentScoreAnalysis::getMaxScore),
                         Columns.min(StudentScore::getScore, StudentScoreAnalysis::getMinScore),
-//                        Columns.sum(StudentScore::getScore, StudentScoreAnalysis::getTotalScore),
-                        Columns.count(StudentSubject::getName, StudentScoreAnalysis::getSubjectCount)
+                        Columns.sum(StudentScore::getScore, StudentScoreAnalysis::getTotalScore),
+                        Columns.count(StudentScoreAnalysis::getSubjectCount)
                 )
                 .write(StudentScoreAnalysis.class);
         System.out.println(studentVos);

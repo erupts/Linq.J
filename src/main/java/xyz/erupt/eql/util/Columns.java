@@ -64,15 +64,15 @@ public class Columns {
         return Columns.fromLambda(fun, LambdaReflect.getInfo(alias).getField());
     }
 
-//    public static Column<Void> count(String alias) {
-//        Column<Void> column = new Column<>(null, null, null, alias);
-//        column.setGroupByFun(List::size);
-//        return column;
-//    }
-//
-//    public static <A> Column<?> count(SFunction<A, ?> alias) {
-//        return count(LambdaReflect.getInfo(alias).getField());
-//    }
+    public static Column<VirtualModel> count(String alias) {
+        Column<VirtualModel> column = new Column<>(VirtualModel.class, String.class, "number", alias);
+        column.setGroupByFun(it -> BigDecimal.valueOf(it.size()));
+        return column;
+    }
+
+    public static <A> Column<?> count(SFunction<A, ?> alias) {
+        return count(LambdaReflect.getInfo(alias).getField());
+    }
 
     public static <R> Column<R> count(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
@@ -80,7 +80,7 @@ public class Columns {
             for (Map<Column<?>, ?> map : list) {
                 if (null != map.get(column)) i++;
             }
-            return i;
+            return BigDecimal.valueOf(i);
         });
     }
 
@@ -94,7 +94,7 @@ public class Columns {
             for (Map<Column<?>, ?> map : list) {
                 Optional.ofNullable(map.get(column)).ifPresent(it -> distinctMap.put(it, null));
             }
-            return distinctMap.size();
+            return BigDecimal.valueOf(distinctMap.size());
         });
     }
 
@@ -154,11 +154,7 @@ public class Columns {
                     count++;
                 }
             }
-            if (count > 0) {
-                return bigDecimal.doubleValue() / count;
-            } else {
-                return 0;
-            }
+            return count > 0 ? BigDecimal.valueOf(bigDecimal.doubleValue() / count) : BigDecimal.valueOf(0);
         });
     }
 
@@ -175,7 +171,7 @@ public class Columns {
                     bigDecimal = bigDecimal.add(new BigDecimal(String.valueOf(val)));
                 }
             }
-            return bigDecimal.doubleValue();
+            return bigDecimal;
         });
     }
 

@@ -4,13 +4,11 @@ public class StudentScoreAnalysis {
 
     private String name;
 
-    private String subjectName;
-
     private Integer totalScore;
 
     private Float avgScore;
 
-    private Integer maxScore;
+    private Float maxScore;
 
     private Integer minScore;
 
@@ -40,11 +38,11 @@ public class StudentScoreAnalysis {
         this.avgScore = avgScore;
     }
 
-    public Integer getMaxScore() {
+    public Float getMaxScore() {
         return maxScore;
     }
 
-    public void setMaxScore(Integer maxScore) {
+    public void setMaxScore(Float maxScore) {
         this.maxScore = maxScore;
     }
 
@@ -64,11 +62,4 @@ public class StudentScoreAnalysis {
         this.subjectCount = subjectCount;
     }
 
-    public String getSubjectName() {
-        return subjectName;
-    }
-
-    public void setSubjectName(String subjectName) {
-        this.subjectName = subjectName;
-    }
 }
