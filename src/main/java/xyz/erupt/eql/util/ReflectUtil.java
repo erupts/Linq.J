@@ -65,4 +65,23 @@ public class ReflectUtil {
         return null;
     }
 
+    public static BigDecimal toBigDecimal(Number number) {
+        if (number instanceof Integer) {
+            return BigDecimal.valueOf((Integer) number);
+        } else if (number instanceof Short) {
+            return BigDecimal.valueOf((Short) number);
+        } else if (number instanceof Float) {
+            return BigDecimal.valueOf((Float) number);
+        } else if (number instanceof Double) {
+            return BigDecimal.valueOf((Double) number);
+        } else if (number instanceof Byte) {
+            return BigDecimal.valueOf((Byte) number);
+        } else if (number instanceof BigDecimal) {
+            return (BigDecimal) number;
+        } else {
+            return BigDecimal.valueOf(number.doubleValue());
+        }
+
+    }
+
 }

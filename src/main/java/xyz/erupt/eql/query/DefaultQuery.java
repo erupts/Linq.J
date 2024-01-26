@@ -1,7 +1,6 @@
 package xyz.erupt.eql.query;
 
 import xyz.erupt.eql.consts.JoinExchange;
-import xyz.erupt.eql.consts.JoinMethod;
 import xyz.erupt.eql.exception.EqlException;
 import xyz.erupt.eql.grammar.OrderBy;
 import xyz.erupt.eql.lambda.LambdaInfo;
@@ -29,21 +28,19 @@ public class DefaultQuery extends Query {
                     List<Map<Column<?>, Object>> targetData = LambdaInfo.objectToLambdaInfos(joinSchema.getTarget());
                     switch (joinSchema.getJoinMethod()) {
                         case LEFT:
-                            this.crossJoin(table, ron, targetData, lon);
+                            this.crossHashJoin(table, ron, targetData, lon);
                             break;
                         case RIGHT:
-                            this.crossJoin(targetData, lon, table, ron);
+                            this.crossHashJoin(targetData, lon, table, ron);
                             table = targetData;
                             break;
                         case INNER:
-                            this.crossJoin(table, ron, targetData, lon);
-                            if (JoinMethod.INNER == joinSchema.getJoinMethod()) {
-                                table.removeIf(it -> !it.containsKey(lon));
-                            }
+                            this.crossHashJoin(table, ron, targetData, lon);
+                            table.removeIf(it -> !it.containsKey(lon));
                             break;
                         case FULL:
-                            this.crossJoin(table, ron, targetData, lon);
-                            this.crossJoin(targetData, lon, table, ron);
+                            this.crossHashJoin(table, ron, targetData, lon);
+                            this.crossHashJoin(targetData, lon, table, ron);
                             targetData.removeIf(it -> it.containsKey(ron));
                             table.addAll(targetData);
                             break;
@@ -77,7 +74,7 @@ public class DefaultQuery extends Query {
                 }
                 groupMap.get(key.toString()).add(columns);
             }
-            table.clear();
+            table = new ArrayList<>(groupMap.size());
             // group by select process
             for (Map.Entry<String, List<Map<Column<?>, Object>>> entry : groupMap.entrySet()) {
                 Map<Column<?>, Object> values = new HashMap<>(dql.getColumns().size());
@@ -99,42 +96,23 @@ public class DefaultQuery extends Query {
             List<Map<Column<?>, Object>> $table = new ArrayList<>(table.size());
             boolean existGroupFun = false;
             for (Map<Column<?>, ?> data : table) {
-                Map<Column<?>, Object> $map = new HashMap<>(dql.getColumns().size());
+                Map<Column<?>, Object> map = new HashMap<>(dql.getColumns().size());
                 for (Column<?> column : dql.getColumns()) {
                     if (null != column.getRawColumn().getGroupByFun()) {
                         existGroupFun = true;
-                        $map.put(column, column.getGroupByFun().apply(table));
+                        map.put(column, column.getGroupByFun().apply(table));
                     } else {
-                        $map.put(column, data.get(column.getRawColumn()));
+                        map.put(column, data.get(column.getRawColumn()));
                     }
                 }
-                $table.add($map);
+                $table.add(map);
                 if (existGroupFun) break;
             }
             table.clear();
             table.addAll($table);
         }
-
         // order by process
-        if (null != dql.getOrderBys() && !dql.getOrderBys().isEmpty()) {
-            table.sort((a, b) -> {
-                int i = 0;
-                for (OrderByColumn orderBy : dql.getOrderBys()) {
-                    if (a.get(orderBy.getColumn()) instanceof Comparable) {
-                        Comparable<Object> comparable = (Comparable<Object>) a.get(orderBy.getColumn());
-                        i = comparable.compareTo(b.get(orderBy.getColumn()));
-                        if (orderBy.getDirection() == OrderBy.Direction.DESC) {
-                            i = ~i + 1;
-                        }
-                        if (i != 0) return i;
-                    }
-//                    else {
-//                        throw new EqlException(orderBy.getColumn().getTable() + "." + orderBy.getColumn().getField() + " sort does not implement the Comparable interface");
-//                    }
-                }
-                return i;
-            });
-        }
+        this.orderBy(dql, table);
         // limit
         if (null != dql.getOffset()) {
             table = dql.getOffset() > table.size() ? new ArrayList<>(0) : table.subList(dql.getOffset(), table.size());
@@ -149,12 +127,9 @@ public class DefaultQuery extends Query {
     }
 
     //Cartesian product case
-    private void crossJoin(List<Map<Column<?>, Object>> source,
-                           Column<?> sourceColumn,
-                           List<Map<Column<?>, Object>> target,
-                           Column<?> targetColumn) {
+    private void crossHashJoin(List<Map<Column<?>, Object>> source, Column<?> sourceColumn,
+                               List<Map<Column<?>, Object>> target, Column<?> targetColumn) {
         Map<Object, List<Map<Column<?>, ?>>> rightMap = new HashMap<>();
-        // Cartesian product case processing
         for (Map<Column<?>, Object> objectMap : target) {
             if (!rightMap.containsKey(objectMap.get(targetColumn))) {
                 rightMap.put(objectMap.get(targetColumn), new LinkedList<>());
@@ -175,6 +150,28 @@ public class DefaultQuery extends Query {
                     }
                 }
             }
+        }
+    }
+
+    private void orderBy(Dql dql, List<Map<Column<?>, Object>> dataset) {
+        if (null != dql.getOrderBys() && !dql.getOrderBys().isEmpty()) {
+            dataset.sort((a, b) -> {
+                int i = 0;
+                for (OrderByColumn orderBy : dql.getOrderBys()) {
+                    Optional.ofNullable(a.get(orderBy.getColumn())).orElseThrow(() -> new EqlException(
+                            "Unknown column '" + orderBy.getColumn().getTable() + "." + orderBy.getColumn().getField() + "' in 'order clause'")
+                    );
+                    if (a.get(orderBy.getColumn()) instanceof Comparable) {
+                        Comparable<Object> comparable = (Comparable<Object>) a.get(orderBy.getColumn());
+                        i = comparable.compareTo(b.get(orderBy.getColumn()));
+                        if (orderBy.getDirection() == OrderBy.Direction.DESC) i = ~i + 1;
+                        if (i != 0) return i;
+                    } else {
+                        throw new EqlException(orderBy.getColumn().getTable() + "." + orderBy.getColumn().getField() + " sort does not implement the Comparable interface");
+                    }
+                }
+                return i;
+            });
         }
     }
 

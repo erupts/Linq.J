@@ -114,7 +114,11 @@ public class Columns {
                     result = val;
                 }
             }
-            return result;
+            if (result instanceof Number) {
+                return ReflectUtil.toBigDecimal((Number) result);
+            } else {
+                return result;
+            }
         });
     }
 
@@ -135,7 +139,11 @@ public class Columns {
                     result = val;
                 }
             }
-            return result;
+            if (result instanceof Number) {
+                return ReflectUtil.toBigDecimal((Number) result);
+            } else {
+                return result;
+            }
         });
     }
 
