@@ -65,7 +65,7 @@ public class ReflectUtil {
         return null;
     }
 
-    public static BigDecimal toBigDecimal(Number number) {
+    public static BigDecimal numberToBigDecimal(Number number) {
         if (number instanceof Integer) {
             return BigDecimal.valueOf((Integer) number);
         } else if (number instanceof Short) {

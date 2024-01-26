@@ -115,7 +115,7 @@ public class Columns {
                 }
             }
             if (result instanceof Number) {
-                return ReflectUtil.toBigDecimal((Number) result);
+                return ReflectUtil.numberToBigDecimal((Number) result);
             } else {
                 return result;
             }
@@ -140,7 +140,7 @@ public class Columns {
                 }
             }
             if (result instanceof Number) {
-                return ReflectUtil.toBigDecimal((Number) result);
+                return ReflectUtil.numberToBigDecimal((Number) result);
             } else {
                 return result;
             }
