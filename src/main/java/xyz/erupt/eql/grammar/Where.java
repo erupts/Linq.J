@@ -14,13 +14,13 @@ import java.util.function.Function;
 
 public interface Where {
 
-    //equals
+    // equals
     default <R> Linq eq(SFunction<R, ?> column, Object value) {
         Column<R> c = Columns.fromLambda(column);
         return condition(f -> null != value && value.equals(f.get(c)));
     }
 
-    //not equals
+    // not equals
     default <R> Linq ne(SFunction<R, ?> column, Object value) {
         Column<R> c = Columns.fromLambda(column);
         return condition(f -> null != value && !value.equals(f.get(c)));
@@ -63,7 +63,6 @@ public interface Where {
         return condition(f -> f.get(c) != null && value != null && f.get(c).toString().contains(value.toString()));
     }
 
-    //in
     default <R> Linq in(SFunction<R, ?> column, Object... value) {
         Column<R> c = Columns.fromLambda(column);
         return condition(f -> f.get(c) != null && Arrays.stream(value).anyMatch(it -> null != it && it.equals(f.get(c))));
@@ -73,7 +72,6 @@ public interface Where {
         return in(column, value.toArray());
     }
 
-    //not in
     default <R> Linq notIn(SFunction<R, ?> column, Object... value) {
         Column<R> c = Columns.fromLambda(column);
         return condition(f -> f.get(c) != null && Arrays.stream(value).noneMatch(it -> null != it && it.equals(f.get(c))));
@@ -104,6 +102,6 @@ public interface Where {
         return condition(f -> f.get(c) != null && !f.get(c).toString().trim().isEmpty());
     }
 
-    <R> Linq condition(Function<Map<Column<?>, ?>, Boolean> fun);
+    Linq condition(Function<Map<Column<?>, ?>, Boolean> fun);
 
 }

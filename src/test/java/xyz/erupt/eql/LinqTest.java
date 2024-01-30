@@ -49,7 +49,7 @@ public class LinqTest {
                     }
                     return true;
                 })
-                .write();
+                .writeMap();
         System.out.println(res);
     }
 
@@ -81,6 +81,15 @@ public class LinqTest {
         System.out.println(result);
     }
 
+    @Test
+    public void writeSimpleType() {
+        List<String[]> arrays = Linq.from(source).select(Columns.of(Master::getTags)).write(String[].class);
+        List<Date> dates = Linq.from(source).select(Columns.of(Master::getAge)).write(Date.class);
+        List<Integer> integers = Linq.from(source).select(Columns.of(Master::getAge)).write(Integer.class);
+        List<String> strings = Linq.from(source).select(Columns.of(Master::getName)).write(String.class);
+        assert !arrays.isEmpty() && !dates.isEmpty() && !integers.isEmpty() && !strings.isEmpty();
+    }
+
 
     @Test
     public void groupBy() {
@@ -93,7 +102,7 @@ public class LinqTest {
                         Columns.avg(Master::getAge, "avg"),
                         Columns.count(Master::getName, "ncount")
                 )
-                .write();
+                .writeMap();
         System.out.println(result);
     }
 

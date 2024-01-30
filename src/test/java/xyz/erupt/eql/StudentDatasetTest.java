@@ -3,9 +3,9 @@ package xyz.erupt.eql;
 import org.junit.Before;
 import org.junit.Test;
 import xyz.erupt.eql.data.*;
+import xyz.erupt.eql.grammar.OrderBy;
 import xyz.erupt.eql.util.Columns;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class StudentDatasetTest {
 
 
     @Before
-    public void before() throws IOException {
+    public void before() {
         students.add(new Student(1L, "Genevieve", 18, LocalDateTime.now().minusYears(3)));
         students.add(new Student(2L, "Liz", 18, LocalDateTime.now().minusYears(5)));
         students.add(new Student(3L, "Berg", 33, LocalDateTime.now().minusYears(9)));
@@ -63,7 +63,7 @@ public class StudentDatasetTest {
 
     @Test
     public void groupTest() {
-        List<StudentScoreAnalysis> studentVos = Linq.from(students)
+        Linq.from(students)
                 .innerJoin(studentScores, StudentScore::getStudentId, Student::getId)
                 .innerJoin(studentSubjects, StudentSubject::getId, StudentScore::getSubjectId)
                 .groupBy(Columns.of(Student::getName))
@@ -76,7 +76,19 @@ public class StudentDatasetTest {
                         Columns.count(StudentScoreAnalysis::getSubjectCount)
                 )
                 .write(StudentScoreAnalysis.class);
-        System.out.println(studentVos);
+        Linq.from(students)
+                .innerJoin(studentScores, StudentScore::getStudentId, Student::getId)
+                .select(Columns.count(StudentScoreAnalysis::getSubjectCount))
+                .writeMap();
+    }
+
+    @Test
+    public void orderByTest() {
+        Object s = Linq.from(students)
+                .orderBy(Student::getAge, OrderBy.Direction.DESC)
+                .orderBy(Student::getId, OrderBy.Direction.DESC)
+                .select(Columns.all(Student.class))
+                .writeMap();
     }
 
 }

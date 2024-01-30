@@ -1,4 +1,4 @@
-package xyz.erupt.eql.query;
+package xyz.erupt.eql.engine;
 
 import xyz.erupt.eql.consts.JoinExchange;
 import xyz.erupt.eql.exception.EqlException;
@@ -14,10 +14,10 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class DefaultQuery extends Query {
+public class DefaultEngine extends Engine {
 
     @Override
-    public List<Map<Column<?>, Object>> dql(Dql dql) {
+    public List<Map<Column<?>, Object>> query(Dql dql) {
         List<Map<Column<?>, Object>> table = LambdaInfo.objectToLambdaInfos(dql.getSource());
         // join process
         if (!dql.getJoinSchemas().isEmpty()) {
@@ -158,9 +158,9 @@ public class DefaultQuery extends Query {
             dataset.sort((a, b) -> {
                 int i = 0;
                 for (OrderByColumn orderBy : dql.getOrderBys()) {
-                    Optional.ofNullable(a.get(orderBy.getColumn())).orElseThrow(() -> new EqlException(
-                            "Unknown column '" + orderBy.getColumn().getTable() + "." + orderBy.getColumn().getField() + "' in 'order clause'")
-                    );
+                    if (null == a.get(orderBy.getColumn())) {
+                        throw new EqlException("Unknown column '" + orderBy.getColumn().getTable() + "." + orderBy.getColumn().getField() + "' in 'order clause'");
+                    }
                     if (a.get(orderBy.getColumn()) instanceof Comparable) {
                         Comparable<Object> comparable = (Comparable<Object>) a.get(orderBy.getColumn());
                         i = comparable.compareTo(b.get(orderBy.getColumn()));

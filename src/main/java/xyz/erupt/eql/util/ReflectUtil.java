@@ -27,8 +27,18 @@ public class ReflectUtil {
         return pt.getActualTypeArguments()[index].getClass();
     }
 
+    public static final Class<?>[] SIMPLE_CLASS = {
+            String.class, Character.class, Byte.class, Short.class, Integer.class, Float.class, Double.class, BigDecimal.class,
+            String[].class, Character[].class, Byte[].class, Short[].class, Integer[].class, Float[].class, Double[].class, BigDecimal[].class
+    };
+
     public static <T> T convertMapToObject(Map<Column<?>, Object> map, Class<T> clazz) {
         try {
+            for (Class<?> sc : SIMPLE_CLASS) {
+                if (sc == clazz) {
+                    return (T) map.get(map.keySet().iterator().next());
+                }
+            }
             T instance = clazz.getDeclaredConstructor().newInstance();
             for (Map.Entry<Column<?>, Object> entry : map.entrySet()) {
                 try {

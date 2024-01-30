@@ -49,7 +49,7 @@ public class DatasetTest {
 //                .eq(CustomerChurnModel::getExited, true)
 //                .groupBy(Columns.of(CustomerChurnModel::getAge), Columns.of(CustomerChurnModel::getGender))
                 .orderBy(CustomerChurnModel::getAge)
-                .write();
+                .writeMap();
         System.out.println(result);
     }
 
