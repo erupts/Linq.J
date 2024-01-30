@@ -2,7 +2,7 @@ package xyz.erupt.eql.data;
 
 import java.util.Date;
 
-public class Master {
+public class TestSource {
 
     private Integer age;
 
@@ -44,13 +44,13 @@ public class Master {
         this.tags = tags;
     }
 
-    public Master(Integer age, String name, Date date, String[] tags) {
+    public TestSource(Integer age, String name, Date date, String[] tags) {
         this.age = age;
         this.name = name;
         this.date = date;
         this.tags = tags;
     }
 
-    public Master() {
+    public TestSource() {
     }
 }

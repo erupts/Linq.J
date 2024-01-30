@@ -1,12 +1,12 @@
 package xyz.erupt.eql.data;
 
-public class Table2 {
+public class TestTarget {
 
     private Integer age;
 
     private String name;
 
-    public Table2(Integer age, String name) {
+    public TestTarget(Integer age, String name) {
         this.age = age;
         this.name = name;
     }
