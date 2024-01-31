@@ -4,23 +4,23 @@ import xyz.erupt.eql.grammar.OrderBy;
 
 public class OrderByColumn {
 
-    private Column<?> column;
+    private Column column;
 
     private OrderBy.Direction direction;
 
     public OrderByColumn() {
     }
 
-    public OrderByColumn(Column<?> column, OrderBy.Direction direction) {
+    public OrderByColumn(Column column, OrderBy.Direction direction) {
         this.column = column;
         this.direction = direction;
     }
 
-    public Column<?> getColumn() {
+    public Column getColumn() {
         return column;
     }
 
-    public void setColumn(Column<?> column) {
+    public void setColumn(Column column) {
         this.column = column;
     }
 

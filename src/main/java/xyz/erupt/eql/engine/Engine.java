@@ -16,6 +16,6 @@ public abstract class Engine {
     }
 
 
-    public abstract List<Map<Column<?>, Object>> query(Dql dql);
+    public abstract List<Map<Column, Object>> query(Dql dql);
 
 }

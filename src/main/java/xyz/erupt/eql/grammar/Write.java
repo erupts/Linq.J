@@ -19,13 +19,13 @@ public interface Write {
 
     default <T> List<T> write(Class<T> clazz) {
         $engine().check(this.$dql());
-        List<Map<Column<?>, Object>> table = $engine().query(this.$dql());
+        List<Map<Column, Object>> table = $engine().query(this.$dql());
         return table.stream().map(it -> ReflectUtil.convertMapToObject(it, clazz)).collect(Collectors.toList());
     }
 
     default <T> T writeOne(Class<T> clazz) {
         $engine().check(this.$dql());
-        List<Map<Column<?>, Object>> table = $engine().query(this.$dql());
+        List<Map<Column, Object>> table = $engine().query(this.$dql());
         if (table.isEmpty()) {
             return null;
         } else {
@@ -34,9 +34,9 @@ public interface Write {
     }
 
     default List<Map<String, Object>> writeMap() {
-        List<Map<Column<?>, Object>> table = $engine().query(this.$dql());
+        List<Map<Column, Object>> table = $engine().query(this.$dql());
         List<Map<String, Object>> result = new ArrayList<>();
-        for (Map<Column<?>, Object> map : table) {
+        for (Map<Column, Object> map : table) {
             Map<String, Object> $map = new HashMap<>();
             result.add($map);
             map.forEach((k, v) -> $map.put(k.getAlias(), v));

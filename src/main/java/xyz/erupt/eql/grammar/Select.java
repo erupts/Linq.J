@@ -7,7 +7,7 @@ public interface Select {
 
     Linq distinct();
 
-    Linq select(Column<?>... column);
+    Linq select(Column... column);
 
 
 }

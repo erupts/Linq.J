@@ -14,16 +14,16 @@ public class Dql {
     private Collection<?> source;
 
     //列信息
-    private List<Column<?>> columns = new ArrayList<>();
+    private List<Column> columns = new ArrayList<>();
 
     //关联信息
     private List<JoinSchema<?>> joinSchemas = new ArrayList<>();
 
     //条件过滤控制
-    private List<Function<Map<Column<?>, ?>, Boolean>> conditions = new ArrayList<>();
+    private List<Function<Map<Column, ?>, Boolean>> conditions = new ArrayList<>();
 
     //分组控制
-    private List<Column<?>> groupBys = new ArrayList<>();
+    private List<Column> groupBys = new ArrayList<>();
 
     //排序控制
     private List<OrderByColumn> orderBys = new ArrayList<>();
@@ -50,19 +50,19 @@ public class Dql {
         this.distinct = distinct;
     }
 
-    public List<Column<?>> getColumns() {
+    public List<Column> getColumns() {
         return columns;
     }
 
-    public void setColumns(List<Column<?>> columns) {
+    public void setColumns(List<Column> columns) {
         this.columns = columns;
     }
 
-    public List<Function<Map<Column<?>, ?>, Boolean>> getConditions() {
+    public List<Function<Map<Column, ?>, Boolean>> getConditions() {
         return conditions;
     }
 
-    public void setConditions(List<Function<Map<Column<?>, ?>, Boolean>> conditions) {
+    public void setConditions(List<Function<Map<Column, ?>, Boolean>> conditions) {
         this.conditions = conditions;
     }
 
@@ -74,11 +74,11 @@ public class Dql {
         this.joinSchemas = joinSchemas;
     }
 
-    public List<Column<?>> getGroupBys() {
+    public List<Column> getGroupBys() {
         return groupBys;
     }
 
-    public void setGroupBys(List<Column<?>> groupBys) {
+    public void setGroupBys(List<Column> groupBys) {
         this.groupBys = groupBys;
     }
 

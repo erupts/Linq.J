@@ -18,7 +18,7 @@ public interface Join {
     <T, S> Linq join(JoinMethod joinMethod, Collection<T> target, SFunction<T, Object> onL, SFunction<S, Object> onR);
 
 
-    default <T> Linq join(JoinMethod joinMethod, Collection<T> target, BiFunction<T, Map<Column<?>, ?>, Boolean> on) {
+    default <T> Linq join(JoinMethod joinMethod, Collection<T> target, BiFunction<T, Map<Column, ?>, Boolean> on) {
         return join(new JoinSchema<>(joinMethod, target, on));
     }
 

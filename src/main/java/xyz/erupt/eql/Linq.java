@@ -43,10 +43,10 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public Linq select(Column<?>... columns) {
+    public Linq select(Column... columns) {
         this.dql.getColumns().addAll(Columns.columnsProcess(columns));
         Map<String, Void> alias = new HashMap<>();
-        for (Column<?> column : this.dql.getColumns()) {
+        for (Column column : this.dql.getColumns()) {
             if (alias.containsKey(column.getAlias())) {
                 throw new EqlException("Column '" + column.getAlias() + "' is ambiguous");
             }
@@ -84,14 +84,14 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public Linq condition(Function<Map<Column<?>, ?>, Boolean> fun) {
+    public Linq condition(Function<Map<Column, ?>, Boolean> fun) {
         this.dql.getConditions().add(fun);
         return this;
     }
 
 
     @Override
-    public Linq groupBy(Column<?>... columns) {
+    public Linq groupBy(Column... columns) {
         this.dql.getGroupBys().addAll(Columns.columnsProcess(columns));
         return this;
     }

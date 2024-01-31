@@ -26,8 +26,8 @@ public class LambdaInfo {
         return field;
     }
 
-    public static Map<Column<?>, Object> objectToColumnMap(Object obj) {
-        Map<Column<?>, Object> columnObjectMap = new HashMap<>();
+    public static Map<Column, Object> objectToColumnMap(Object obj) {
+        Map<Column, Object> columnObjectMap = new HashMap<>();
         Field[] fields = obj.getClass().getDeclaredFields();
         try {
             for (Field field : fields) {
@@ -40,8 +40,8 @@ public class LambdaInfo {
         return columnObjectMap;
     }
 
-    public static List<Map<Column<?>, Object>> objectToLambdaInfos(Collection<?> objects) {
-        List<Map<Column<?>, Object>> list = new ArrayList<>(objects.size());
+    public static List<Map<Column, Object>> objectToLambdaInfos(Collection<?> objects) {
+        List<Map<Column, Object>> list = new ArrayList<>(objects.size());
         for (Object object : objects) {
             Optional.ofNullable(object).ifPresent(it -> list.add(objectToColumnMap(it)));
         }

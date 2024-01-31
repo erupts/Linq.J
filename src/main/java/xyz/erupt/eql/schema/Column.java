@@ -1,15 +1,13 @@
 package xyz.erupt.eql.schema;
 
-import xyz.erupt.eql.util.Columns;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class Column<T> implements Cloneable {
+public class Column {
 
-    private Class<T> table;
+    private Class<?> table;
 
     private Class<?> fieldType;
 
@@ -21,12 +19,12 @@ public class Column<T> implements Cloneable {
     private Function<Object, Object> valueConvertFun;
 
     //The handler functions listed in the grouping scenario
-    private Function<List<Map<Column<?>, Object>>, Object> groupByFun;
+    private Function<List<Map<Column, Object>>, Object> groupByFun;
 
     public Column() {
     }
 
-    public Column(Class<T> table, Class<?> fieldType, String field, String alias) {
+    public Column(Class<?> table, Class<?> fieldType, String field, String alias) {
         this.table = table;
         this.field = field;
         this.fieldType = fieldType;
@@ -34,8 +32,8 @@ public class Column<T> implements Cloneable {
     }
 
     // Get the original column information
-    public Column<?> getRawColumn() {
-        Column<?> column = new Column<>(this.table, this.fieldType, this.field, this.field);
+    public Column getRawColumn() {
+        Column column = new Column(this.table, this.fieldType, this.field, this.field);
         column.setGroupByFun(this.getGroupByFun());
         column.setValueConvertFun(this.getValueConvertFun());
         return column;
@@ -45,7 +43,7 @@ public class Column<T> implements Cloneable {
         return table;
     }
 
-    public void setTable(Class<T> table) {
+    public void setTable(Class<?> table) {
         this.table = table;
     }
 
@@ -74,11 +72,11 @@ public class Column<T> implements Cloneable {
     }
 
 
-    public Function<List<Map<Column<?>, Object>>, Object> getGroupByFun() {
+    public Function<List<Map<Column, Object>>, Object> getGroupByFun() {
         return groupByFun;
     }
 
-    public void setGroupByFun(Function<List<Map<Column<?>, Object>>, Object> groupByFun) {
+    public void setGroupByFun(Function<List<Map<Column, Object>>, Object> groupByFun) {
         this.groupByFun = groupByFun;
     }
 
@@ -95,7 +93,7 @@ public class Column<T> implements Cloneable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Column<?> column = (Column<?>) o;
+        Column column = (Column) o;
         return Objects.equals(table.getSimpleName(), column.table.getSimpleName()) && Objects.equals(field, column.field) && Objects.equals(alias, column.alias);
     }
 

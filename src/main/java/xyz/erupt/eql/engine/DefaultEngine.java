@@ -17,15 +17,15 @@ import java.util.stream.Collectors;
 public class DefaultEngine extends Engine {
 
     @Override
-    public List<Map<Column<?>, Object>> query(Dql dql) {
-        List<Map<Column<?>, Object>> table = LambdaInfo.objectToLambdaInfos(dql.getSource());
+    public List<Map<Column, Object>> query(Dql dql) {
+        List<Map<Column, Object>> table = LambdaInfo.objectToLambdaInfos(dql.getSource());
         // join process
         if (!dql.getJoinSchemas().isEmpty()) {
             for (JoinSchema<?> joinSchema : dql.getJoinSchemas()) {
-                Column<?> lon = Columns.fromLambda(joinSchema.getLon());
-                Column<?> ron = Columns.fromLambda(joinSchema.getRon());
+                Column lon = Columns.fromLambda(joinSchema.getLon());
+                Column ron = Columns.fromLambda(joinSchema.getRon());
                 if (joinSchema.getJoinExchange() == JoinExchange.HASH) {
-                    List<Map<Column<?>, Object>> targetData = LambdaInfo.objectToLambdaInfos(joinSchema.getTarget());
+                    List<Map<Column, Object>> targetData = LambdaInfo.objectToLambdaInfos(joinSchema.getTarget());
                     switch (joinSchema.getJoinMethod()) {
                         case LEFT:
                             this.crossHashJoin(table, ron, targetData, lon);
@@ -52,17 +52,17 @@ public class DefaultEngine extends Engine {
         }
         // condition process
         table.removeIf(it -> {
-            for (Function<Map<Column<?>, ?>, Boolean> condition : dql.getConditions()) {
+            for (Function<Map<Column, ?>, Boolean> condition : dql.getConditions()) {
                 if (!condition.apply(it)) return true;
             }
             return false;
         });
         // group by process
         if (null != dql.getGroupBys() && !dql.getGroupBys().isEmpty()) {
-            Map<String, List<Map<Column<?>, Object>>> groupMap = new HashMap<>();
-            for (Map<Column<?>, Object> columns : table) {
+            Map<String, List<Map<Column, Object>>> groupMap = new HashMap<>();
+            for (Map<Column, Object> columns : table) {
                 StringBuilder key = new StringBuilder();
-                for (Column<?> groupBy : dql.getGroupBys()) {
+                for (Column groupBy : dql.getGroupBys()) {
                     if (null != groupBy.getValueConvertFun()) {
                         key.append(groupBy.getValueConvertFun().apply(columns.get(groupBy)));
                     } else {
@@ -76,10 +76,10 @@ public class DefaultEngine extends Engine {
             }
             table = new ArrayList<>(groupMap.size());
             // group by select process
-            for (Map.Entry<String, List<Map<Column<?>, Object>>> entry : groupMap.entrySet()) {
-                Map<Column<?>, Object> values = new HashMap<>(dql.getColumns().size());
+            for (Map.Entry<String, List<Map<Column, Object>>> entry : groupMap.entrySet()) {
+                Map<Column, Object> values = new HashMap<>(dql.getColumns().size());
                 table.add(values);
-                for (Column<?> column : dql.getColumns()) {
+                for (Column column : dql.getColumns()) {
                     Object val = null;
                     if (null != column.getGroupByFun()) {
                         val = column.getGroupByFun().apply(entry.getValue());
@@ -93,11 +93,11 @@ public class DefaultEngine extends Engine {
             }
         } else {
             // simple select process
-            List<Map<Column<?>, Object>> $table = new ArrayList<>(table.size());
+            List<Map<Column, Object>> $table = new ArrayList<>(table.size());
             boolean existGroupFun = false;
-            for (Map<Column<?>, ?> data : table) {
-                Map<Column<?>, Object> map = new HashMap<>(dql.getColumns().size());
-                for (Column<?> column : dql.getColumns()) {
+            for (Map<Column, ?> data : table) {
+                Map<Column, Object> map = new HashMap<>(dql.getColumns().size());
+                for (Column column : dql.getColumns()) {
                     if (null != column.getRawColumn().getGroupByFun()) {
                         existGroupFun = true;
                         map.put(column, column.getGroupByFun().apply(table));
@@ -127,24 +127,24 @@ public class DefaultEngine extends Engine {
     }
 
     //Cartesian product case
-    private void crossHashJoin(List<Map<Column<?>, Object>> source, Column<?> sourceColumn,
-                               List<Map<Column<?>, Object>> target, Column<?> targetColumn) {
-        Map<Object, List<Map<Column<?>, ?>>> rightMap = new HashMap<>();
-        for (Map<Column<?>, Object> objectMap : target) {
+    private void crossHashJoin(List<Map<Column, Object>> source, Column sourceColumn,
+                               List<Map<Column, Object>> target, Column targetColumn) {
+        Map<Object, List<Map<Column, ?>>> rightMap = new HashMap<>();
+        for (Map<Column, Object> objectMap : target) {
             if (!rightMap.containsKey(objectMap.get(targetColumn))) {
                 rightMap.put(objectMap.get(targetColumn), new LinkedList<>());
             }
             rightMap.get(objectMap.get(targetColumn)).add(objectMap);
         }
-        ListIterator<Map<Column<?>, Object>> iterator = source.listIterator();
+        ListIterator<Map<Column, Object>> iterator = source.listIterator();
         while (iterator.hasNext()) {
-            Map<Column<?>, Object> map = iterator.next();
+            Map<Column, Object> map = iterator.next();
             if (rightMap.containsKey(map.get(sourceColumn))) {
                 for (int i = rightMap.get(map.get(sourceColumn)).size() - 1; i >= 0; i--) {
                     if (i == 0) {
                         map.putAll(rightMap.get(map.get(sourceColumn)).get(i));
                     } else {
-                        Map<Column<?>, Object> cartesianMap = new HashMap<>(map);
+                        Map<Column, Object> cartesianMap = new HashMap<>(map);
                         cartesianMap.putAll(rightMap.get(map.get(sourceColumn)).get(i));
                         iterator.add(cartesianMap);
                     }
@@ -153,7 +153,7 @@ public class DefaultEngine extends Engine {
         }
     }
 
-    private void orderBy(Dql dql, List<Map<Column<?>, Object>> dataset) {
+    private void orderBy(Dql dql, List<Map<Column, Object>> dataset) {
         if (null != dql.getOrderBys() && !dql.getOrderBys().isEmpty()) {
             dataset.sort((a, b) -> {
                 int i = 0;

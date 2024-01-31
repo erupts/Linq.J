@@ -32,7 +32,7 @@ public class ReflectUtil {
             String[].class, Character[].class, Byte[].class, Short[].class, Integer[].class, Float[].class, Double[].class, BigDecimal[].class
     };
 
-    public static <T> T convertMapToObject(Map<Column<?>, Object> map, Class<T> clazz) {
+    public static <T> T convertMapToObject(Map<Column, Object> map, Class<T> clazz) {
         try {
             for (Class<?> sc : SIMPLE_CLASS) {
                 if (sc == clazz) {
@@ -40,7 +40,7 @@ public class ReflectUtil {
                 }
             }
             T instance = clazz.getDeclaredConstructor().newInstance();
-            for (Map.Entry<Column<?>, Object> entry : map.entrySet()) {
+            for (Map.Entry<Column, Object> entry : map.entrySet()) {
                 try {
                     Field field = clazz.getDeclaredField(entry.getKey().getAlias());
                     field.setAccessible(true);

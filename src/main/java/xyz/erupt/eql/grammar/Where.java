@@ -16,55 +16,55 @@ public interface Where {
 
     // equals
     default <R> Linq eq(SFunction<R, ?> column, Object value) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> null != value && value.equals(f.get(c)));
     }
 
     // not equals
     default <R> Linq ne(SFunction<R, ?> column, Object value) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> null != value && !value.equals(f.get(c)));
     }
 
 
     // :val >= start and :val <= end
     default <R> Linq between(SFunction<R, ?> column, Object start, Object end) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> CompareUtil.compare(start, f.get(c), CompareSymbol.LTE) &&
                 CompareUtil.compare(end, f.get(c), CompareSymbol.GTE));
     }
 
     // >
     default <R> Linq gt(SFunction<R, ?> column, Object value) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> CompareUtil.compare(value, f.get(c), CompareSymbol.GT));
     }
 
     // >=
     default <R> Linq gte(SFunction<R, ?> column, Object value) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> CompareUtil.compare(value, f.get(c), CompareSymbol.GTE));
     }
 
     // <
     default <R> Linq lt(SFunction<R, ?> column, Object value) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> CompareUtil.compare(value, f.get(c), CompareSymbol.LT));
     }
 
     // <=
     default <R> Linq lte(SFunction<R, ?> column, Object value) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> CompareUtil.compare(value, f.get(c), CompareSymbol.LTE));
     }
 
     default <R> Linq like(SFunction<R, ?> column, Object value) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> f.get(c) != null && value != null && f.get(c).toString().contains(value.toString()));
     }
 
     default <R> Linq in(SFunction<R, ?> column, Object... value) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> f.get(c) != null && Arrays.stream(value).anyMatch(it -> null != it && it.equals(f.get(c))));
     }
 
@@ -73,7 +73,7 @@ public interface Where {
     }
 
     default <R> Linq notIn(SFunction<R, ?> column, Object... value) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> f.get(c) != null && Arrays.stream(value).noneMatch(it -> null != it && it.equals(f.get(c))));
     }
 
@@ -83,25 +83,25 @@ public interface Where {
 
 
     default <R> Linq isNull(SFunction<R, ?> column) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> f.get(c) == null);
     }
 
     default <R> Linq isNotNull(SFunction<R, ?> column) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> f.get(c) != null);
     }
 
     default <R> Linq isBlank(SFunction<R, ?> column) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> f.get(c) == null || f.get(c).toString().trim().isEmpty());
     }
 
     default <R> Linq isNotBlank(SFunction<R, ?> column) {
-        Column<R> c = Columns.fromLambda(column);
+        Column c = Columns.fromLambda(column);
         return condition(f -> f.get(c) != null && !f.get(c).toString().trim().isEmpty());
     }
 
-    Linq condition(Function<Map<Column<?>, ?>, Boolean> fun);
+    Linq condition(Function<Map<Column, ?>, Boolean> fun);
 
 }

@@ -13,10 +13,10 @@ import java.util.function.BiFunction;
 
 public class Columns {
 
-    public static <T> Column<T> fromLambda(SFunction<T, ?> fun, String alias) {
+    public static <T> Column fromLambda(SFunction<T, ?> fun, String alias) {
         LambdaInfo lambdaInfo = LambdaReflect.getInfo(fun);
-        Column<T> column = new Column<>();
-        column.setTable((Class<T>) lambdaInfo.getClazz());
+        Column column = new Column();
+        column.setTable(lambdaInfo.getClazz());
         column.setField(lambdaInfo.getField());
         if (null == alias) {
             column.setAlias(lambdaInfo.getField());
@@ -26,86 +26,86 @@ public class Columns {
         return column;
     }
 
-    public static <T> Column<T> fromLambda(SFunction<T, ?> fun) {
+    public static <T> Column fromLambda(SFunction<T, ?> fun) {
         return Columns.fromLambda(fun, null);
     }
 
-    public static <T> Column<T> fromField(Field field) {
-        Column<T> column = new Column<>();
-        column.setTable((Class<T>) field.getDeclaringClass());
+    public static Column fromField(Field field) {
+        Column column = new Column();
+        column.setTable(field.getDeclaringClass());
         column.setField(field.getName());
         column.setAlias(field.getName());
         return column;
     }
 
-    public static <R> Column<R> all(Class<R> r) {
-        Column<R> column = new Column<>();
+    public static <R> Column all(Class<R> r) {
+        Column column = new Column();
         column.setTable(r);
         return column;
     }
 
-    public static <R> Column<R> of(SFunction<R, ?> fun) {
+    public static <R> Column of(SFunction<R, ?> fun) {
         return Columns.fromLambda(fun);
     }
 
-    public static <R> Column<R> of(SFunction<R, ?> fun, String alias) {
+    public static <R> Column of(SFunction<R, ?> fun, String alias) {
         return Columns.fromLambda(fun, alias);
     }
 
-    public static <R, A> Column<R> of(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+    public static <R, A> Column of(SFunction<R, ?> fun, SFunction<A, ?> alias) {
         return of(fun, LambdaReflect.getInfo(alias).getField());
     }
 
-    public static Column<?> ofs(SFunction<Map<String, ?>, ?> fun, String alias) {
+    public static Column ofs(SFunction<Map<String, ?>, ?> fun, String alias) {
         return Columns.fromLambda(fun, alias);
     }
 
-    public static <A> Column<?> ofs(SFunction<Map<String, ?>, ?> fun, SFunction<A, ?> alias) {
+    public static <A> Column ofs(SFunction<Map<String, ?>, ?> fun, SFunction<A, ?> alias) {
         return Columns.fromLambda(fun, LambdaReflect.getInfo(alias).getField());
     }
 
-    public static Column<VirtualModel> count(String alias) {
-        Column<VirtualModel> column = new Column<>(VirtualModel.class, String.class, "number", alias);
+    public static Column count(String alias) {
+        Column column = new Column(VirtualModel.class, String.class, LambdaReflect.getInfo(VirtualModel::getNumber).getField(), alias);
         column.setGroupByFun(it -> BigDecimal.valueOf(it.size()));
         return column;
     }
 
-    public static <A> Column<?> count(SFunction<A, ?> alias) {
+    public static <A> Column count(SFunction<A, ?> alias) {
         return count(LambdaReflect.getInfo(alias).getField());
     }
 
-    public static <R> Column<R> count(SFunction<R, ?> fun, String alias) {
+    public static <R> Column count(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             int i = 0;
-            for (Map<Column<?>, ?> map : list) {
+            for (Map<Column, ?> map : list) {
                 if (null != map.get(column)) i++;
             }
             return BigDecimal.valueOf(i);
         });
     }
 
-    public static <R, A> Column<R> count(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+    public static <R, A> Column count(SFunction<R, ?> fun, SFunction<A, ?> alias) {
         return count(fun, LambdaReflect.getInfo(alias).getField());
     }
 
-    public static <R> Column<R> countDistinct(SFunction<R, ?> fun, String alias) {
+    public static <R> Column countDistinct(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             Map<Object, Void> distinctMap = new HashMap<>();
-            for (Map<Column<?>, ?> map : list) {
+            for (Map<Column, ?> map : list) {
                 Optional.ofNullable(map.get(column)).ifPresent(it -> distinctMap.put(it, null));
             }
             return BigDecimal.valueOf(distinctMap.size());
         });
     }
 
-    public static <R, A> Column<R> countDistinct(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+    public static <R, A> Column countDistinct(SFunction<R, ?> fun, SFunction<A, ?> alias) {
         return countDistinct(fun, LambdaReflect.getInfo(alias).getField());
     }
 
-    public static <R> Column<R> max(SFunction<R, ?> fun, String alias) {
+    public static <R> Column max(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             Object result = null;
-            for (Map<Column<?>, ?> map : list) {
+            for (Map<Column, ?> map : list) {
                 Object val = map.get(column);
                 if (null == result) {
                     result = val;
@@ -123,14 +123,14 @@ public class Columns {
     }
 
 
-    public static <R, A> Column<R> max(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+    public static <R, A> Column max(SFunction<R, ?> fun, SFunction<A, ?> alias) {
         return max(fun, LambdaReflect.getInfo(alias).getField());
     }
 
-    public static <R> Column<R> min(SFunction<R, ?> fun, String alias) {
+    public static <R> Column min(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             Object result = null;
-            for (Map<Column<?>, ?> map : list) {
+            for (Map<Column, ?> map : list) {
                 Object val = map.get(column);
                 if (null == result) {
                     result = val;
@@ -147,15 +147,15 @@ public class Columns {
         });
     }
 
-    public static <R, A> Column<R> min(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+    public static <R, A> Column min(SFunction<R, ?> fun, SFunction<A, ?> alias) {
         return min(fun, LambdaReflect.getInfo(alias).getField());
     }
 
-    public static <R> Column<R> avg(SFunction<R, ?> fun, String alias) {
+    public static <R> Column avg(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             BigDecimal bigDecimal = new BigDecimal(0);
             int count = 0;
-            for (Map<Column<?>, ?> map : list) {
+            for (Map<Column, ?> map : list) {
                 Object val = map.get(column);
                 if (val instanceof Number) {
                     bigDecimal = bigDecimal.add(new BigDecimal(String.valueOf(val)));
@@ -166,14 +166,14 @@ public class Columns {
         });
     }
 
-    public static <R, A> Column<R> avg(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+    public static <R, A> Column avg(SFunction<R, ?> fun, SFunction<A, ?> alias) {
         return avg(fun, LambdaReflect.getInfo(alias).getField());
     }
 
-    public static <R> Column<R> sum(SFunction<R, ?> fun, String alias) {
+    public static <R> Column sum(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             BigDecimal bigDecimal = new BigDecimal(0);
-            for (Map<Column<?>, ?> map : list) {
+            for (Map<Column, ?> map : list) {
                 Object val = map.get(column);
                 if (val instanceof Number) {
                     bigDecimal = bigDecimal.add(new BigDecimal(String.valueOf(val)));
@@ -183,26 +183,26 @@ public class Columns {
         });
     }
 
-    public static <R, A> Column<R> sum(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+    public static <R, A> Column sum(SFunction<R, ?> fun, SFunction<A, ?> alias) {
         return sum(fun, LambdaReflect.getInfo(alias).getField());
     }
 
     //自定义分组处理函数
-    public static <R> Column<R> groupByProcess(SFunction<R, ?> fun, String alias, BiFunction<Column<?>, List<Map<Column<?>, Object>>, Object> groupByFun) {
-        Column<R> column = Columns.fromLambda(fun, alias);
+    public static <R> Column groupByProcess(SFunction<R, ?> fun, String alias, BiFunction<Column, List<Map<Column, Object>>, Object> groupByFun) {
+        Column column = Columns.fromLambda(fun, alias);
         column.setGroupByFun(it -> groupByFun.apply(column.getRawColumn(), it));
         return column;
     }
 
     //column common process
-    public static List<Column<?>> columnsProcess(Column<?>... columns) {
-        List<Column<?>> cols = new ArrayList<>();
-        for (Column<?> column : columns) {
+    public static List<Column> columnsProcess(Column... columns) {
+        List<Column> cols = new ArrayList<>();
+        for (Column column : columns) {
             if (column.getField() == null) {
                 // Column.All → select *
                 if (null != column.getTable()) {
                     for (Field field : column.getTable().getDeclaredFields()) {
-                        cols.add(new Column<>(column.getTable(), field.getType(), field.getName(), field.getName()));
+                        cols.add(new Column(column.getTable(), field.getType(), field.getName(), field.getName()));
                     }
                 }
             } else {
