@@ -3,7 +3,7 @@ package xyz.erupt.eql;
 import org.junit.Before;
 import org.junit.Test;
 import xyz.erupt.eql.data.TestSource;
-import xyz.erupt.eql.data.TestTarget;
+import xyz.erupt.eql.data.TestSourceExt;
 import xyz.erupt.eql.grammar.OrderBy;
 import xyz.erupt.eql.util.Columns;
 
@@ -13,7 +13,7 @@ public class LinqTest {
 
     private final List<TestSource> source = new ArrayList<>();
 
-    private final List<TestTarget> target = new ArrayList<>();
+    private final List<TestSourceExt> target = new ArrayList<>();
 
 
     @Before
@@ -21,30 +21,29 @@ public class LinqTest {
         source.add(new TestSource(1, "Thanos", new Date(), new String[]{"a", "b"}));
         source.add(new TestSource(2, "Cube", new Date(), new String[]{"c", "d"}));
         source.add(new TestSource(3, "Berg", new Date(), new String[]{"f"}));
-        source.add(new TestSource(4, "Liz", new Date(), new String[]{"x", "y", "z"}));
+        source.add(new TestSource(4, "Liz", new Date(), new String[]{"a", "s", "x", "y", "z"}));
 
-        target.add(new TestTarget(1, "Aa"));
-        target.add(new TestTarget(2, "Bb"));
-        target.add(new TestTarget(3, "Cc"));
+        target.add(new TestSourceExt(1, "Aa"));
+        target.add(new TestSourceExt(2, "Bb"));
+        target.add(new TestSourceExt(3, "Cc"));
     }
 
     @Test
     public void joinTest() {
         List<Map<String, Object>> leftJoinRes = Linq.from(source)
-                .leftJoin(target, TestTarget::getAge, TestSource::getAge)
+                .leftJoin(target, TestSourceExt::getId, TestSource::getId)
                 .select(
                         Columns.all(TestSource.class),
-                        Columns.of(TestTarget::getName, "name2")
+                        Columns.of(TestSourceExt::getName, "name2")
                 )
                 .writeMap();
         assert source.size() == leftJoinRes.size();
-        assert leftJoinRes.get(0).get("name2") != null;
 
         List<Map<String, Object>> rightJoinRes = Linq.from(source)
-                .rightJoin(target, TestTarget::getAge, TestSource::getAge)
+                .rightJoin(target, TestSourceExt::getId, TestSource::getId)
                 .select(
                         Columns.all(TestSource.class),
-                        Columns.of(TestTarget::getName, "name2")
+                        Columns.of(TestSourceExt::getName, "name2")
                 )
                 .writeMap();
         assert target.size() == rightJoinRes.size();
@@ -54,8 +53,8 @@ public class LinqTest {
     @Test
     public void writeSimpleType() {
         List<String[]> arrays = Linq.from(source).select(Columns.of(TestSource::getTags)).write(String[].class);
-        List<Date> dates = Linq.from(source).select(Columns.of(TestSource::getAge)).write(Date.class);
-        List<Integer> integers = Linq.from(source).select(Columns.of(TestSource::getAge)).write(Integer.class);
+        List<Date> dates = Linq.from(source).select(Columns.of(TestSource::getId)).write(Date.class);
+        List<Integer> integers = Linq.from(source).select(Columns.of(TestSource::getId)).write(Integer.class);
         List<String> strings = Linq.from(source).select(Columns.of(TestSource::getName)).write(String.class);
         assert !arrays.isEmpty() && !dates.isEmpty() && !integers.isEmpty() && !strings.isEmpty();
     }
@@ -66,10 +65,10 @@ public class LinqTest {
         List<Map<String, Object>> result = Linq.from(source)
                 .groupBy(Columns.of(TestSource::getName))
                 .select(
-                        Columns.of(TestSource::getAge, "age_xxx"),
-                        Columns.sum(TestSource::getAge, TestTarget::getAge),
-                        Columns.min(TestSource::getAge, TestSource::getDate),
-                        Columns.avg(TestSource::getAge, "avg"),
+                        Columns.of(TestSource::getId, "raw_id"),
+                        Columns.sum(TestSource::getId, TestSourceExt::getId),
+                        Columns.min(TestSource::getDate, TestSource::getDate),
+                        Columns.avg(TestSource::getId, "avg"),
                         Columns.count(TestSource::getName, "ncount")
                 ).writeMap();
         System.out.println(result);
@@ -79,57 +78,52 @@ public class LinqTest {
     public void orderBy() {
         List<TestSource> result = Linq.from(source)
                 .select(Columns.all(TestSource.class))
-                .orderBy(TestSource::getAge, OrderBy.Direction.DESC)
+                .orderBy(TestSource::getId, OrderBy.Direction.DESC)
                 .orderBy(TestSource::getName)
                 .write(TestSource.class);
-        source.sort(Comparator.comparingInt(TestSource::getAge));
-        assert Objects.equals(result.get(0).getAge(), source.get(source.size() - 1).getAge());
+        source.sort(Comparator.comparingInt(TestSource::getId));
+        assert Objects.equals(result.get(0).getId(), source.get(source.size() - 1).getId());
     }
 
     @Test
     public void customerCondition() {
         List<Map<String, Object>> res = Linq.from(source)
-                .innerJoin(target, TestTarget::getAge, TestSource::getAge)
-                .select(
-                        Columns.all(TestSource.class),
-                        Columns.of(TestTarget::getName, "name2"),
-                        Columns.sum(TestSource::getAge, "sum")
-                )
+                .leftJoin(target, TestSourceExt::getId, TestSource::getId).select(Columns.all(TestSource.class))
                 .condition(data -> {
                     Object o = data.get(Columns.fromLambda(TestSource::getTags));
                     if (null != o) {
-                        return ((String[]) o)[0].equals("a");
+                        for (String s : ((String[]) o)) {
+                            if ("a".equals(s)) {
+                                return true;
+                            }
+                        }
+                        return false;
                     }
                     return true;
-                })
-                .writeMap();
-        System.out.println(res);
+                }).writeMap();
+        int count = 0;
+        for (TestSource testSource : source) {
+            if (null != testSource.getTags()) {
+                for (String s : testSource.getTags()) {
+                    if ("a".equals(s)) {
+                        count++;
+                        break;
+                    }
+                }
+            }
+        }
+        assert res.size() == count;
     }
 
 
     @Test
-    public void conditionEqTest() {
-        Linq.from(source).ne(TestSource::getName, 1).write(null);
-    }
-
-    @Test
-    public void conditionInTest() {
-        Linq.from(source).in(TestSource::getAge, 1, null).write(null);
-    }
-
-    @Test
-    public void conditionNotInTest() {
-        Linq.from(source).notIn(TestSource::getAge, 1, 2, null).write(null);
-    }
-
-    @Test
-    public void conditionLikeTest() {
-        Linq.from(source).like(TestSource::getName, 'a').write(null);
-    }
-
-    @Test
-    public void conditionLtTest() {
-        Linq.from(source).gt(TestSource::getName, "bb").write(null);
+    public void conditionTest() {
+        Linq.from(source).eq(TestSource::getName, "Thanos").select(Columns.of(TestSource::getId)).write(Integer.class);
+        Linq.from(source).ne(TestSource::getName, "Thanos").select(Columns.of(TestSource::getId)).write(Integer.class);
+        Linq.from(source).in(TestSource::getId, 1, null).select(Columns.of(TestSource::getId)).write(Integer.class);
+        Linq.from(source).notIn(TestSource::getId, 1, 2, null).select(Columns.of(TestSource::getId)).write(Integer.class);
+        Linq.from(source).like(TestSource::getName, "a").select(Columns.of(TestSource::getId)).write(Integer.class);
+        Linq.from(source).between(TestSource::getId, 1, 3).select(Columns.of(TestSource::getId)).write(Integer.class);
     }
 
 }

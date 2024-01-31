@@ -8,7 +8,7 @@ public class LambdaTest {
 
     @Test
     public void testLambdaInfo() {
-        assert "age".equals(LambdaReflect.getInfo(TestSource::getAge).getField());
+        assert "id".equals(LambdaReflect.getInfo(TestSource::getId).getField());
         assert "name".equals(LambdaReflect.getInfo(TestSource::getName).getField());
         assert TestSource.class == LambdaReflect.getInfo(TestSource::getName).getClazz();
     }

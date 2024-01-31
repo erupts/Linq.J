@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class TestSource {
 
-    private Integer age;
+    private Integer id;
 
     private String name;
 
@@ -12,12 +12,12 @@ public class TestSource {
 
     private String[] tags;
 
-    public Integer getAge() {
-        return age;
+    public Integer getId() {
+        return id;
     }
 
-    public void setAge(Integer age) {
-        this.age = age;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -44,8 +44,8 @@ public class TestSource {
         this.tags = tags;
     }
 
-    public TestSource(Integer age, String name, Date date, String[] tags) {
-        this.age = age;
+    public TestSource(Integer id, String name, Date date, String[] tags) {
+        this.id = id;
         this.name = name;
         this.date = date;
         this.tags = tags;
