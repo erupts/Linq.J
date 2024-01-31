@@ -7,18 +7,18 @@ import xyz.erupt.eql.util.Columns;
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class LambdaInfo<T> {
+public class LambdaInfo {
 
-    private final Class<T> clazz;
+    private final Class<?> clazz;
 
     private final String field;
 
-    public LambdaInfo(Class<T> clazz, String field) {
+    public LambdaInfo(Class<?> clazz, String field) {
         this.clazz = clazz;
         this.field = field;
     }
 
-    public Class<T> getClazz() {
+    public Class<?> getClazz() {
         return clazz;
     }
 

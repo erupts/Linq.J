@@ -13,4 +13,14 @@ public class LambdaTest {
         assert TestSource.class == LambdaReflect.getInfo(TestSource::getName).getClazz();
     }
 
+    @Test
+    public void lambdaCacheTest() {
+        LambdaReflect.getInfo(TestSource::getDate);
+        LambdaReflect.getInfo(TestSource::getClass);
+        for (int i = 0; i < 100000; i++) {
+            LambdaReflect.getInfo(TestSource::getName);
+            LambdaReflect.getInfo(TestSource::getId);
+        }
+    }
+
 }

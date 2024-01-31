@@ -14,9 +14,9 @@ import java.util.function.BiFunction;
 public class Columns {
 
     public static <T> Column<T> fromLambda(SFunction<T, ?> fun, String alias) {
-        LambdaInfo<T> lambdaInfo = LambdaReflect.getInfo(fun);
+        LambdaInfo lambdaInfo = LambdaReflect.getInfo(fun);
         Column<T> column = new Column<>();
-        column.setTable(lambdaInfo.getClazz());
+        column.setTable((Class<T>) lambdaInfo.getClazz());
         column.setField(lambdaInfo.getField());
         if (null == alias) {
             column.setAlias(lambdaInfo.getField());

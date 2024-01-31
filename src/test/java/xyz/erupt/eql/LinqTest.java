@@ -29,6 +29,15 @@ public class LinqTest {
     }
 
     @Test
+    public void select() {
+        Linq.from(source).select(
+                Columns.ofs(it -> {
+                    return null;
+                }, "哈哈")
+        );
+    }
+
+    @Test
     public void joinTest() {
         List<Map<String, Object>> leftJoinRes = Linq.from(source)
                 .leftJoin(target, TestSourceExt::getId, TestSource::getId)

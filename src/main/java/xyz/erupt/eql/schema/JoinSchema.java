@@ -4,9 +4,7 @@ import xyz.erupt.eql.consts.JoinExchange;
 import xyz.erupt.eql.consts.JoinMethod;
 import xyz.erupt.eql.lambda.LambdaReflect;
 import xyz.erupt.eql.lambda.SFunction;
-import xyz.erupt.eql.util.ReflectUtil;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -34,7 +32,7 @@ public class JoinSchema<T> {
         this.target = target;
         this.lon = lon;
         this.ron = ron;
-        this.clazz = LambdaReflect.getInfo(lon).getClazz();
+        this.clazz = (Class<T>) LambdaReflect.getInfo(lon).getClazz();
         this.joinExchange = JoinExchange.HASH;
     }
 
