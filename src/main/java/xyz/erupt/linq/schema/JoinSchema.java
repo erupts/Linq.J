@@ -6,7 +6,6 @@ import xyz.erupt.linq.lambda.LambdaReflect;
 import xyz.erupt.linq.lambda.SFunction;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.function.BiFunction;
 
 public class JoinSchema<T> {
@@ -19,7 +18,7 @@ public class JoinSchema<T> {
 
     private final Class<T> clazz;
 
-    private BiFunction<T, Map<Column, ?>, Boolean> on;
+    private BiFunction<T, Row, Boolean> on;
 
     private SFunction<T, ?> lon;
 
@@ -36,7 +35,7 @@ public class JoinSchema<T> {
         this.joinExchange = JoinExchange.HASH;
     }
 
-    public JoinSchema(JoinMethod joinMethod, Collection<T> target, BiFunction<T, Map<Column, ?>, Boolean> on) {
+    public JoinSchema(JoinMethod joinMethod, Collection<T> target, BiFunction<T, Row, Boolean> on) {
         this.joinMethod = joinMethod;
         this.target = target;
         this.on = on;
@@ -60,11 +59,11 @@ public class JoinSchema<T> {
         return clazz;
     }
 
-    public BiFunction<T, Map<Column, ?>, Boolean> getOn() {
+    public BiFunction<T, Row, Boolean> getOn() {
         return on;
     }
 
-    public void setOn(BiFunction<T, Map<Column, ?>, Boolean> on) {
+    public void setOn(BiFunction<T, Row, Boolean> on) {
         this.on = on;
     }
 

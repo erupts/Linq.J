@@ -4,12 +4,12 @@ import xyz.erupt.linq.Linq;
 import xyz.erupt.linq.consts.CompareSymbol;
 import xyz.erupt.linq.lambda.SFunction;
 import xyz.erupt.linq.schema.Column;
+import xyz.erupt.linq.schema.Row;
 import xyz.erupt.linq.util.Columns;
 import xyz.erupt.linq.util.CompareUtil;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 public interface Where {
@@ -102,6 +102,6 @@ public interface Where {
         return condition(f -> f.get(c) != null && !f.get(c).toString().trim().isEmpty());
     }
 
-    Linq condition(Function<Map<Column, ?>, Boolean> fun);
+    Linq condition(Function<Row, Boolean> fun);
 
 }

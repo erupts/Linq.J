@@ -4,6 +4,7 @@ import xyz.erupt.linq.exception.EqlException;
 import xyz.erupt.linq.schema.Column;
 import xyz.erupt.linq.schema.Dql;
 import xyz.erupt.linq.schema.JoinSchema;
+import xyz.erupt.linq.schema.Row;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,6 @@ public abstract class Engine {
     }
 
 
-    public abstract List<Map<Column, Object>> query(Dql dql);
+    public abstract List<Row> query(Dql dql);
 
 }

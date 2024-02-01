@@ -3,7 +3,6 @@ package xyz.erupt.linq.schema;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 public class Dql {
@@ -20,7 +19,7 @@ public class Dql {
     private List<JoinSchema<?>> joinSchemas = new ArrayList<>();
 
     //条件过滤控制
-    private List<Function<Map<Column, ?>, Boolean>> conditions = new ArrayList<>();
+    private List<Function<Row, Boolean>> conditions = new ArrayList<>();
 
     //分组控制
     private List<Column> groupBys = new ArrayList<>();
@@ -58,11 +57,11 @@ public class Dql {
         this.columns = columns;
     }
 
-    public List<Function<Map<Column, ?>, Boolean>> getConditions() {
+    public List<Function<Row, Boolean>> getConditions() {
         return conditions;
     }
 
-    public void setConditions(List<Function<Map<Column, ?>, Boolean>> conditions) {
+    public void setConditions(List<Function<Row, Boolean>> conditions) {
         this.conditions = conditions;
     }
 

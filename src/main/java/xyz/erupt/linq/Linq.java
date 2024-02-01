@@ -5,14 +5,10 @@ import xyz.erupt.linq.engine.DefaultEngine;
 import xyz.erupt.linq.engine.Engine;
 import xyz.erupt.linq.grammar.*;
 import xyz.erupt.linq.lambda.SFunction;
-import xyz.erupt.linq.schema.Column;
-import xyz.erupt.linq.schema.Dql;
-import xyz.erupt.linq.schema.JoinSchema;
-import xyz.erupt.linq.schema.OrderByColumn;
+import xyz.erupt.linq.schema.*;
 import xyz.erupt.linq.util.Columns;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.function.Function;
 
 public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
@@ -67,7 +63,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public Linq condition(Function<Map<Column, ?>, Boolean> fun) {
+    public Linq condition(Function<Row, Boolean> fun) {
         this.dql.getConditions().add(fun);
         return this;
     }

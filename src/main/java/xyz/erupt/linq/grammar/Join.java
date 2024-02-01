@@ -3,11 +3,10 @@ package xyz.erupt.linq.grammar;
 import xyz.erupt.linq.Linq;
 import xyz.erupt.linq.consts.JoinMethod;
 import xyz.erupt.linq.lambda.SFunction;
-import xyz.erupt.linq.schema.Column;
 import xyz.erupt.linq.schema.JoinSchema;
+import xyz.erupt.linq.schema.Row;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.function.BiFunction;
 
 public interface Join {
@@ -18,7 +17,7 @@ public interface Join {
     <T, S> Linq join(JoinMethod joinMethod, Collection<T> target, SFunction<T, Object> onL, SFunction<S, Object> onR);
 
 
-    default <T> Linq join(JoinMethod joinMethod, Collection<T> target, BiFunction<T, Map<Column, ?>, Boolean> on) {
+    default <T> Linq join(JoinMethod joinMethod, Collection<T> target, BiFunction<T, Row, Boolean> on) {
         return join(new JoinSchema<>(joinMethod, target, on));
     }
 

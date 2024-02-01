@@ -1,7 +1,6 @@
 package xyz.erupt.linq.schema;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -20,10 +19,10 @@ public class Column {
     private Supplier<List<Column>> unfold;
 
     // Column value convert handler
-    private Function<Map<Column, Object>, ?> valueConvertFun;
+    private Function<Row, ?> valueConvertFun;
 
     // The handler functions listed in the grouping scenario
-    private Function<List<Map<Column, Object>>, Object> groupByFun;
+    private Function<List<Row>, Object> groupByFun;
 
     public Column() {
     }
@@ -77,19 +76,19 @@ public class Column {
     }
 
 
-    public Function<List<Map<Column, Object>>, Object> getGroupByFun() {
+    public Function<List<Row>, Object> getGroupByFun() {
         return groupByFun;
     }
 
-    public void setGroupByFun(Function<List<Map<Column, Object>>, Object> groupByFun) {
+    public void setGroupByFun(Function<List<Row>, Object> groupByFun) {
         this.groupByFun = groupByFun;
     }
 
-    public Function<Map<Column, Object>, ?> getValueConvertFun() {
+    public Function<Row, ?> getValueConvertFun() {
         return valueConvertFun;
     }
 
-    public void setValueConvertFun(Function<Map<Column, Object>, ?> valueConvertFun) {
+    public void setValueConvertFun(Function<Row, ?> valueConvertFun) {
         this.valueConvertFun = valueConvertFun;
     }
 

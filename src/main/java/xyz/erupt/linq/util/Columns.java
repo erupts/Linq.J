@@ -5,6 +5,7 @@ import xyz.erupt.linq.lambda.LambdaInfo;
 import xyz.erupt.linq.lambda.LambdaReflect;
 import xyz.erupt.linq.lambda.SFunction;
 import xyz.erupt.linq.schema.Column;
+import xyz.erupt.linq.schema.Row;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -64,7 +65,7 @@ public class Columns {
         return of(fun, LambdaReflect.getInfo(alias).getField());
     }
 
-    public static Column ofs(Function<Map<Column, Object>, ?> fun, String alias) {
+    public static Column ofs(Function<Row, ?> fun, String alias) {
         Column column = new Column();
         column.setTable(VirtualColumn.class);
         column.setField(VirtualColumn.lambdaInfo().getField());
@@ -73,7 +74,7 @@ public class Columns {
         return column;
     }
 
-    public static <A> Column ofs(Function<Map<Column, Object>, ?> fun, SFunction<A, ?> alias) {
+    public static <A> Column ofs(Function<Row, ?> fun, SFunction<A, ?> alias) {
         return ofs(fun, LambdaReflect.getInfo(alias).getField());
     }
 
@@ -90,8 +91,8 @@ public class Columns {
     public static <R> Column count(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             int i = 0;
-            for (Map<Column, ?> map : list) {
-                if (null != map.get(column)) i++;
+            for (Row row : list) {
+                if (null != row.get(column)) i++;
             }
             return BigDecimal.valueOf(i);
         });
@@ -104,8 +105,8 @@ public class Columns {
     public static <R> Column countDistinct(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             Map<Object, Void> distinctMap = new HashMap<>();
-            for (Map<Column, ?> map : list) {
-                Optional.ofNullable(map.get(column)).ifPresent(it -> distinctMap.put(it, null));
+            for (Row row : list) {
+                Optional.ofNullable(row.get(column)).ifPresent(it -> distinctMap.put(it, null));
             }
             return BigDecimal.valueOf(distinctMap.size());
         });
@@ -118,8 +119,8 @@ public class Columns {
     public static <R> Column max(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             Object result = null;
-            for (Map<Column, ?> map : list) {
-                Object val = map.get(column);
+            for (Row row : list) {
+                Object val = row.get(column);
                 if (null == result) result = val;
                 if (CompareUtil.compare(val, result, CompareSymbol.GT)) result = val;
             }
@@ -139,8 +140,8 @@ public class Columns {
     public static <R> Column min(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             Object result = null;
-            for (Map<Column, ?> map : list) {
-                Object val = map.get(column);
+            for (Row row : list) {
+                Object val = row.get(column);
                 if (null == result) result = val;
                 if (CompareUtil.compare(val, result, CompareSymbol.LT)) result = val;
             }
@@ -160,8 +161,8 @@ public class Columns {
         return groupByProcess(fun, alias, (column, list) -> {
             BigDecimal bigDecimal = new BigDecimal(0);
             int count = 0;
-            for (Map<Column, ?> map : list) {
-                Object val = map.get(column);
+            for (Row row : list) {
+                Object val = row.get(column);
                 if (val instanceof Number) {
                     bigDecimal = bigDecimal.add(new BigDecimal(String.valueOf(val)));
                     count++;
@@ -178,8 +179,8 @@ public class Columns {
     public static <R> Column sum(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             BigDecimal bigDecimal = new BigDecimal(0);
-            for (Map<Column, ?> map : list) {
-                Object val = map.get(column);
+            for (Row row : list) {
+                Object val = row.get(column);
                 if (val instanceof Number) {
                     bigDecimal = bigDecimal.add(new BigDecimal(String.valueOf(val)));
                 }
@@ -193,7 +194,7 @@ public class Columns {
     }
 
     //自定义分组处理函数
-    public static <R> Column groupByProcess(SFunction<R, ?> fun, String alias, BiFunction<Column, List<Map<Column, Object>>, Object> groupByFun) {
+    public static <R> Column groupByProcess(SFunction<R, ?> fun, String alias, BiFunction<Column, List<Row>, Object> groupByFun) {
         Column column = Columns.fromLambda(fun, alias);
         column.setGroupByFun(it -> groupByFun.apply(column.getRawColumn(), it));
         return column;
