@@ -32,8 +32,8 @@ public class LinqTest {
     @Test
     public void select() {
         List<String> result = Linq.from(source).select(
-                Columns.ofs(it -> it.get("name") + " student", "哈哈")
-        ).write(String.class);
+                Columns.ofs(it -> it.get("name") + " Borg", "Hello")
+        ).distinct().write(String.class);
         System.out.println(result);
     }
 

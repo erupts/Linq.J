@@ -24,7 +24,12 @@ public class Row extends HashMap<Column, Object> {
     }
 
     public Object get(String alias) {
-        return super.get(alias);
+        for (Column column : this.keySet()) {
+            if (alias.equals(column.getAlias())) {
+                return super.get(column);
+            }
+        }
+        return null;
     }
 
     public <T, R> Object get(SFunction<T, R> alias) {

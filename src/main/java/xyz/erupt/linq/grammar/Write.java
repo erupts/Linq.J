@@ -1,6 +1,7 @@
 package xyz.erupt.linq.grammar;
 
 import xyz.erupt.linq.engine.Engine;
+import xyz.erupt.linq.exception.EqlException;
 import xyz.erupt.linq.schema.Dql;
 import xyz.erupt.linq.schema.Row;
 import xyz.erupt.linq.util.ColumnReflects;
@@ -12,6 +13,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public interface Write {
+
+    String MULTI_VAL_ERROR = "Expected one result (or null) to be returned by writeOne(), but found: ";
 
     Engine $engine();
 
@@ -25,11 +28,13 @@ public interface Write {
 
     default <T> T writeOne(Class<T> clazz) {
         $engine().syntaxCheck(this.$dql());
-        List<Row> table = $engine().query(this.$dql());
-        if (table.isEmpty()) {
+        List<Row> result = $engine().query(this.$dql());
+        if (result.isEmpty()) {
             return null;
+        } else if (result.size() == 1) {
+            return ColumnReflects.rowToObject(result.get(0), clazz);
         } else {
-            return ColumnReflects.rowToObject(table.get(0), clazz);
+            throw new EqlException(MULTI_VAL_ERROR + result.size());
         }
     }
 
@@ -45,5 +50,15 @@ public interface Write {
         return result;
     }
 
+    default Map<String, Object> writeMapOne() {
+        List<Map<String, Object>> result = writeMap();
+        if (result.isEmpty()) {
+            return null;
+        } else if (result.size() == 1) {
+            return result.get(0);
+        } else {
+            throw new EqlException(MULTI_VAL_ERROR + result.size());
+        }
+    }
 
 }
