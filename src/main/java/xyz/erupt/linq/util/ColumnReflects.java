@@ -1,6 +1,6 @@
 package xyz.erupt.linq.util;
 
-import xyz.erupt.linq.exception.EqlException;
+import xyz.erupt.linq.exception.LinqException;
 import xyz.erupt.linq.schema.Column;
 import xyz.erupt.linq.schema.Row;
 
@@ -20,7 +20,7 @@ public class ColumnReflects {
                 row.put(Columns.fromField(field), field.get(obj));
             }
         } catch (Exception e) {
-            throw new EqlException(e);
+            throw new LinqException(e);
         }
         return row;
     }
@@ -58,7 +58,7 @@ public class ColumnReflects {
             }
             return instance;
         } catch (Exception e) {
-            throw new EqlException(e);
+            throw new LinqException(e);
         }
     }
 

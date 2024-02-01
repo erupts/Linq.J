@@ -1,6 +1,6 @@
 package xyz.erupt.linq.engine;
 
-import xyz.erupt.linq.exception.EqlException;
+import xyz.erupt.linq.exception.LinqException;
 import xyz.erupt.linq.schema.Column;
 import xyz.erupt.linq.schema.Dql;
 import xyz.erupt.linq.schema.JoinSchema;
@@ -14,13 +14,13 @@ public abstract class Engine {
 
     public void syntaxCheck(Dql dql) {
         if (dql.getColumns().isEmpty()) {
-            throw new EqlException("Missing select definition");
+            throw new LinqException("Missing select definition");
         }
         // alias check
         Map<String, Void> alias = new HashMap<>();
         for (Column column : dql.getColumns()) {
             if (alias.containsKey(column.getAlias())) {
-                throw new EqlException("Column '" + column.getAlias() + "' is ambiguous");
+                throw new LinqException("Column '" + column.getAlias() + "' is ambiguous");
             }
             alias.put(column.getAlias(), null);
         }
@@ -28,7 +28,7 @@ public abstract class Engine {
         Map<Class<?>, Void> joinMap = new HashMap<>();
         for (JoinSchema<?> schema : dql.getJoinSchemas()) {
             if (joinMap.containsKey(schema.getClazz())) {
-                throw new EqlException("The same object join is not supported " + " → " + schema.getClazz().getSimpleName());
+                throw new LinqException("The same object join is not supported " + " → " + schema.getClazz().getSimpleName());
             }
             joinMap.put(schema.getClazz(), null);
         }

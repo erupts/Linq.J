@@ -1,7 +1,7 @@
 package xyz.erupt.linq.engine;
 
 import xyz.erupt.linq.consts.JoinExchange;
-import xyz.erupt.linq.exception.EqlException;
+import xyz.erupt.linq.exception.LinqException;
 import xyz.erupt.linq.grammar.OrderBy;
 import xyz.erupt.linq.schema.*;
 import xyz.erupt.linq.util.ColumnReflects;
@@ -43,7 +43,7 @@ public class DefaultEngine extends Engine {
                             break;
                     }
                 } else {
-                    throw new EqlException(joinSchema.getJoinExchange().name() + " is not supported yet");
+                    throw new LinqException(joinSchema.getJoinExchange().name() + " is not supported yet");
                 }
             }
         }
@@ -168,7 +168,7 @@ public class DefaultEngine extends Engine {
                         if (orderBy.getDirection() == OrderBy.Direction.DESC) i = ~i + 1;
                         if (i != 0) return i;
                     } else {
-                        throw new EqlException(orderBy.getColumn().getTable() + "." + orderBy.getColumn().getField() + " sort does not implement the Comparable interface");
+                        throw new LinqException(orderBy.getColumn().getTable() + "." + orderBy.getColumn().getField() + " sort does not implement the Comparable interface");
                     }
                 }
                 return i;

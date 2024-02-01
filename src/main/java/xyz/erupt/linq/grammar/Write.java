@@ -1,7 +1,7 @@
 package xyz.erupt.linq.grammar;
 
 import xyz.erupt.linq.engine.Engine;
-import xyz.erupt.linq.exception.EqlException;
+import xyz.erupt.linq.exception.LinqException;
 import xyz.erupt.linq.schema.Dql;
 import xyz.erupt.linq.schema.Row;
 import xyz.erupt.linq.util.ColumnReflects;
@@ -34,7 +34,7 @@ public interface Write {
         } else if (result.size() == 1) {
             return ColumnReflects.rowToObject(result.get(0), clazz);
         } else {
-            throw new EqlException(MULTI_VAL_ERROR + result.size());
+            throw new LinqException(MULTI_VAL_ERROR + result.size());
         }
     }
 
@@ -57,7 +57,7 @@ public interface Write {
         } else if (result.size() == 1) {
             return result.get(0);
         } else {
-            throw new EqlException(MULTI_VAL_ERROR + result.size());
+            throw new LinqException(MULTI_VAL_ERROR + result.size());
         }
     }
 
