@@ -11,12 +11,20 @@ public class LambdaReflect {
 
     private static final String IS = "is";
 
-    private static final Map<SFunction<?, ?>, LambdaInfo> FUNCTION_CACHE = new HashMap<>();
+    private static final String WRITE_REPLACE = "writeReplace";
+
+    private static final Map<SFunction<?, ?>, LambdaInfo> S_FUNCTION_CACHE = new HashMap<>();
 
     public static <T, R> LambdaInfo getInfo(SFunction<T, R> func) {
         try {
-            if (FUNCTION_CACHE.containsKey(func)) return FUNCTION_CACHE.get(func);
-            Method method = func.getClass().getDeclaredMethod("writeReplace");
+            if (S_FUNCTION_CACHE.containsKey(func)) {
+                return S_FUNCTION_CACHE.get(func);
+            } else {
+                synchronized (LambdaReflect.class) {
+                    if (S_FUNCTION_CACHE.containsKey(func)) return S_FUNCTION_CACHE.get(func);
+                }
+            }
+            Method method = func.getClass().getDeclaredMethod(WRITE_REPLACE);
             method.setAccessible(true);
             SerializedLambda serializedLambda = (SerializedLambda) method.invoke(func);
             String fieldName = serializedLambda.getImplMethodName();
@@ -26,7 +34,7 @@ public class LambdaReflect {
                     Class.forName(serializedLambda.getImplClass().replace("/", ".")),
                     fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1)
             );
-            FUNCTION_CACHE.put(func, lambdaInfo);
+            S_FUNCTION_CACHE.put(func, lambdaInfo);
             return lambdaInfo;
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

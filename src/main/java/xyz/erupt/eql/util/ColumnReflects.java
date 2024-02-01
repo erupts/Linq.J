@@ -7,24 +7,29 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.util.Map;
+import java.util.*;
 
-public class ReflectUtil {
+public class ColumnReflects {
 
-    public static Object getFieldValue(Object obj, String fieldName) {
+    public static Map<Column, Object> objectToColumnMap(Object obj) {
+        Map<Column, Object> columnObjectMap = new HashMap<>();
         try {
-            Field field = obj.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.get(obj);
+            for (Field field : obj.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                columnObjectMap.put(Columns.fromField(field), field.get(obj));
+            }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new EqlException(e);
         }
+        return columnObjectMap;
     }
 
-    public static Class<?> getActualType(Object o, int index) {
-        Type clazz = o.getClass().getGenericSuperclass();
-        ParameterizedType pt = (ParameterizedType) clazz;
-        return pt.getActualTypeArguments()[index].getClass();
+    public static List<Map<Column, Object>> listToColumns(Collection<?> objects) {
+        List<Map<Column, Object>> list = new ArrayList<>(objects.size());
+        for (Object object : objects) {
+            Optional.ofNullable(object).ifPresent(it -> list.add(objectToColumnMap(it)));
+        }
+        return list;
     }
 
     public static final Class<?>[] SIMPLE_CLASS = {
@@ -35,9 +40,7 @@ public class ReflectUtil {
     public static <T> T convertMapToObject(Map<Column, Object> map, Class<T> clazz) {
         try {
             for (Class<?> sc : SIMPLE_CLASS) {
-                if (sc == clazz) {
-                    return (T) map.get(map.keySet().iterator().next());
-                }
+                if (sc == clazz) return (T) map.get(map.keySet().iterator().next());
             }
             T instance = clazz.getDeclaredConstructor().newInstance();
             for (Map.Entry<Column, Object> entry : map.entrySet()) {
@@ -91,7 +94,12 @@ public class ReflectUtil {
         } else {
             return BigDecimal.valueOf(number.doubleValue());
         }
+    }
 
+    public static Class<?> getActualType(Object o, int index) {
+        Type clazz = o.getClass().getGenericSuperclass();
+        ParameterizedType pt = (ParameterizedType) clazz;
+        return pt.getActualTypeArguments()[index].getClass();
     }
 
 }

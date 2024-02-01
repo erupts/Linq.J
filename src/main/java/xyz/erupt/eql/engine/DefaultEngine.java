@@ -3,11 +3,11 @@ package xyz.erupt.eql.engine;
 import xyz.erupt.eql.consts.JoinExchange;
 import xyz.erupt.eql.exception.EqlException;
 import xyz.erupt.eql.grammar.OrderBy;
-import xyz.erupt.eql.lambda.LambdaInfo;
 import xyz.erupt.eql.schema.Column;
 import xyz.erupt.eql.schema.Dql;
 import xyz.erupt.eql.schema.JoinSchema;
 import xyz.erupt.eql.schema.OrderByColumn;
+import xyz.erupt.eql.util.ColumnReflects;
 import xyz.erupt.eql.util.Columns;
 
 import java.util.*;
@@ -18,14 +18,14 @@ public class DefaultEngine extends Engine {
 
     @Override
     public List<Map<Column, Object>> query(Dql dql) {
-        List<Map<Column, Object>> table = LambdaInfo.objectToLambdaInfos(dql.getSource());
+        List<Map<Column, Object>> table = ColumnReflects.listToColumns(dql.getSource());
         // join process
         if (!dql.getJoinSchemas().isEmpty()) {
             for (JoinSchema<?> joinSchema : dql.getJoinSchemas()) {
                 Column lon = Columns.fromLambda(joinSchema.getLon());
                 Column ron = Columns.fromLambda(joinSchema.getRon());
                 if (joinSchema.getJoinExchange() == JoinExchange.HASH) {
-                    List<Map<Column, Object>> targetData = LambdaInfo.objectToLambdaInfos(joinSchema.getTarget());
+                    List<Map<Column, Object>> targetData = ColumnReflects.listToColumns(joinSchema.getTarget());
                     switch (joinSchema.getJoinMethod()) {
                         case LEFT:
                             this.crossHashJoin(table, ron, targetData, lon);

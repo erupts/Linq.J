@@ -9,11 +9,11 @@ public interface OrderBy {
 
 
     default <R> Linq orderBy(SFunction<R, ?> column) {
-        return orderBy(column, Direction.ASC);
+        return orderByAsc(column);
     }
 
     default <R> Linq orderByAsc(SFunction<R, ?> column) {
-        return orderBy(column);
+        return orderBy(column, Direction.ASC);
     }
 
     default <R> Linq orderByDesc(SFunction<R, ?> column) {

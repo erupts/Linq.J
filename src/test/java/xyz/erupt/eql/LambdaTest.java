@@ -15,12 +15,14 @@ public class LambdaTest {
 
     @Test
     public void lambdaCacheTest() {
-        LambdaReflect.getInfo(TestSource::getDate);
-        LambdaReflect.getInfo(TestSource::getClass);
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 1000000; i++) {
             LambdaReflect.getInfo(TestSource::getName);
+            LambdaReflect.getInfo(TestSource::name);
             LambdaReflect.getInfo(TestSource::getId);
+            LambdaReflect.getInfo(TestSource::getDate);
+            LambdaReflect.getInfo(TestSource::getClass);
         }
+        LambdaReflect.getInfo(TestSource::getClass);
     }
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class Column {
 
@@ -15,10 +16,13 @@ public class Column {
 
     private String alias;
 
-    //列值转换处理逻辑
+    // Column unfold process
+    private Supplier<List<Column>> unfold;
+
+    // Column value convert handler
     private Function<Object, Object> valueConvertFun;
 
-    //The handler functions listed in the grouping scenario
+    // The handler functions listed in the grouping scenario
     private Function<List<Map<Column, Object>>, Object> groupByFun;
 
     public Column() {
@@ -88,6 +92,13 @@ public class Column {
         this.valueConvertFun = valueConvertFun;
     }
 
+    public Supplier<List<Column>> getUnfold() {
+        return unfold;
+    }
+
+    public void setUnfold(Supplier<List<Column>> unfold) {
+        this.unfold = unfold;
+    }
 
     @Override
     public boolean equals(Object o) {

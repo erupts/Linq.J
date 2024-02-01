@@ -38,9 +38,16 @@ public class Columns {
         return column;
     }
 
+    // Column.All → select *
     public static <R> Column all(Class<R> r) {
         Column column = new Column();
-        column.setTable(r);
+        column.setUnfold(() -> {
+            List<Column> columns = new ArrayList<>();
+            for (Field field : r.getDeclaredFields()) {
+                columns.add(new Column(column.getTable(), field.getType(), field.getName(), field.getName()));
+            }
+            return columns;
+        });
         return column;
     }
 
@@ -107,15 +114,11 @@ public class Columns {
             Object result = null;
             for (Map<Column, ?> map : list) {
                 Object val = map.get(column);
-                if (null == result) {
-                    result = val;
-                }
-                if (CompareUtil.compare(val, result, CompareSymbol.GT)) {
-                    result = val;
-                }
+                if (null == result) result = val;
+                if (CompareUtil.compare(val, result, CompareSymbol.GT)) result = val;
             }
             if (result instanceof Number) {
-                return ReflectUtil.numberToBigDecimal((Number) result);
+                return ColumnReflects.numberToBigDecimal((Number) result);
             } else {
                 return result;
             }
@@ -132,15 +135,11 @@ public class Columns {
             Object result = null;
             for (Map<Column, ?> map : list) {
                 Object val = map.get(column);
-                if (null == result) {
-                    result = val;
-                }
-                if (CompareUtil.compare(val, result, CompareSymbol.LT)) {
-                    result = val;
-                }
+                if (null == result) result = val;
+                if (CompareUtil.compare(val, result, CompareSymbol.LT)) result = val;
             }
             if (result instanceof Number) {
-                return ReflectUtil.numberToBigDecimal((Number) result);
+                return ColumnReflects.numberToBigDecimal((Number) result);
             } else {
                 return result;
             }
@@ -198,15 +197,10 @@ public class Columns {
     public static List<Column> columnsProcess(Column... columns) {
         List<Column> cols = new ArrayList<>();
         for (Column column : columns) {
-            if (column.getField() == null) {
-                // Column.All → select *
-                if (null != column.getTable()) {
-                    for (Field field : column.getTable().getDeclaredFields()) {
-                        cols.add(new Column(column.getTable(), field.getType(), field.getName(), field.getName()));
-                    }
-                }
-            } else {
+            if (null == column.getUnfold()) {
                 cols.add(column);
+            } else {
+                cols.addAll(column.getUnfold().get());
             }
         }
         return cols;
