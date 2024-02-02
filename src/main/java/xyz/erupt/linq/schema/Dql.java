@@ -7,24 +7,23 @@ import java.util.function.Function;
 
 public class Dql {
 
-    //去重
     private boolean distinct = false;
 
-    private Collection<?> source;
+    private Collection<?> from;
 
-    //列信息
+    // columns definition
     private List<Column> columns = new ArrayList<>();
 
-    //关联信息
+    // json definition
     private List<JoinSchema<?>> joinSchemas = new ArrayList<>();
 
-    //条件过滤控制
+    // definition definition
     private List<Function<Row, Boolean>> conditions = new ArrayList<>();
 
-    //分组控制
+    // group by definition
     private List<Column> groupBys = new ArrayList<>();
 
-    //排序控制
+    // order by definition
     private List<OrderByColumn> orderBys = new ArrayList<>();
 
     private Integer limit = null;
@@ -36,12 +35,12 @@ public class Dql {
         return distinct;
     }
 
-    public Collection<?> getSource() {
-        return source;
+    public Collection<?> getFrom() {
+        return from;
     }
 
-    public void setSource(Collection<?> source) {
-        this.source = source;
+    public void setFrom(Collection<?> from) {
+        this.from = from;
     }
 
 

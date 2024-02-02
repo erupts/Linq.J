@@ -70,7 +70,7 @@ public class Columns {
         column.setTable(VirtualColumn.class);
         column.setField(VirtualColumn.lambdaInfo().getField());
         column.setAlias(alias);
-        column.setValueConvertFun(fun);
+        column.setRowValueProcess(fun);
         return column;
     }
 
@@ -193,7 +193,7 @@ public class Columns {
         return sum(fun, LambdaReflect.getInfo(alias).getField());
     }
 
-    //自定义分组处理函数
+    // custom group by logic
     public static <R> Column groupByProcess(SFunction<R, ?> fun, String alias, BiFunction<Column, List<Row>, Object> groupByFun) {
         Column column = Columns.fromLambda(fun, alias);
         column.setGroupByFun(it -> groupByFun.apply(column.getRawColumn(), it));

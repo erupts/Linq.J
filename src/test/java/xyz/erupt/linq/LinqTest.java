@@ -30,11 +30,11 @@ public class LinqTest {
     }
 
     @Test
-    public void select() {
+    public void customerSelect() {
         List<String> result = Linq.from(source).select(
                 Columns.ofs(it -> it.get("name") + " Borg", "Hello")
         ).distinct().write(String.class);
-        System.out.println(result);
+        assert result.get(0).equals(source.get(0).getName() + " Borg");
     }
 
     @Test
@@ -74,12 +74,13 @@ public class LinqTest {
         List<Map<String, Object>> result = Linq.from(source)
                 .groupBy(Columns.of(TestSource::getName))
                 .select(
-                        Columns.of(TestSource::getId, "raw_id"),
-                        Columns.sum(TestSource::getId, TestSourceExt::getId),
-                        Columns.min(TestSource::getDate, TestSource::getDate),
+                        Columns.of(TestSource::getName, "name"),
+                        Columns.of(TestSource::getId, "id"),
+                        Columns.min(TestSource::getDate, "date"),
                         Columns.avg(TestSource::getId, "avg"),
-                        Columns.count(TestSource::getName, "ncount")
-                ).writeMap();
+                        Columns.count(TestSource::getName, "count"),
+                        Columns.count("aCount")
+                ).orderBy(TestSource::getName).writeMap();
         System.out.println(result);
     }
 

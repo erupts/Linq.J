@@ -13,21 +13,22 @@ import java.util.function.Function;
 
 public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
 
-    private final Engine engine;
+    private Engine engine;
 
     private Linq() {
-        this.engine = new DefaultEngine();
-    }
-
-    public Linq(Engine engine) {
-        this.engine = engine;
     }
 
     private final Dql dql = new Dql();
 
     public static <T> Linq from(Collection<T> table) {
         Linq linq = new Linq();
-        linq.dql.setSource(table);
+        linq.dql.setFrom(table);
+        return linq;
+    }
+
+    public static <T> Linq from(Collection<T> table, Engine engine) {
+        Linq linq = new Linq();
+        linq.dql.setFrom(table);
         return linq;
     }
 
@@ -85,8 +86,19 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
         return this;
     }
 
+    public Engine getEngine() {
+        return engine;
+    }
+
+    public void setEngine(Engine engine) {
+        this.engine = engine;
+    }
+
     @Override
     public Engine $engine() {
+        if (null == this.engine) {
+            return new DefaultEngine();
+        }
         return this.engine;
     }
 

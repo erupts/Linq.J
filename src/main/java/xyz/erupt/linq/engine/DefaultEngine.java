@@ -15,7 +15,7 @@ public class DefaultEngine extends Engine {
 
     @Override
     public List<Row> query(Dql dql) {
-        List<Row> table = ColumnReflects.listToRow(dql.getSource());
+        List<Row> dataset = ColumnReflects.listToRow(dql.getFrom());
         // join process
         if (!dql.getJoinSchemas().isEmpty()) {
             for (JoinSchema<?> joinSchema : dql.getJoinSchemas()) {
@@ -25,21 +25,21 @@ public class DefaultEngine extends Engine {
                     List<Row> targetData = ColumnReflects.listToRow(joinSchema.getTarget());
                     switch (joinSchema.getJoinMethod()) {
                         case LEFT:
-                            this.crossHashJoin(table, ron, targetData, lon);
+                            this.crossHashJoin(dataset, ron, targetData, lon);
                             break;
                         case RIGHT:
-                            this.crossHashJoin(targetData, lon, table, ron);
-                            table = targetData;
+                            this.crossHashJoin(targetData, lon, dataset, ron);
+                            dataset = targetData;
                             break;
                         case INNER:
-                            this.crossHashJoin(table, ron, targetData, lon);
-                            table.removeIf(it -> !it.containsKey(lon));
+                            this.crossHashJoin(dataset, ron, targetData, lon);
+                            dataset.removeIf(it -> !it.containsKey(lon));
                             break;
                         case FULL:
-                            this.crossHashJoin(table, ron, targetData, lon);
-                            this.crossHashJoin(targetData, lon, table, ron);
+                            this.crossHashJoin(dataset, ron, targetData, lon);
+                            this.crossHashJoin(targetData, lon, dataset, ron);
                             targetData.removeIf(it -> it.containsKey(ron));
-                            table.addAll(targetData);
+                            dataset.addAll(targetData);
                             break;
                     }
                 } else {
@@ -48,7 +48,7 @@ public class DefaultEngine extends Engine {
             }
         }
         // condition process
-        table.removeIf(it -> {
+        dataset.removeIf(it -> {
             for (Function<Row, Boolean> condition : dql.getConditions()) {
                 if (!condition.apply(it)) return true;
             }
@@ -57,11 +57,11 @@ public class DefaultEngine extends Engine {
         // group by process
         if (null != dql.getGroupBys() && !dql.getGroupBys().isEmpty()) {
             Map<String, List<Row>> groupMap = new HashMap<>();
-            for (Row row : table) {
+            for (Row row : dataset) {
                 StringBuilder key = new StringBuilder();
                 for (Column groupBy : dql.getGroupBys()) {
-                    if (null != groupBy.getValueConvertFun()) {
-                        key.append(groupBy.getValueConvertFun().apply(row));
+                    if (null != groupBy.getRowValueProcess()) {
+                        key.append(groupBy.getRowValueProcess().apply(row));
                     } else {
                         key.append(row.get(groupBy));
                     }
@@ -71,11 +71,11 @@ public class DefaultEngine extends Engine {
                 }
                 groupMap.get(key.toString()).add(row);
             }
-            table = new ArrayList<>(groupMap.size());
+            dataset = new ArrayList<>(groupMap.size());
             // group by select process
             for (Map.Entry<String, List<Row>> entry : groupMap.entrySet()) {
                 Row values = new Row(dql.getColumns().size());
-                table.add(values);
+                dataset.add(values);
                 for (Column column : dql.getColumns()) {
                     Object val = null;
                     if (null != column.getGroupByFun()) {
@@ -90,40 +90,40 @@ public class DefaultEngine extends Engine {
             }
         } else {
             // simple select process
-            List<Row> $table = new ArrayList<>(table.size());
+            List<Row> $table = new ArrayList<>(dataset.size());
             boolean existGroupFun = false;
-            for (Row row : table) {
+            for (Row row : dataset) {
                 Row newRow = new Row(dql.getColumns().size());
                 for (Column column : dql.getColumns()) {
                     if (null != column.getGroupByFun()) {
                         existGroupFun = true;
-                        newRow.put(column, column.getGroupByFun().apply(table));
+                        newRow.put(column, column.getGroupByFun().apply(dataset));
                     } else {
                         newRow.put(column, row.get(column.getRawColumn()));
                     }
-                    if (null != column.getValueConvertFun()) {
-                        newRow.put(column, column.getValueConvertFun().apply(row));
+                    if (null != column.getRowValueProcess()) {
+                        newRow.put(column, column.getRowValueProcess().apply(row));
                     }
                 }
                 $table.add(newRow);
                 if (existGroupFun) break;
             }
-            table.clear();
-            table.addAll($table);
+            dataset.clear();
+            dataset.addAll($table);
         }
         // order by process
-        this.orderBy(dql, table);
+        this.orderBy(dql, dataset);
         // limit
         if (null != dql.getOffset()) {
-            table = dql.getOffset() > table.size() ? new ArrayList<>(0) : table.subList(dql.getOffset(), table.size());
+            dataset = dql.getOffset() > dataset.size() ? new ArrayList<>(0) : dataset.subList(dql.getOffset(), dataset.size());
         }
         if (null != dql.getLimit()) {
-            table = table.subList(0, dql.getLimit() > table.size() ? table.size() : dql.getLimit());
+            dataset = dataset.subList(0, dql.getLimit() > dataset.size() ? dataset.size() : dql.getLimit());
         }
         if (dql.isDistinct()) {
-            table = table.stream().distinct().collect(Collectors.toList());
+            dataset = dataset.stream().distinct().collect(Collectors.toList());
         }
-        return table;
+        return dataset;
     }
 
     //Cartesian product case
@@ -157,11 +157,8 @@ public class DefaultEngine extends Engine {
         if (null != dql.getOrderBys() && !dql.getOrderBys().isEmpty()) {
             dataset.sort((a, b) -> {
                 int i = 0;
-                if (a == null || b == null) {
-                    return i;
-                }
                 for (OrderByColumn orderBy : dql.getOrderBys()) {
-                    if (null == a.get(orderBy.getColumn())) return 0;
+                    if (null == a.get(orderBy.getColumn()) || null == b.get(orderBy.getColumn())) return 0;
                     if (a.get(orderBy.getColumn()) instanceof Comparable) {
                         Comparable<Object> comparable = (Comparable<Object>) a.get(orderBy.getColumn());
                         i = comparable.compareTo(b.get(orderBy.getColumn()));

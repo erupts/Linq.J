@@ -9,10 +9,6 @@ public interface OrderBy {
 
 
     default <R> Linq orderBy(SFunction<R, ?> column) {
-        return orderByAsc(column);
-    }
-
-    default <R> Linq orderByAsc(SFunction<R, ?> column) {
         return orderBy(column, Direction.ASC);
     }
 
