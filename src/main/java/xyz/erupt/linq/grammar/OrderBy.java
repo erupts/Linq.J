@@ -16,7 +16,7 @@ public interface OrderBy {
         return orderBy(column, Direction.DESC);
     }
 
-    public enum Direction {
+    enum Direction {
 
         ASC,
         DESC
