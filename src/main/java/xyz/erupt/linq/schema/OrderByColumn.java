@@ -31,4 +31,5 @@ public class OrderByColumn {
     public void setDirection(OrderBy.Direction direction) {
         this.direction = direction;
     }
+
 }

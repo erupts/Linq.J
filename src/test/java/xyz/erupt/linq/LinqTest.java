@@ -7,6 +7,7 @@ import xyz.erupt.linq.data.TestSourceExt;
 import xyz.erupt.linq.grammar.OrderBy;
 import xyz.erupt.linq.util.Columns;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class LinqTest {
@@ -81,6 +82,17 @@ public class LinqTest {
                         Columns.count(TestSource::getName, "count"),
                         Columns.count("aCount")
                 ).orderBy(TestSource::getName).writeMap();
+        System.out.println(result);
+    }
+
+    @Test
+    public void groupByDate() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        System.out.println(dateFormat.format(new Date()));
+        List<Map<String, Object>> result = Linq.from(source)
+                .select(Columns.ofs(row -> dateFormat.format(row.get(TestSource::getDate)), "aa"))
+//                .groupBy(Columns.ofs(row -> dateFormat.format(row.get(TestSource::getDate)), "aa"))
+                .writeMap();
         System.out.println(result);
     }
 

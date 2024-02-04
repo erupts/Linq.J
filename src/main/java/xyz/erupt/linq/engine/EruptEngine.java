@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class DefaultEngine extends Engine {
+public class EruptEngine extends Engine {
 
     @Override
     public List<Row> query(Dql dql) {
@@ -56,38 +56,7 @@ public class DefaultEngine extends Engine {
         });
         // group by process
         if (null != dql.getGroupBys() && !dql.getGroupBys().isEmpty()) {
-            Map<String, List<Row>> groupMap = new HashMap<>();
-            for (Row row : dataset) {
-                StringBuilder key = new StringBuilder();
-                for (Column groupBy : dql.getGroupBys()) {
-                    if (null != groupBy.getRowValueProcess()) {
-                        key.append(groupBy.getRowValueProcess().apply(row));
-                    } else {
-                        key.append(row.get(groupBy));
-                    }
-                }
-                if (!groupMap.containsKey(key.toString())) {
-                    groupMap.put(key.toString(), new ArrayList<>());
-                }
-                groupMap.get(key.toString()).add(row);
-            }
-            dataset = new ArrayList<>(groupMap.size());
-            // group by select process
-            for (Map.Entry<String, List<Row>> entry : groupMap.entrySet()) {
-                Row values = new Row(dql.getColumns().size());
-                dataset.add(values);
-                for (Column column : dql.getColumns()) {
-                    Object val = null;
-                    if (null != column.getGroupByFun()) {
-                        val = column.getGroupByFun().apply(entry.getValue());
-                    } else {
-                        if (!entry.getValue().isEmpty()) {
-                            val = entry.getValue().get(0).get(column.getRawColumn());
-                        }
-                    }
-                    values.put(column, val);
-                }
-            }
+            dataset = this.groupBy(dql, dataset);
         } else {
             // simple select process
             List<Row> $table = new ArrayList<>(dataset.size());
@@ -120,6 +89,7 @@ public class DefaultEngine extends Engine {
         if (null != dql.getLimit()) {
             dataset = dataset.subList(0, dql.getLimit() > dataset.size() ? dataset.size() : dql.getLimit());
         }
+        // distinct process
         if (dql.isDistinct()) {
             dataset = dataset.stream().distinct().collect(Collectors.toList());
         }
@@ -153,7 +123,43 @@ public class DefaultEngine extends Engine {
         }
     }
 
-    private void orderBy(Dql dql, List<Row> dataset) {
+    public List<Row> groupBy(Dql dql, List<Row> dataset) {
+        Map<String, List<Row>> groupMap = new HashMap<>();
+        for (Row row : dataset) {
+            StringBuilder key = new StringBuilder();
+            for (Column groupBy : dql.getGroupBys()) {
+                if (null != groupBy.getRowValueProcess()) {
+                    key.append(groupBy.getRawColumn().getRowValueProcess().apply(row));
+                } else {
+                    key.append(row.get(groupBy.getRawColumn()));
+                }
+            }
+            if (!groupMap.containsKey(key.toString())) {
+                groupMap.put(key.toString(), new ArrayList<>());
+            }
+            groupMap.get(key.toString()).add(row);
+        }
+        List<Row> result = new ArrayList<>(groupMap.size());
+        // group by select process
+        for (Map.Entry<String, List<Row>> entry : groupMap.entrySet()) {
+            Row values = new Row(dql.getColumns().size());
+            result.add(values);
+            for (Column column : dql.getColumns()) {
+                Object val = null;
+                if (null != column.getGroupByFun()) {
+                    val = column.getRawColumn().getGroupByFun().apply(entry.getValue());
+                } else {
+                    if (!entry.getValue().isEmpty()) {
+                        val = entry.getValue().get(0).get(column.getRawColumn());
+                    }
+                }
+                values.put(column, val);
+            }
+        }
+        return result;
+    }
+
+    public void orderBy(Dql dql, List<Row> dataset) {
         if (null != dql.getOrderBys() && !dql.getOrderBys().isEmpty()) {
             dataset.sort((a, b) -> {
                 int i = 0;

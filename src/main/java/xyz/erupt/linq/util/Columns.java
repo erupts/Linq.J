@@ -46,7 +46,7 @@ public class Columns {
         column.setUnfold(() -> {
             List<Column> columns = new ArrayList<>();
             for (Field field : r.getDeclaredFields()) {
-                columns.add(new Column(r, field.getType(), field.getName(), field.getName()));
+                columns.add(new Column(r, field.getName(), field.getName()));
             }
             return columns;
         });
@@ -79,7 +79,7 @@ public class Columns {
     }
 
     public static Column count(String alias) {
-        Column column = new Column(VirtualColumn.class, String.class, VirtualColumn.lambdaInfo().getField(), alias);
+        Column column = new Column(VirtualColumn.class, VirtualColumn.lambdaInfo().getField(), alias);
         column.setGroupByFun(it -> BigDecimal.valueOf(it.size()));
         return column;
     }

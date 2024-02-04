@@ -9,8 +9,6 @@ public class Column {
 
     private Class<?> table;
 
-    private Class<?> fieldType;
-
     private String field;
 
     private String alias;
@@ -27,16 +25,15 @@ public class Column {
     public Column() {
     }
 
-    public Column(Class<?> table, Class<?> fieldType, String field, String alias) {
+    public Column(Class<?> table, String field, String alias) {
         this.table = table;
         this.field = field;
-        this.fieldType = fieldType;
         this.alias = alias;
     }
 
     // Get the original column information
     public Column getRawColumn() {
-        Column column = new Column(this.table, this.fieldType, this.field, this.field);
+        Column column = new Column(this.table, this.field, this.field);
         column.setGroupByFun(this.getGroupByFun());
         column.setRowValueProcess(this.getRowValueProcess());
         column.setUnfold(this.unfold);
@@ -66,15 +63,6 @@ public class Column {
     public void setAlias(String alias) {
         this.alias = alias;
     }
-
-    public Class<?> getFieldType() {
-        return fieldType;
-    }
-
-    public void setFieldType(Class<?> fieldType) {
-        this.fieldType = fieldType;
-    }
-
 
     public Function<List<Row>, Object> getGroupByFun() {
         return groupByFun;

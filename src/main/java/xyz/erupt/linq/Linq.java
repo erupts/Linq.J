@@ -1,8 +1,8 @@
 package xyz.erupt.linq;
 
 import xyz.erupt.linq.consts.JoinMethod;
-import xyz.erupt.linq.engine.DefaultEngine;
 import xyz.erupt.linq.engine.Engine;
+import xyz.erupt.linq.engine.EruptEngine;
 import xyz.erupt.linq.grammar.*;
 import xyz.erupt.linq.lambda.SFunction;
 import xyz.erupt.linq.schema.*;
@@ -97,7 +97,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     @Override
     public Engine $engine() {
         if (null == this.engine) {
-            return new DefaultEngine();
+            return new EruptEngine();
         }
         return this.engine;
     }
