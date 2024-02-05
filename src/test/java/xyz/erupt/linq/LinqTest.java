@@ -5,6 +5,7 @@ import org.junit.Test;
 import xyz.erupt.linq.data.TestSource;
 import xyz.erupt.linq.data.TestSourceExt;
 import xyz.erupt.linq.grammar.OrderBy;
+import xyz.erupt.linq.lambda.SE;
 import xyz.erupt.linq.util.Columns;
 
 import java.text.SimpleDateFormat;
@@ -28,6 +29,30 @@ public class LinqTest {
         target.add(new TestSourceExt(1, "Aa"));
         target.add(new TestSourceExt(2, "Bb"));
         target.add(new TestSourceExt(3, "Cc"));
+    }
+
+    @Test
+    public void fromSingleton() {
+        String name = Linq.from(new TestSource(1, "Thanos", null, null))
+                .select(Columns.of(TestSource::getName)).writeOne(String.class);
+        System.out.println(name);
+    }
+
+    @Test
+    public void fromSimpleClass() {
+        List<String> strings = new ArrayList<>();
+        strings.add("A");
+        strings.add("B");
+        strings.add("B");
+        strings.add("C");
+        List<String> result = Linq.from(strings).select(Columns.of(SE::LF)).write(String.class);
+        List<Integer> numbers = new ArrayList<>();
+        numbers.add(1);
+        numbers.add(2);
+        numbers.add(3);
+        List<Integer> n = Linq.from(numbers).select(Columns.of(SE::LF)).write(Integer.class);
+        System.out.println(result);
+        System.out.println(n);
     }
 
     @Test

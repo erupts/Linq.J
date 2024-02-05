@@ -8,4 +8,5 @@ public interface GroupBy {
     Linq groupBy(Column... columns);
 
 //    Linq having();
+
 }

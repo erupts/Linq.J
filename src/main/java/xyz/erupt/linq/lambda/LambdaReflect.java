@@ -28,8 +28,10 @@ public class LambdaReflect {
             method.setAccessible(true);
             SerializedLambda serializedLambda = (SerializedLambda) method.invoke(func);
             String fieldName = serializedLambda.getImplMethodName();
-            if (fieldName.startsWith(GET)) fieldName = fieldName.substring(GET.length());
-            if (fieldName.startsWith(IS)) fieldName = fieldName.substring(IS.length());
+            if (fieldName.startsWith(GET) && fieldName.length() != GET.length())
+                fieldName = fieldName.substring(GET.length());
+            if (fieldName.startsWith(IS) && fieldName.length() != IS.length())
+                fieldName = fieldName.substring(IS.length());
             LambdaInfo lambdaInfo = new LambdaInfo(
                     Class.forName(serializedLambda.getImplClass().replace("/", ".")),
                     fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1)

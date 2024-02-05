@@ -6,11 +6,33 @@
 
 #### simple query
 
+对象定义
+```javascript
+ // table 
+ var TestSource = [{
+        id:1,
+        name:"Thanos",
+        date: new Date()
+    }, {
+         id:2,
+         name:"Liz",
+         date: new Date()
+    },
+ ]
+```
+Linq
 ```javascript
     Linq.from(table).select().write();
 ```
+SQL
 ```sql
     select * from table
+```
+结果
+```json
+[
+  {}
+]
 ```
 
 

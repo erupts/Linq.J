@@ -9,6 +9,7 @@ import xyz.erupt.linq.schema.*;
 import xyz.erupt.linq.util.Columns;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.function.Function;
 
 public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
@@ -20,15 +21,15 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
 
     private final Dql dql = new Dql();
 
-    public static <T> Linq from(Collection<T> table) {
+    public static Linq from(Collection<?> table) {
         Linq linq = new Linq();
         linq.dql.setFrom(table);
         return linq;
     }
 
-    public static <T> Linq from(Collection<T> table, Engine engine) {
+    public static <T> Linq from(T row) {
         Linq linq = new Linq();
-        linq.dql.setFrom(table);
+        linq.dql.setFrom(Collections.singleton(row));
         return linq;
     }
 

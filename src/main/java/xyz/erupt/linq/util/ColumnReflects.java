@@ -1,6 +1,7 @@
 package xyz.erupt.linq.util;
 
 import xyz.erupt.linq.exception.LinqException;
+import xyz.erupt.linq.lambda.SE;
 import xyz.erupt.linq.schema.Column;
 import xyz.erupt.linq.schema.Row;
 
@@ -12,8 +13,30 @@ import java.util.*;
 
 public class ColumnReflects {
 
+    public static final Class<?>[] SIMPLE_CLASS = {
+            String.class, Character.class, Byte.class, Short.class, Integer.class, Float.class, Double.class, BigDecimal.class
+    };
+
+    public static final Class<?>[] SIMPLE_ARR_CLASS = {
+            String[].class, Character[].class, Byte[].class, Short[].class, Integer[].class, Float[].class, Double[].class, BigDecimal[].class
+    };
+
+    public static List<Row> listToRow(Collection<?> objects) {
+        List<Row> list = new ArrayList<>(objects.size());
+        for (Object object : objects) {
+            Optional.ofNullable(object).ifPresent(it -> list.add(objectToRow(it)));
+        }
+        return list;
+    }
+
     public static Row objectToRow(Object obj) {
         Row row = new Row();
+        for (Class<?> clazz : SIMPLE_CLASS) {
+            if (obj.getClass() == clazz) {
+                row.put(Columns.of(SE::LF), obj);
+                return row;
+            }
+        }
         try {
             for (Field field : obj.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
@@ -25,23 +48,13 @@ public class ColumnReflects {
         return row;
     }
 
-    public static List<Row> listToRow(Collection<?> objects) {
-        List<Row> list = new ArrayList<>(objects.size());
-        for (Object object : objects) {
-            Optional.ofNullable(object).ifPresent(it -> list.add(objectToRow(it)));
-        }
-        return list;
-    }
-
-    public static final Class<?>[] SIMPLE_CLASS = {
-            String.class, Character.class, Byte.class, Short.class, Integer.class, Float.class, Double.class, BigDecimal.class,
-            String[].class, Character[].class, Byte[].class, Short[].class, Integer[].class, Float[].class, Double[].class, BigDecimal[].class
-    };
-
     public static <T> T rowToObject(Row row, Class<T> clazz) {
         try {
             for (Class<?> sc : SIMPLE_CLASS) {
                 if (sc == clazz) return (T) row.get(row.keySet().iterator().next());
+            }
+            for (Class<?> arr : SIMPLE_ARR_CLASS) {
+                if (arr == clazz) return (T) row.get(row.keySet().iterator().next());
             }
             T instance = clazz.getDeclaredConstructor().newInstance();
             for (Map.Entry<Column, Object> entry : row.entrySet()) {
