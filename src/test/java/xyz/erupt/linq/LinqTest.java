@@ -142,21 +142,21 @@ public class LinqTest {
 
     @Test
     public void conditionTest() {
-        String count = "count";
-        int eq = Linq.from(source).eq(TestSource::getName, "Thanos").select(Columns.count(count)).writeOne(Integer.class);
-        int ne = Linq.from(source).ne(TestSource::getName, "Thanos").select(Columns.count(count)).writeOne(Integer.class);
-        int gt = Linq.from(source).gt(TestSource::getName, "Thanos").select(Columns.count(count)).writeOne(Integer.class);
-        int lt = Linq.from(source).lt(TestSource::getName, "Thanos").select(Columns.count(count)).writeOne(Integer.class);
-        int gte = Linq.from(source).gte(TestSource::getName, "Thanos").select(Columns.count(count)).writeOne(Integer.class);
-        int lte = Linq.from(source).lte(TestSource::getName, "Thanos").select(Columns.count(count)).writeOne(Integer.class);
-        int in = Linq.from(source).in(TestSource::getId, 1, null).select(Columns.count(count)).writeOne(Integer.class);
-        int notIn = Linq.from(source).notIn(TestSource::getId, 1, 2, null).select(Columns.count(count)).writeOne(Integer.class);
-        int like = Linq.from(source).like(TestSource::getName, "a").select(Columns.count(count)).writeOne(Integer.class);
-        int between = Linq.from(source).between(TestSource::getId, 1, 3).select(Columns.count(count)).writeOne(Integer.class);
-        int isNull = Linq.from(source).isNull(TestSource::getId).select(Columns.count(count)).writeOne(Integer.class);
-        int isNotNull = Linq.from(source).isNotNull(TestSource::getId).select(Columns.count(count)).writeOne(Integer.class);
-        int blank = Linq.from(source).isBlank(TestSource::getName).select(Columns.count(count)).writeOne(Integer.class);
-        int notBlank = Linq.from(source).isNotNull(TestSource::getName).select(Columns.count(count)).writeOne(Integer.class);
+        String countAlias = "count";
+        int eq = Linq.from(source).eq(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
+        int ne = Linq.from(source).ne(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
+        int gt = Linq.from(source).gt(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
+        int lt = Linq.from(source).lt(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
+        int gte = Linq.from(source).gte(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
+        int lte = Linq.from(source).lte(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
+        int in = Linq.from(source).in(TestSource::getId, 1, 2, null).select(Columns.count(countAlias)).writeOne(Integer.class);
+        int notIn = Linq.from(source).notIn(TestSource::getId, 1, 2, null).select(Columns.count(countAlias)).writeOne(Integer.class);
+        int like = Linq.from(source).like(TestSource::getName, "a").select(Columns.count(countAlias)).writeOne(Integer.class);
+        int between = Linq.from(source).between(TestSource::getId, 1, 3).select(Columns.count(countAlias)).writeOne(Integer.class);
+        int isNull = Linq.from(source).isNull(TestSource::getId).select(Columns.count(countAlias)).writeOne(Integer.class);
+        int isNotNull = Linq.from(source).isNotNull(TestSource::getId).select(Columns.count(countAlias)).writeOne(Integer.class);
+        int blank = Linq.from(source).isBlank(TestSource::getName).select(Columns.count(countAlias)).writeOne(Integer.class);
+        int notBlank = Linq.from(source).isNotNull(TestSource::getName).select(Columns.count(countAlias)).writeOne(Integer.class);
         assert eq == source.stream().filter(it -> it.getName().equals("Thanos")).count();
         assert ne == source.stream().filter(it -> !it.getName().equals("Thanos")).count();
 
