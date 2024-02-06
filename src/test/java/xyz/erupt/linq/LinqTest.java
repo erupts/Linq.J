@@ -135,7 +135,6 @@ public class LinqTest {
                 .select(Columns.all(TestSource.class),
                         Columns.of(TestSourceExt::getName, "name2"),
                         Columns.of(TestSourceExt2::getValue))
-                .select(TestSourceExt::getId, TestSourceExt::getName)
                 .writeMap();
         assert testSourceInfo.size() > source.size();
     }
@@ -164,37 +163,18 @@ public class LinqTest {
 
     @Test
     public void orConditionTest() {
-
-    }
-
-    @Test
-    public void customerCondition() {
+        // name = Thanos or id = 4
         List<Map<String, Object>> res = Linq.from(source)
                 .leftJoin(target, TestSourceExt::getId, TestSource::getId).select(Columns.all(TestSource.class))
                 .condition(data -> {
-                    Object o = data.get(Columns.fromLambda(TestSource::getTags));
-                    if (null != o) {
-                        for (String s : ((String[]) o)) {
-                            if ("a".equals(s)) {
-                                return true;
-                            }
-                        }
-                        return false;
+                    Object name = data.get(TestSource::getName);
+                    Object id = data.get(TestSource::getId);
+                    if (null != name && null != id) {
+                        return name.toString().equals("Thanos") || Integer.parseInt(id.toString()) == 4;
                     }
-                    return true;
+                    return false;
                 }).writeMap();
-        int count = 0;
-        for (TestSource testSource : source) {
-            if (null != testSource.getTags()) {
-                for (String s : testSource.getTags()) {
-                    if ("a".equals(s)) {
-                        count++;
-                        break;
-                    }
-                }
-            }
-        }
-        assert res.size() == count;
+        assert res.size() == 2;
     }
 
 
