@@ -2,7 +2,7 @@ package xyz.erupt.linq;
 
 import org.junit.Before;
 import org.junit.Test;
-import xyz.erupt.linq.data.*;
+import xyz.erupt.linq.data.student.*;
 import xyz.erupt.linq.grammar.OrderBy;
 import xyz.erupt.linq.util.Columns;
 
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StudentDatasetTest {
+public class DatasetStudentTest {
 
     private final List<Student> students = new ArrayList<>();
 
@@ -62,7 +62,7 @@ public class StudentDatasetTest {
     }
 
     @Test
-    public void groupTest() {
+    public void groupByTest() {
         Linq.from(students)
                 .innerJoin(studentScores, StudentScore::getStudentId, Student::getId)
                 .innerJoin(studentSubjects, StudentSubject::getId, StudentScore::getSubjectId)
@@ -76,10 +76,15 @@ public class StudentDatasetTest {
                         Columns.count(StudentScoreAnalysis::getSubjectCount)
                 )
                 .write(StudentScoreAnalysis.class);
-        Linq.from(students)
+    }
+
+    @Test
+    public void allAnalysisTest(){
+        Integer r = Linq.from(students)
                 .innerJoin(studentScores, StudentScore::getStudentId, Student::getId)
                 .select(Columns.count(StudentScoreAnalysis::getSubjectCount))
-                .writeMap();
+                .writeOne(Integer.class);
+        System.out.println(r);
     }
 
     @Test

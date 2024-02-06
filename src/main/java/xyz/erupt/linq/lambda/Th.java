@@ -1,8 +1,8 @@
 package xyz.erupt.linq.lambda;
 
-public class SE {
+public class Th {
 
-    public Object LF(){
+    public Object is(){
         return null;
     }
 

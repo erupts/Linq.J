@@ -1,7 +1,7 @@
 package xyz.erupt.linq.util;
 
 import xyz.erupt.linq.exception.LinqException;
-import xyz.erupt.linq.lambda.SE;
+import xyz.erupt.linq.lambda.Th;
 import xyz.erupt.linq.schema.Column;
 import xyz.erupt.linq.schema.Row;
 
@@ -10,6 +10,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ColumnReflects {
 
@@ -33,7 +34,7 @@ public class ColumnReflects {
         Row row = new Row();
         for (Class<?> clazz : SIMPLE_CLASS) {
             if (obj.getClass() == clazz) {
-                row.put(Columns.of(SE::LF), obj);
+                row.put(Columns.of(Th::is), obj);
                 return row;
             }
         }
@@ -49,24 +50,31 @@ public class ColumnReflects {
     }
 
     public static <T> T rowToObject(Row row, Class<T> clazz) {
+        for (Class<?> sc : SIMPLE_CLASS) {
+            if (sc == clazz) {
+                Object val = row.get(row.keySet().iterator().next());
+                if (val instanceof BigDecimal) {
+                    return (T) bigDecimalConvert((BigDecimal) val, clazz);
+                } else {
+                    return (T) val;
+                }
+            }
+        }
+        for (Class<?> arr : SIMPLE_ARR_CLASS) {
+            if (arr == clazz) return (T) row.get(row.keySet().iterator().next());
+        }
         try {
-            for (Class<?> sc : SIMPLE_CLASS) {
-                if (sc == clazz) return (T) row.get(row.keySet().iterator().next());
-            }
-            for (Class<?> arr : SIMPLE_ARR_CLASS) {
-                if (arr == clazz) return (T) row.get(row.keySet().iterator().next());
-            }
             T instance = clazz.getDeclaredConstructor().newInstance();
+            Map<String, Field> fieldMap = Arrays.stream(clazz.getDeclaredFields()).collect(Collectors.toMap(Field::getName, it -> it));
             for (Map.Entry<Column, Object> entry : row.entrySet()) {
-                try {
-                    Field field = clazz.getDeclaredField(entry.getKey().getAlias());
+                if (fieldMap.containsKey(entry.getKey().getAlias())) {
+                    Field field = fieldMap.get(entry.getKey().getAlias());
                     field.setAccessible(true);
                     if (entry.getValue() instanceof BigDecimal) {
                         field.set(instance, bigDecimalConvert((BigDecimal) entry.getValue(), field.getType()));
                     } else {
                         field.set(instance, entry.getValue());
                     }
-                } catch (NoSuchFieldException ignore) {
                 }
             }
             return instance;
@@ -89,7 +97,7 @@ public class ColumnReflects {
         } else if (BigDecimal.class == target) {
             return bigDecimal;
         }
-        return null;
+        throw new LinqException("unknown 'bigDecimal' target type: " + target.getName());
     }
 
     public static BigDecimal numberToBigDecimal(Number number) {

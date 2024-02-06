@@ -1,4 +1,4 @@
-package xyz.erupt.linq.data;
+package xyz.erupt.linq.data.source;
 
 import java.util.Date;
 

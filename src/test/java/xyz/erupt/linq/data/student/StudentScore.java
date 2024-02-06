@@ -1,4 +1,4 @@
-package xyz.erupt.linq.data;
+package xyz.erupt.linq.data.student;
 
 import java.time.LocalDateTime;
 

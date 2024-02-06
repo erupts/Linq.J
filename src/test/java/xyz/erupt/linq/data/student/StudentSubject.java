@@ -1,21 +1,21 @@
-package xyz.erupt.linq.data;
+package xyz.erupt.linq.data.student;
 
-public class TestSourceExt {
+public class StudentSubject {
 
-    private Integer id;
+    private Long id;
 
     private String name;
 
-    public TestSourceExt(Integer id, String name) {
+    public StudentSubject(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

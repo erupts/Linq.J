@@ -1,7 +1,7 @@
 package xyz.erupt.linq;
 
 import org.junit.Test;
-import xyz.erupt.linq.data.TestSource;
+import xyz.erupt.linq.data.source.TestSource;
 import xyz.erupt.linq.lambda.LambdaReflect;
 
 public class LambdaTest {

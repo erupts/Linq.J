@@ -12,7 +12,7 @@ import java.util.Map;
 
 public abstract class Engine {
 
-    public void syntaxCheck(Dql dql) {
+    public void preprocessor(Dql dql) {
         if (dql.getColumns().isEmpty()) {
             throw new LinqException("Missing select definition");
         }

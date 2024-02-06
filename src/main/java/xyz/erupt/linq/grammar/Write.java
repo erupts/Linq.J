@@ -16,19 +16,19 @@ public interface Write {
 
     String MULTI_VAL_ERROR = "Expected one result (or null) to be returned by writeOne(), but found: ";
 
-    Engine $engine();
+    Engine wEngine();
 
-    Dql $dql();
+    Dql wDQL();
 
     default <T> List<T> write(Class<T> clazz) {
-        $engine().syntaxCheck(this.$dql());
-        List<Row> table = $engine().query(this.$dql());
+        wEngine().preprocessor(this.wDQL());
+        List<Row> table = wEngine().query(this.wDQL());
         return table.stream().map(it -> ColumnReflects.rowToObject(it, clazz)).collect(Collectors.toList());
     }
 
     default <T> T writeOne(Class<T> clazz) {
-        $engine().syntaxCheck(this.$dql());
-        List<Row> result = $engine().query(this.$dql());
+        wEngine().preprocessor(this.wDQL());
+        List<Row> result = wEngine().query(this.wDQL());
         if (result.isEmpty()) {
             return null;
         } else if (result.size() == 1) {
@@ -39,8 +39,8 @@ public interface Write {
     }
 
     default List<Map<String, Object>> writeMap() {
-        $engine().syntaxCheck(this.$dql());
-        List<Row> table = $engine().query(this.$dql());
+        wEngine().preprocessor(this.wDQL());
+        List<Row> table = wEngine().query(this.wDQL());
         List<Map<String, Object>> result = new ArrayList<>();
         for (Row row : table) {
             Map<String, Object> $map = new HashMap<>();

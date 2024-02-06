@@ -1,8 +1,6 @@
 package xyz.erupt.linq.schema;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 public class Dql {
@@ -12,19 +10,19 @@ public class Dql {
     private Collection<?> from;
 
     // columns definition
-    private List<Column> columns = new ArrayList<>();
+    private Set<Column> columns = new HashSet<>();
 
     // json definition
-    private List<JoinSchema<?>> joinSchemas = new ArrayList<>();
+    private final List<JoinSchema<?>> joinSchemas = new ArrayList<>();
 
     // definition definition
-    private List<Function<Row, Boolean>> conditions = new ArrayList<>();
+    private final List<Function<Row, Boolean>> conditions = new ArrayList<>();
 
     // group by definition
-    private List<Column> groupBys = new ArrayList<>();
+    private final List<Column> groupBys = new ArrayList<>();
 
     // order by definition
-    private List<OrderByColumn> orderBys = new ArrayList<>();
+    private final List<OrderByColumn> orderBys = new ArrayList<>();
 
     private Integer limit = null;
 
@@ -43,16 +41,15 @@ public class Dql {
         this.from = from;
     }
 
-
     public void setDistinct(boolean distinct) {
         this.distinct = distinct;
     }
 
-    public List<Column> getColumns() {
+    public Set<Column> getColumns() {
         return columns;
     }
 
-    public void setColumns(List<Column> columns) {
+    public void setColumns(Set<Column> columns) {
         this.columns = columns;
     }
 
@@ -60,24 +57,12 @@ public class Dql {
         return conditions;
     }
 
-    public void setConditions(List<Function<Row, Boolean>> conditions) {
-        this.conditions = conditions;
-    }
-
     public List<JoinSchema<?>> getJoinSchemas() {
         return joinSchemas;
     }
 
-    public void setJoinSchemas(List<JoinSchema<?>> joinSchemas) {
-        this.joinSchemas = joinSchemas;
-    }
-
     public List<Column> getGroupBys() {
         return groupBys;
-    }
-
-    public void setGroupBys(List<Column> groupBys) {
-        this.groupBys = groupBys;
     }
 
     public Integer getLimit() {
@@ -100,7 +85,4 @@ public class Dql {
         return orderBys;
     }
 
-    public void setOrderBys(List<OrderByColumn> orderBys) {
-        this.orderBys = orderBys;
-    }
 }

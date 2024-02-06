@@ -1,5 +1,7 @@
 package xyz.erupt.linq.lambda;
 
+import xyz.erupt.linq.exception.LinqException;
+
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -39,7 +41,7 @@ public class LambdaReflect {
             S_FUNCTION_CACHE.put(func, lambdaInfo);
             return lambdaInfo;
         } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
+            throw new LinqException(e);
         }
     }
 

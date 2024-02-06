@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.junit.Before;
 import org.junit.Test;
-import xyz.erupt.linq.data.CustomerChurnModel;
-import xyz.erupt.linq.data.CustomerInfo;
+import xyz.erupt.linq.data.customer.CustomerChurnModel;
+import xyz.erupt.linq.data.customer.CustomerInfo;
 import xyz.erupt.linq.util.Columns;
 
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class DatasetTest {
+public class DatasetCustomerTest {
 
     private List<CustomerChurnModel> dataset;
 
@@ -23,7 +23,7 @@ public class DatasetTest {
 
     @Before
     public void before() throws IOException {
-        try (InputStream stream = DatasetTest.class.getResourceAsStream("/CustomerChurnModelDataSet.json")) {
+        try (InputStream stream = DatasetCustomerTest.class.getResourceAsStream("/CustomerChurnModelDataSet.json")) {
             if (stream != null) {
                 dataset = new Gson().fromJson(new InputStreamReader(stream), new TypeToken<List<CustomerChurnModel>>() {
                 }.getType());

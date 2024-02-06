@@ -5,21 +5,24 @@ import xyz.erupt.linq.engine.Engine;
 import xyz.erupt.linq.engine.EruptEngine;
 import xyz.erupt.linq.grammar.*;
 import xyz.erupt.linq.lambda.SFunction;
+import xyz.erupt.linq.lambda.Th;
 import xyz.erupt.linq.schema.*;
 import xyz.erupt.linq.util.Columns;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
 
     private Engine engine;
 
-    private Linq() {
+    public Linq() {
     }
 
     private final Dql dql = new Dql();
+
 
     public static Linq from(Collection<?> table) {
         Linq linq = new Linq();
@@ -27,12 +30,47 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
         return linq;
     }
 
-    public static <T> Linq from(T row) {
-        Linq linq = new Linq();
-        linq.dql.setFrom(Collections.singleton(row));
-        return linq;
+    @SafeVarargs
+    public static <T> Linq from(T... table) {
+        return Linq.from(Arrays.stream(table).collect(Collectors.toList()));
     }
 
+    public static Linq from(Boolean... table) {
+        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    }
+
+    public static Linq from(Byte... table) {
+        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    }
+
+    public static Linq from(Character... table) {
+        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    }
+
+    public static Linq from(String... table) {
+        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    }
+
+    public static Linq from(Short... table) {
+        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    }
+
+    public static Linq from(Integer... table) {
+        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    }
+
+    public static Linq from(Long... table) {
+        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    }
+
+    public static Linq from(Float... table) {
+        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    }
+
+
+    public static Linq from(Double... table) {
+        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    }
 
     @Override
     public Linq distinct() {
@@ -43,6 +81,15 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     @Override
     public Linq select(Column... columns) {
         this.dql.getColumns().addAll(Columns.columnsProcess(columns));
+        return this;
+    }
+
+    @Override
+    @SafeVarargs
+    public final <T> Linq select(SFunction<T, ?>... columns) {
+        for (SFunction<T, ?> column : columns) {
+            this.dql.getColumns().add(Columns.fromLambda(column));
+        }
         return this;
     }
 
@@ -70,7 +117,6 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
         return this;
     }
 
-
     @Override
     public Linq groupBy(Column... columns) {
         this.dql.getGroupBys().addAll(Columns.columnsProcess(columns));
@@ -87,24 +133,18 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
         return this;
     }
 
-    public Engine getEngine() {
-        return engine;
-    }
-
     public void setEngine(Engine engine) {
         this.engine = engine;
     }
 
     @Override
-    public Engine $engine() {
-        if (null == this.engine) {
-            return new EruptEngine();
-        }
+    public Engine wEngine() {
+        if (null == this.engine) return new EruptEngine();
         return this.engine;
     }
 
     @Override
-    public Dql $dql() {
+    public Dql wDQL() {
         return this.dql;
     }
 

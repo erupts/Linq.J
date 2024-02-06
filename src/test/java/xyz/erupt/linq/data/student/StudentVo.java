@@ -1,4 +1,4 @@
-package xyz.erupt.linq.data;
+package xyz.erupt.linq.data.student;
 
 public class StudentVo {
 

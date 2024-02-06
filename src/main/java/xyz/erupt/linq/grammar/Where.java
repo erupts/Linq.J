@@ -40,16 +40,16 @@ public interface Where {
         return condition(f -> CompareUtil.compare(value, f.get(c), CompareSymbol.GT));
     }
 
-    // >=
-    default <R> Linq gte(SFunction<R, ?> column, Object value) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> CompareUtil.compare(value, f.get(c), CompareSymbol.GTE));
-    }
-
     // <
     default <R> Linq lt(SFunction<R, ?> column, Object value) {
         Column c = Columns.fromLambda(column);
         return condition(f -> CompareUtil.compare(value, f.get(c), CompareSymbol.LT));
+    }
+
+    // >=
+    default <R> Linq gte(SFunction<R, ?> column, Object value) {
+        Column c = Columns.fromLambda(column);
+        return condition(f -> CompareUtil.compare(value, f.get(c), CompareSymbol.GTE));
     }
 
     // <=
