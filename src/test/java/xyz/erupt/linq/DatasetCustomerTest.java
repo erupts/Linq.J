@@ -31,26 +31,28 @@ public class DatasetCustomerTest {
         }
         customerInfos.add(new CustomerInfo(15634602L, "MM"));
         customerInfos.add(new CustomerInfo(15634602L, "KK"));
+        System.out.println("dataset length:" + dataset.size());
     }
 
     @Test
-    public void test() {
+    public void query() {
+        Long curr = System.currentTimeMillis();
         List<Map<String, Object>> result = Linq.from(dataset)
                 .distinct()
-                .rightJoin(customerInfos, CustomerInfo::getCustomerId, CustomerChurnModel::getCustomerId)
+//                .rightJoin(customerInfos, CustomerInfo::getCustomerId, CustomerChurnModel::getCustomerId)
                 .select(
                         Columns.of(CustomerChurnModel::getAge),
                         Columns.of(CustomerChurnModel::getGender),
                         Columns.of(CustomerInfo::getNickName)
 //                        Columns.sum(CustomerChurnModel::getAge, "sum")
                 )
-//                .like(CustomerChurnModel::getGender, "Male")
-//                .between(CustomerChurnModel::getAge, 10, 20)
-//                .eq(CustomerChurnModel::getExited, true)
+                .like(CustomerChurnModel::getGender, "Male")
+                .between(CustomerChurnModel::getAge, 10, 20)
+                .eq(CustomerChurnModel::getExited, true)
 //                .groupBy(Columns.of(CustomerChurnModel::getAge), Columns.of(CustomerChurnModel::getGender))
                 .orderBy(CustomerChurnModel::getAge)
                 .writeMap();
-        System.out.println(result);
+        System.out.println("process time " + (System.currentTimeMillis() - curr) + "ms");
     }
 
 }

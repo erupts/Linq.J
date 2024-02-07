@@ -235,8 +235,7 @@ public class LinqTest {
         String name = Linq.from(source)
                 .select(TestSource::getName)
                 .distinct()
-                .limit(1)
-                .offset(offset)
+                .limit(1).offset(offset)
                 .writeOne(String.class);
         for (int i = 0; i < source.size(); i++) {
             assert i != offset || name.equals(source.get(i).getName());
