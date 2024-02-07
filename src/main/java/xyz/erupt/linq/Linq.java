@@ -81,8 +81,8 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
 
     @Override
     public Linq select(Column column, Column... columns) {
-        this.dql.getColumns().addAll(Columns.columnsProcess(column));
-        this.dql.getColumns().addAll(Columns.columnsProcess(columns));
+        this.dql.getColumns().addAll(Columns.columnsUnfold(column));
+        this.dql.getColumns().addAll(Columns.columnsUnfold(columns));
         return this;
     }
 

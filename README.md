@@ -7,38 +7,46 @@
 #### simple query
 
 对象定义
+
 ```javascript
  // table 
- var TestSource = [{
-        id:1,
-        name:"Thanos",
-        date: new Date()
-    }, {
-         id:2,
-         name:"Liz",
-         date: new Date()
-    },
- ]
+var TestSource = [{
+    id: 1,
+    name: "Thanos",
+    date: new Date()
+}, {
+    id: 2,
+    name: "Liz",
+    date: new Date()
+},
+]
 ```
+
 Linq
+
 ```javascript
     Linq.from(table).select().write();
 ```
+
 SQL
+
 ```sql
-    select * from table
+    select *
+    from table
 ```
+
 结果
+
 ```json
 [
   {}
 ]
 ```
 
-
 #### where
 
 #### join
+
 ```javascript
     Linq.from(source)
     .leftJoin(target, target::getId, Source::getId)
@@ -48,6 +56,7 @@ SQL
         Columns.of(target::getName, "name2")
     ).write();
 ```
+
 ```sql
     select source.*, target.name name2
     from source
@@ -56,17 +65,19 @@ SQL
 ```
 
 #### group by
+
 ```javascript
      Linq.from(source).groupBy(Columns.of(TestSource::getName))
-        .select(
-                Columns.of(TestSource::getName, "name"),
-                Columns.min(TestSource::getDate, "min"),
-                Columns.avg(TestSource::getId, "avg"),
-                Columns.count("count"),
-                Columns.count(TestSource::getName, "countName"),
-                Columns.countDistinct(TestSource::getName, "countDistinct")
-        ).orderBy(TestSource::getName).writeMap();
+    .select(
+        Columns.of(TestSource::getName, "name"),
+        Columns.min(TestSource::getDate, "min"),
+        Columns.avg(TestSource::getId, "avg"),
+        Columns.count("count"),
+        Columns.count(TestSource::getName, "countName"),
+        Columns.countDistinct(TestSource::getName, "countDistinct")
+    ).orderBy(TestSource::getName).writeMap();
 ```
+
 ```sql
     select name,
            min(date)            min,
@@ -82,8 +93,10 @@ SQL
 
 #### limit
 
-
 ### 后续迭代计划
+
 - group by 支持自定义分组 key 格式化
+- 支持 having
+- 支持多个查询结果集进行组合: UNION ALL、UNION、INTERSECT、EXCEPT、
 - 支持窗口函数
 - 支持自定义条件 join

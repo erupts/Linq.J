@@ -210,8 +210,8 @@ public class Columns {
         return column;
     }
 
-    //column common process
-    public static List<Column> columnsProcess(Column... columns) {
+    // column common process
+    public static List<Column> columnsUnfold(Column... columns) {
         List<Column> cols = new ArrayList<>();
         for (Column column : columns) {
             if (null == column.getUnfold()) {
