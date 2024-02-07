@@ -25,52 +25,52 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     private final Dql dql = new Dql();
 
 
-    public static Linq from(Collection<?> table) {
+    public static Linq from(Collection<?> data) {
         Linq linq = new Linq();
-        linq.dql.setFrom(table);
+        linq.dql.setFrom(data);
         return linq;
     }
 
     @SafeVarargs
-    public static <T> Linq from(T... table) {
-        return Linq.from(Arrays.stream(table).collect(Collectors.toList()));
+    public static <T> Linq from(T... data) {
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList()));
     }
 
-    public static Linq from(Boolean... table) {
-        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    public static Linq from(Boolean... data) {
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
     }
 
-    public static Linq from(Byte... table) {
-        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    public static Linq from(Byte... data) {
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
     }
 
     public static Linq from(Character... table) {
         return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
     }
 
-    public static Linq from(String... table) {
-        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    public static Linq from(String... data) {
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
     }
 
-    public static Linq from(Short... table) {
-        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    public static Linq from(Short... data) {
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
     }
 
-    public static Linq from(Integer... table) {
-        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    public static Linq from(Integer... data) {
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
     }
 
-    public static Linq from(Long... table) {
-        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    public static Linq from(Long... data) {
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
     }
 
-    public static Linq from(Float... table) {
-        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    public static Linq from(Float... data) {
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
     }
 
 
-    public static Linq from(Double... table) {
-        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+    public static Linq from(Double... data) {
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
     }
 
     @Override
