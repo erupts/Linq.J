@@ -2,8 +2,8 @@ package xyz.erupt.linq;
 
 import org.junit.Before;
 import org.junit.Test;
+import xyz.erupt.linq.consts.OrderByDirection;
 import xyz.erupt.linq.data.student.*;
-import xyz.erupt.linq.grammar.OrderBy;
 import xyz.erupt.linq.util.Columns;
 
 import java.time.LocalDateTime;
@@ -66,7 +66,7 @@ public class DatasetStudentTest {
         Linq.from(students)
                 .innerJoin(studentScores, StudentScore::getStudentId, Student::getId)
                 .innerJoin(studentSubjects, StudentSubject::getId, StudentScore::getSubjectId)
-                .groupBy(Columns.of(Student::getName))
+                .groupBy(Student::getName)
                 .select(
                         Columns.of(Student::getName, StudentScoreAnalysis::getName),
                         Columns.avg(StudentScore::getScore, StudentScoreAnalysis::getAvgScore),
@@ -90,8 +90,8 @@ public class DatasetStudentTest {
     @Test
     public void orderByTest() {
         Object s = Linq.from(students)
-                .orderBy(Student::getAge, OrderBy.Direction.DESC)
-                .orderBy(Student::getId, OrderBy.Direction.DESC)
+                .orderBy(Student::getAge, OrderByDirection.DESC)
+                .orderBy(Student::getId, OrderByDirection.DESC)
                 .select(Columns.all(Student.class))
                 .writeMap();
     }

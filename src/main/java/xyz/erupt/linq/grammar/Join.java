@@ -21,22 +21,6 @@ public interface Join {
         return join(new JoinSchema<>(joinMethod, target, on));
     }
 
-//    default <T, S> Linq join(JoinMethod joinMethod, Collection<T> target, SFunction<T, Object> onL, SFunction<S, Object> onR) {
-//        Column<T> l = Columns.fromLambda(onL);
-//        Column<S> r = Columns.fromLambda(onR);
-//        return join(new JoinSchema<>(joinMethod, target, (t1, t2) -> {
-//            Object lv = ReflectUtil.getFieldValue(t1, l.getField());
-//            Object rv = t2.get(r);
-//            if (null == lv && null == rv) {
-//                return true;
-//            } else if (null == lv || null == rv) {
-//                return false;
-//            } else {
-//                return lv.toString().equals(rv.toString());
-//            }
-//        }));
-//    }
-
     default <L, R> Linq innerJoin(Collection<L> t, SFunction<L, Object> lon, SFunction<R, Object> ron) {
         return this.join(JoinMethod.INNER, t, lon, ron);
     }

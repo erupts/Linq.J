@@ -1,8 +1,8 @@
 package xyz.erupt.linq.engine;
 
 import xyz.erupt.linq.consts.JoinExchange;
+import xyz.erupt.linq.consts.OrderByDirection;
 import xyz.erupt.linq.exception.LinqException;
-import xyz.erupt.linq.grammar.OrderBy;
 import xyz.erupt.linq.schema.*;
 import xyz.erupt.linq.util.ColumnReflects;
 import xyz.erupt.linq.util.Columns;
@@ -19,8 +19,8 @@ public class EruptEngine extends Engine {
         // join process
         if (!dql.getJoinSchemas().isEmpty()) {
             for (JoinSchema<?> joinSchema : dql.getJoinSchemas()) {
-                Column lon = Columns.fromLambda(joinSchema.getLon());
-                Column ron = Columns.fromLambda(joinSchema.getRon());
+                Column lon = Columns.of(joinSchema.getLon());
+                Column ron = Columns.of(joinSchema.getRon());
                 if (joinSchema.getJoinExchange() == JoinExchange.HASH) {
                     List<Row> targetData = ColumnReflects.listToRow(joinSchema.getTarget());
                     switch (joinSchema.getJoinMethod()) {
@@ -163,12 +163,12 @@ public class EruptEngine extends Engine {
         if (null != dql.getOrderBys() && !dql.getOrderBys().isEmpty()) {
             dataset.sort((a, b) -> {
                 int i = 0;
-                for (OrderByColumn orderBy : dql.getOrderBys()) {
+                for (OrderBySchema orderBy : dql.getOrderBys()) {
                     if (null == a.get(orderBy.getColumn()) || null == b.get(orderBy.getColumn())) return 0;
                     if (a.get(orderBy.getColumn()) instanceof Comparable) {
                         Comparable<Object> comparable = (Comparable<Object>) a.get(orderBy.getColumn());
                         i = comparable.compareTo(b.get(orderBy.getColumn()));
-                        if (orderBy.getDirection() == OrderBy.Direction.DESC) i = ~i + 1;
+                        if (orderBy.getDirection() == OrderByDirection.DESC) i = ~i + 1;
                         if (i != 0) return i;
                     } else {
                         throw new LinqException(orderBy.getColumn().getTable() + "." + orderBy.getColumn().getField() + " sort does not implement the Comparable interface");

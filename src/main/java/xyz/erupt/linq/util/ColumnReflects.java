@@ -41,7 +41,7 @@ public class ColumnReflects {
         try {
             for (Field field : obj.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
-                row.put(Columns.fromField(field), field.get(obj));
+                row.put(Columns.of(field), field.get(obj));
             }
         } catch (Exception e) {
             throw new LinqException(e);

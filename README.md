@@ -81,3 +81,9 @@ SQL
 #### order by
 
 #### limit
+
+
+### 后续迭代计划
+- group by 支持自定义分组 key 格式化
+- 支持窗口函数
+- 支持自定义条件 join

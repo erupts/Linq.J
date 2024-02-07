@@ -33,7 +33,7 @@ public class Row extends HashMap<Column, Object> {
     }
 
     public <T, R> Object get(SFunction<T, R> alias) {
-        return super.get(Columns.fromLambda(alias));
+        return super.get(Columns.of(alias));
     }
 
 }

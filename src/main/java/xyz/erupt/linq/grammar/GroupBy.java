@@ -1,12 +1,12 @@
 package xyz.erupt.linq.grammar;
 
 import xyz.erupt.linq.Linq;
-import xyz.erupt.linq.schema.Column;
+import xyz.erupt.linq.lambda.SFunction;
 
 public interface GroupBy {
 
-    Linq groupBy(Column... columns);
+    <T> Linq groupBy(SFunction<T, ?> column, SFunction<T, ?>... columns);
 
-//    Linq having();
+//    Linq having(Function<Row, Boolean>... fun);
 
 }

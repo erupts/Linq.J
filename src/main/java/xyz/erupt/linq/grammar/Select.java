@@ -8,8 +8,8 @@ public interface Select {
 
     Linq distinct();
 
-    Linq select(Column... columns);
+    Linq select(Column column, Column... columns);
 
-    <T> Linq select(SFunction<T, ?>... columns);
+    <T> Linq select(SFunction<T, ?> column, SFunction<T, ?>... columns);
 
 }

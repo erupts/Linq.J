@@ -2,14 +2,14 @@ package xyz.erupt.linq;
 
 import org.junit.Before;
 import org.junit.Test;
+import xyz.erupt.linq.consts.OrderByDirection;
 import xyz.erupt.linq.data.source.TestSource;
 import xyz.erupt.linq.data.source.TestSourceExt;
 import xyz.erupt.linq.data.source.TestSourceExt2;
-import xyz.erupt.linq.grammar.OrderBy;
+import xyz.erupt.linq.data.source.TestSourceGroupByVo;
 import xyz.erupt.linq.lambda.Th;
 import xyz.erupt.linq.util.Columns;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class LinqTest {
@@ -27,7 +27,8 @@ public class LinqTest {
         source.add(new TestSource(2, "Cube", new Date(), new String[]{"c", "d"}));
         source.add(new TestSource(3, "Berg", new Date(), new String[]{"f"}));
         source.add(new TestSource(4, "Liz", new Date(), new String[]{"a", "s", "x", "y", "z"}));
-        source.add(new TestSource(null, "Thanos", new Date(), new String[]{"k"}));
+        source.add(new TestSource(5, "Thanos", new Date(), new String[]{"k"}));
+        source.add(new TestSource(null, "", new Date(), new String[]{"k"}));
 
         target.add(new TestSourceExt(1, "Aa"));
         target.add(new TestSourceExt(2, "Bb"));
@@ -52,8 +53,8 @@ public class LinqTest {
 
     @Test
     public void fromSimpleClass() {
-        List<String> strings = Linq.from("C", "A", "B", "B").orderBy(Th::is).write(String.class);
-        List<Integer> integers = Linq.from(1, 2, 3, 7, 6, 5).write(Integer.class);
+        List<String> strings = Linq.from("C", "A", "B", "B").orderByDesc(Th::is).write(String.class);
+        List<Integer> integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(Th::is).write(Integer.class);
         System.out.println(strings);
         System.out.println(integers);
     }
@@ -90,7 +91,7 @@ public class LinqTest {
                 .select(Columns.avg(TestSource::getId, "avg"))
                 .writeMapOne();
         assert Integer.parseInt(map.get("count").toString()) == source.size();
-        assert Integer.parseInt(map.get("countDistinct").toString()) == source.stream().filter(it -> null != it.getId()).map(TestSource::getName).distinct().count();
+        assert Integer.parseInt(map.get("countDistinct").toString()) == source.stream().map(TestSource::getName).distinct().count();
         assert Integer.parseInt(map.get("sum").toString()) == source.stream().filter(it -> null != it.getId()).mapToInt(TestSource::getId).sum();
         assert Integer.parseInt(map.get("max").toString()) == source.stream().filter(it -> null != it.getId()).mapToInt(TestSource::getId).max().orElse(0);
         assert Integer.parseInt(map.get("min").toString()) == source.stream().filter(it -> null != it.getId()).mapToInt(TestSource::getId).min().orElse(0);
@@ -99,8 +100,10 @@ public class LinqTest {
 
     @Test
     public void customerSelect() {
-        List<String> result = Linq.from(source).select(Columns.ofs(it -> it.get("name") + " Borg", "Hello")).distinct().write(String.class);
-        for (int i = 0; i < result.size(); i++) assert (source.get(i).getName() + " Borg").equals(result.get(i));
+        List<String> result = Linq.from(source).select(Columns.ofs(it -> it.get("name") + " Borg", "Hello")).write(String.class);
+        for (int i = 0; i < result.size(); i++) {
+            assert (source.get(i).getName() + " Borg").equals(result.get(i));
+        }
     }
 
     @Test
@@ -142,28 +145,39 @@ public class LinqTest {
     @Test
     public void conditionTest() {
         String countAlias = "count";
-        int eq = Linq.from(source).eq(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
-        int ne = Linq.from(source).ne(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
-        int gt = Linq.from(source).gt(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
-        int lt = Linq.from(source).lt(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
-        int gte = Linq.from(source).gte(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
-        int lte = Linq.from(source).lte(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
-        int in = Linq.from(source).in(TestSource::getId, 1, 2, null).select(Columns.count(countAlias)).writeOne(Integer.class);
-        int notIn = Linq.from(source).notIn(TestSource::getId, 1, 2, null).select(Columns.count(countAlias)).writeOne(Integer.class);
-        int like = Linq.from(source).like(TestSource::getName, "a").select(Columns.count(countAlias)).writeOne(Integer.class);
-        int between = Linq.from(source).between(TestSource::getId, 1, 3).select(Columns.count(countAlias)).writeOne(Integer.class);
-        int isNull = Linq.from(source).isNull(TestSource::getId).select(Columns.count(countAlias)).writeOne(Integer.class);
-        int isNotNull = Linq.from(source).isNotNull(TestSource::getId).select(Columns.count(countAlias)).writeOne(Integer.class);
-        int blank = Linq.from(source).isBlank(TestSource::getName).select(Columns.count(countAlias)).writeOne(Integer.class);
-        int notBlank = Linq.from(source).isNotNull(TestSource::getName).select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer eq = Linq.from(source).eq(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer ne = Linq.from(source).ne(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer gt = Linq.from(source).gt(TestSource::getId, 2).select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer lt = Linq.from(source).lt(TestSource::getId, 2).select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer gte = Linq.from(source).gte(TestSource::getId, 2).select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer lte = Linq.from(source).lte(TestSource::getId, 2).select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer between = Linq.from(source).between(TestSource::getId, 1, 3).select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer in = Linq.from(source).in(TestSource::getId, 1, 2, null).select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer notIn = Linq.from(source).notIn(TestSource::getId, 1, 2, null).select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer like = Linq.from(source).like(TestSource::getName, "a").select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer isNull = Linq.from(source).isNull(TestSource::getId).select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer isNotNull = Linq.from(source).isNotNull(TestSource::getId).select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer blank = Linq.from(source).isBlank(TestSource::getName).select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer notBlank = Linq.from(source).isNotBlank(TestSource::getName).select(Columns.count(countAlias)).writeOne(Integer.class);
         assert eq == source.stream().filter(it -> it.getName().equals("Thanos")).count();
         assert ne == source.stream().filter(it -> !it.getName().equals("Thanos")).count();
-
+        assert gt == source.stream().filter(it -> null != it.getId() && it.getId() > 2).count();
+        assert lt == source.stream().filter(it -> null != it.getId() && it.getId() < 2).count();
+        assert gte == source.stream().filter(it -> null != it.getId() && it.getId() >= 2).count();
+        assert lte == source.stream().filter(it -> null != it.getId() && it.getId() <= 2).count();
+        assert between == source.stream().filter(it -> null != it.getId() && it.getId() >= 1 && it.getId() <= 3).count();
+        assert in == source.stream().filter(it -> null != it.getId() && (it.getId() == 1 || it.getId() == 2)).count();
+        assert notIn == source.stream().filter(it -> null != it.getId() && it.getId() != 1 && it.getId() != 2).count();
+        assert like == source.stream().filter(it -> it.getName().contains("a")).count();
+        assert isNull == source.stream().filter(it -> null == it.getId()).count();
+        assert isNotNull == source.stream().filter(it -> null != it.getId()).count();
+        assert blank == source.stream().filter(it -> null == it.getName() || it.getName().trim().isEmpty()).count();
+        assert notBlank == source.stream().filter(it -> null != it.getName() && !it.getName().trim().isEmpty()).count();
     }
 
     @Test
     public void orConditionTest() {
-        // name = Thanos or id = 4
+        // name = 'Thanos' or id = 4
         List<Map<String, Object>> res = Linq.from(source)
                 .leftJoin(target, TestSourceExt::getId, TestSource::getId).select(Columns.all(TestSource.class))
                 .condition(data -> {
@@ -174,33 +188,24 @@ public class LinqTest {
                     }
                     return false;
                 }).writeMap();
-        assert res.size() == 2;
+        assert res.size() == 3;
     }
 
 
     @Test
     public void groupBy() {
-        List<Map<String, Object>> result = Linq.from(source)
-                .groupBy(Columns.of(TestSource::getName))
+        List<TestSourceGroupByVo> result = Linq.from(source)
+                .groupBy(TestSource::getName)
                 .select(
-                        Columns.of(TestSource::getName, "name"),
-                        Columns.of(TestSource::getId, "id"),
-                        Columns.min(TestSource::getDate, "date"),
-                        Columns.avg(TestSource::getId, "avg"),
-                        Columns.count(TestSource::getName, "count"),
-                        Columns.count("aCount")
-                ).orderBy(TestSource::getName).writeMap();
-        System.out.println(result);
-    }
-
-    @Test
-    public void groupByDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        System.out.println(dateFormat.format(new Date()));
-        List<Map<String, Object>> result = Linq.from(source)
-                .select(Columns.ofs(row -> dateFormat.format(row.get(TestSource::getDate)), "aa"))
-//                .groupBy(Columns.ofs(row -> dateFormat.format(row.get(TestSource::getDate)), "aa"))
-                .writeMap();
+                        Columns.of(TestSource::getName, TestSourceGroupByVo::getName),
+                        Columns.groupArray(TestSource::getId, TestSourceGroupByVo::getIds),
+                        Columns.min(TestSource::getDate, TestSourceGroupByVo::getMin),
+                        Columns.max(TestSource::getDate, TestSourceGroupByVo::getMax),
+                        Columns.avg(TestSource::getId, TestSourceGroupByVo::getAvg),
+                        Columns.count(TestSource::getName, TestSourceGroupByVo::getNameCount),
+                        Columns.count(TestSourceGroupByVo::getCount)
+                )
+                .orderBy(TestSource::getName).write(TestSourceGroupByVo.class);
         System.out.println(result);
     }
 
@@ -208,7 +213,7 @@ public class LinqTest {
     public void orderBy() {
         List<TestSource> result = Linq.from(source)
                 .select(Columns.all(TestSource.class))
-                .orderBy(TestSource::getId, OrderBy.Direction.DESC)
+                .orderBy(TestSource::getId, OrderByDirection.DESC)
                 .orderBy(TestSource::getName)
                 .write(TestSource.class);
         source.sort((a, b) -> a.getId() == null || b.getId() == null ? 0 : b.getId() - a.getId());
@@ -217,8 +222,25 @@ public class LinqTest {
 
     @Test
     public void distinctTest() {
-        List<String> names = Linq.from(source).select(Columns.of(TestSource::getName)).distinct().write(String.class);
+        List<String> names = Linq.from(source)
+                .select(TestSource::getName)
+                .distinct()
+                .write(String.class);
         assert names.size() == source.stream().map(TestSource::getName).distinct().count();
+    }
+
+    @Test
+    public void limit() {
+        int offset = 3;
+        String name = Linq.from(source)
+                .select(TestSource::getName)
+                .distinct()
+                .limit(1)
+                .offset(offset)
+                .writeOne(String.class);
+        for (int i = 0; i < source.size(); i++) {
+            assert i != offset || name.equals(source.get(i).getName());
+        }
     }
 
 }

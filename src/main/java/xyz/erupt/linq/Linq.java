@@ -11,6 +11,7 @@ import xyz.erupt.linq.util.Columns;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -79,16 +80,18 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public Linq select(Column... columns) {
+    public Linq select(Column column, Column... columns) {
+        this.dql.getColumns().addAll(Columns.columnsProcess(column));
         this.dql.getColumns().addAll(Columns.columnsProcess(columns));
         return this;
     }
 
     @Override
     @SafeVarargs
-    public final <T> Linq select(SFunction<T, ?>... columns) {
-        for (SFunction<T, ?> column : columns) {
-            this.dql.getColumns().add(Columns.fromLambda(column));
+    public final <T> Linq select(SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        this.dql.getColumns().add(Columns.of(column));
+        for (SFunction<T, ?> col : columns) {
+            this.dql.getColumns().add(Columns.of(col));
         }
         return this;
     }
@@ -106,8 +109,8 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public <R> Linq orderBy(SFunction<R, ?> column, Direction direction) {
-        this.dql.getOrderBys().add(new OrderByColumn(Columns.of(column), direction));
+    public Linq orderBy(List<OrderBySchema> orderBySchemas) {
+        this.dql.getOrderBys().addAll(orderBySchemas);
         return this;
     }
 
@@ -117,9 +120,13 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
         return this;
     }
 
+    @SafeVarargs
     @Override
-    public Linq groupBy(Column... columns) {
-        this.dql.getGroupBys().addAll(Columns.columnsProcess(columns));
+    public final <T> Linq groupBy(SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        this.dql.getGroupBys().add(Columns.of(column));
+        for (SFunction<T, ?> col : columns) {
+            this.dql.getGroupBys().add(Columns.of(col));
+        }
         return this;
     }
 

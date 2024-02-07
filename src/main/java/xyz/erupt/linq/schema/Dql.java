@@ -22,7 +22,7 @@ public class Dql {
     private final List<Column> groupBys = new ArrayList<>();
 
     // order by definition
-    private final List<OrderByColumn> orderBys = new ArrayList<>();
+    private final List<OrderBySchema> orderBys = new ArrayList<>();
 
     private Integer limit = null;
 
@@ -81,7 +81,7 @@ public class Dql {
         this.offset = offset;
     }
 
-    public List<OrderByColumn> getOrderBys() {
+    public List<OrderBySchema> getOrderBys() {
         return orderBys;
     }
 

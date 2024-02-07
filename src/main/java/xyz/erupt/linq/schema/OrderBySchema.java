@@ -1,17 +1,17 @@
 package xyz.erupt.linq.schema;
 
-import xyz.erupt.linq.grammar.OrderBy;
+import xyz.erupt.linq.consts.OrderByDirection;
 
-public class OrderByColumn {
+public class OrderBySchema {
 
     private Column column;
 
-    private OrderBy.Direction direction;
+    private OrderByDirection direction;
 
-    public OrderByColumn() {
+    public OrderBySchema() {
     }
 
-    public OrderByColumn(Column column, OrderBy.Direction direction) {
+    public OrderBySchema(Column column, OrderByDirection direction) {
         this.column = column;
         this.direction = direction;
     }
@@ -24,11 +24,11 @@ public class OrderByColumn {
         this.column = column;
     }
 
-    public OrderBy.Direction getDirection() {
+    public OrderByDirection getDirection() {
         return direction;
     }
 
-    public void setDirection(OrderBy.Direction direction) {
+    public void setDirection(OrderByDirection direction) {
         this.direction = direction;
     }
 

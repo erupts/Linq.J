@@ -16,56 +16,56 @@ public interface Where {
 
     // equals
     default <R> Linq eq(SFunction<R, ?> column, Object value) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> null != value && value.equals(f.get(c)));
+        Column col = Columns.of(column);
+        return condition(f -> null != value && value.equals(f.get(col)));
     }
 
     // not equals
     default <R> Linq ne(SFunction<R, ?> column, Object value) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> null != value && !value.equals(f.get(c)));
+        Column col = Columns.of(column);
+        return condition(f -> null != value && !value.equals(f.get(col)));
     }
 
 
     // :val >= start and :val <= end
     default <R> Linq between(SFunction<R, ?> column, Object start, Object end) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> CompareUtil.compare(start, f.get(c), CompareSymbol.LTE) &&
-                CompareUtil.compare(end, f.get(c), CompareSymbol.GTE));
+        Column col = Columns.of(column);
+        return condition(row -> CompareUtil.compare(row.get(col), start, CompareSymbol.GTE) &&
+                CompareUtil.compare(row.get(col), end, CompareSymbol.LTE));
     }
 
     // >
     default <R> Linq gt(SFunction<R, ?> column, Object value) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> CompareUtil.compare(value, f.get(c), CompareSymbol.GT));
+        Column col = Columns.of(column);
+        return condition(f -> CompareUtil.compare(f.get(col), value, CompareSymbol.GT));
     }
 
     // <
     default <R> Linq lt(SFunction<R, ?> column, Object value) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> CompareUtil.compare(value, f.get(c), CompareSymbol.LT));
+        Column col = Columns.of(column);
+        return condition(f -> CompareUtil.compare(f.get(col), value, CompareSymbol.LT));
     }
 
     // >=
     default <R> Linq gte(SFunction<R, ?> column, Object value) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> CompareUtil.compare(value, f.get(c), CompareSymbol.GTE));
+        Column col = Columns.of(column);
+        return condition(f -> CompareUtil.compare(f.get(col), value, CompareSymbol.GTE));
     }
 
     // <=
     default <R> Linq lte(SFunction<R, ?> column, Object value) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> CompareUtil.compare(value, f.get(c), CompareSymbol.LTE));
+        Column col = Columns.of(column);
+        return condition(f -> CompareUtil.compare(f.get(col), value, CompareSymbol.LTE));
     }
 
     default <R> Linq like(SFunction<R, ?> column, Object value) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> f.get(c) != null && value != null && f.get(c).toString().contains(value.toString()));
+        Column col = Columns.of(column);
+        return condition(f -> f.get(col) != null && value != null && f.get(col).toString().contains(value.toString()));
     }
 
     default <R> Linq in(SFunction<R, ?> column, Object... value) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> f.get(c) != null && Arrays.stream(value).anyMatch(it -> null != it && it.equals(f.get(c))));
+        Column col = Columns.of(column);
+        return condition(f -> f.get(col) != null && Arrays.stream(value).anyMatch(it -> null != it && it.equals(f.get(col))));
     }
 
     default <R> Linq in(SFunction<R, ?> column, List<Object> value) {
@@ -73,8 +73,8 @@ public interface Where {
     }
 
     default <R> Linq notIn(SFunction<R, ?> column, Object... value) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> f.get(c) != null && Arrays.stream(value).noneMatch(it -> null != it && it.equals(f.get(c))));
+        Column col = Columns.of(column);
+        return condition(f -> f.get(col) != null && Arrays.stream(value).noneMatch(it -> null != it && it.equals(f.get(col))));
     }
 
     default <R> Linq notIn(SFunction<R, ?> column, List<Object> value) {
@@ -83,23 +83,23 @@ public interface Where {
 
 
     default <R> Linq isNull(SFunction<R, ?> column) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> f.get(c) == null);
+        Column col = Columns.of(column);
+        return condition(f -> f.get(col) == null);
     }
 
     default <R> Linq isNotNull(SFunction<R, ?> column) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> f.get(c) != null);
+        Column col = Columns.of(column);
+        return condition(f -> f.get(col) != null);
     }
 
     default <R> Linq isBlank(SFunction<R, ?> column) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> f.get(c) == null || f.get(c).toString().trim().isEmpty());
+        Column col = Columns.of(column);
+        return condition(f -> f.get(col) == null || f.get(col).toString().trim().isEmpty());
     }
 
     default <R> Linq isNotBlank(SFunction<R, ?> column) {
-        Column c = Columns.fromLambda(column);
-        return condition(f -> f.get(c) != null && !f.get(c).toString().trim().isEmpty());
+        Column col = Columns.of(column);
+        return condition(f -> f.get(col) != null && !f.get(col).toString().trim().isEmpty());
     }
 
     Linq condition(Function<Row, Boolean> fun);
