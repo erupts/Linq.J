@@ -1,6 +1,6 @@
 # LINQ by Java
 
-### Best linq implementation
+### Best linq implementation for Java
 
 ### 操作 Java 对象和写 SQL一样的体验
 
