@@ -4,7 +4,24 @@
 
 ### 操作 Java 对象和写 SQL一样的体验
 
-#### simple query
+### 使用方法
+```xml
+<dependency>
+    <groupId>xyz.erupt</groupId>
+    <artifactId>linq</artifactId>
+    <version>0.0.1</version>
+</dependency>
+```
+
+### 应用场景
+
+- 不同对象间的关联，无需转换为map再关联，代码简洁，且性能卓越
+- 学习成本低，有SQL基础即可操作任意对象矩阵
+- feign结果间的关联
+- 多个结果对象的排序聚合与去重
+- 对象转换与映射
+
+#### query DEMO
 
 对象定义
 
