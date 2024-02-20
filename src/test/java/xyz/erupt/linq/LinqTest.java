@@ -53,7 +53,7 @@ public class LinqTest {
 
     @Test
     public void fromSimpleClass() {
-        List<String> strings = Linq.from("C", "A", "B", "B").orderByDesc(Th::is).write(String.class);
+        List<String> strings = Linq.from("C", "A", "B", "B").gt(Th::is, "A").orderByDesc(Th::is).write(String.class);
         List<Integer> integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(Th::is).write(Integer.class);
         System.out.println(strings);
         System.out.println(integers);
