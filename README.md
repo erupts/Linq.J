@@ -18,10 +18,15 @@
 ### 应用场景
 
 - 不同对象间的关联，无需转换为map再关联，代码简洁，且性能卓越
-- 学习成本低，有SQL基础即可操作任意对象矩阵
 - 不同数据集结果间的关联
 - 多个结果对象的排序聚合与去重
 - 对象转换与映射
+
+### 优点
+
+- 学习成本低，有SQL基础即可操作任意对象
+- 代码简洁，无需for循环与分支操作数据
+- 执行效率高10W级数据毫秒级处理
 
 #### query DEMO
 
@@ -44,14 +49,14 @@ List<TestSource> testSource = [{
 ### select
 
 ```javascript
-List<String> strings = Linq.from("C", "A", "B", "B").gt(Th::is, "A").orderByDesc(Th::is).write(String.class);
+List < String > strings = Linq.from("C", "A", "B", "B").gt(Th::is, "A").orderByDesc(Th::is).write(String.class);
 // [C, B, B]
 
 
-List<Integer> integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(Th::is).write(Integer.class);
+List < Integer > integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(Th::is).write(Integer.class);
 // [1, 2, 3, 5, 6, 7]
 
-List<String> names = Linq.from(testSource)
+List < String > names = Linq.from(testSource)
     .select(Columns.of(TestSource::getName))
     .write(String.class);
 // ["Thanos", "Liz"]
@@ -68,7 +73,9 @@ List<String> names = Linq.from(testSource)
         Columns.of(target::getName, "name2")
     ).write();
 ```
+
 Corresponding SQL
+
 ```sql
     select source.*, target.name name2
     from source
@@ -90,7 +97,9 @@ Linq.from(source).groupBy(Columns.of(TestSource::getName))
         Columns.countDistinct(TestSource::getName, "countDistinct")
     ).orderBy(TestSource::getName).writeMap();
 ```
+
 result
+
 ```json
  [
   {
@@ -111,7 +120,9 @@ result
   }
 ]
 ```
+
 Corresponding SQL
+
 ```sql
     select name,
            min(date) min,
