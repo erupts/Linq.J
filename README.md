@@ -50,14 +50,14 @@ List<TestSource> testSource = [{
 ### select
 
 ```javascript
-List < String > strings = Linq.from("C", "A", "B", "B").gt(Th::is, "A").orderByDesc(Th::is).write(String.class);
+List<String> strings = Linq.from("C", "A", "B", "B").gt(Th::is, "A").orderByDesc(Th::is).write(String.class);
 // [C, B, B]
 
 
-List < Integer > integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(Th::is).write(Integer.class);
+List<Integer> integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(Th::is).write(Integer.class);
 // [1, 2, 3, 5, 6, 7]
 
-List < String > names = Linq.from(testSource)
+List<String> names = Linq.from(testSource)
     .select(Columns.of(TestSource::getName))
     .write(String.class);
 // ["Thanos", "Liz"]
@@ -67,11 +67,11 @@ List < String > names = Linq.from(testSource)
 
 ```javascript
     Linq.from(source)
-    .leftJoin(target, target::getId, Source::getId)
-    .innerJoin(target2, target2::getId, Source::getId)
+    .leftJoin(target, Target::getId, Source::getId)
+    .innerJoin(target2, Target2::getId, Source::getId)
     .select(
         Columns.all(Source.class),
-        Columns.of(target::getName, "name2")
+        Columns.of(Target::getName, "name2")
     ).write();
 ```
 
@@ -104,20 +104,20 @@ result
 ```json
  [
   {
-    name: "Thanos",
-    min: 10,
-    avg: 1.0,
-    count: 2,
-    countName: 1,
-    countDistinct: 1
+    "name": "Thanos",
+    "min": 10,
+    "avg": 1.0,
+    "count": 2,
+    "countName": 1,
+    "countDistinct": 1
   },
   {
-    name: "Liz",
-    min: 10,
-    avg: 3.0,
-    count: 4,
-    countName: 2,
-    countDistinct: 1
+    "name": "Liz",
+    "min": 10,
+    "avg": 3.0,
+    "count": 4,
+    "countName": 2,
+    "countDistinct": 1
   }
 ]
 ```
@@ -135,7 +135,7 @@ Corresponding SQL
     group by name
 ```
 
-### Planning for subsequent iterations
+### 后续迭代计划
 
 - group by 支持自定义分组 key 格式化
 - 支持 having
