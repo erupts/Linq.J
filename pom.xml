@@ -14,6 +14,7 @@
 
     <properties>
         <java.version>8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
@@ -85,9 +86,10 @@
             <activation>
                 <jdk>[1.8,)</jdk>
             </activation>
+            <!-- java8版本导致javadoc打包编译失败时候，添加-->
             <properties>
                 <javadoc.opts>-Xdoclint:none</javadoc.opts>
-                <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
+<!--                <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>-->
             </properties>
         </profile>
         <profile>
@@ -138,7 +140,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>1.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
