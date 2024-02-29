@@ -1,13 +1,38 @@
-# LINQ by Java
+# LINQ in Java
+> Linq是面向对象的sql，linq实际上是对内存里的数据的查询
 
-### Best linq implementation for Java
+可以通过最少的代码对数据源进行关联、筛选、排序和分组等操作
 
-### 操作 Java 对象和写 SQL一样的体验
+允许编写Java代码以查询数据库相同的方式操作内存数据，如
+- List 集合中的数据
+- SQL 结果的数据
+- Array 数组中的数据
+- CSV 数据集
+- XML 文档
+- JSON 文档
+- Stream 流
+
+### 应用场景
+- 分布式开发时Feign / Dubbo的结果关联
+- 多个结果对象的排序聚合与内存分页
+- 语义化对象转换与映射
+- 联邦查询
+
+### 操作语法
+- From
+- Select
+- Distinct
+- Join
+- Where
+- Group By
+- Order By
+- Limit
+- Offset
+- ...
 
 ### 使用方法
-
+包内零外部依赖，包体仅仅50kb
 ```xml
-
 <dependency>
     <groupId>xyz.erupt</groupId>
     <artifactId>linq</artifactId>
@@ -30,7 +55,7 @@
 - 执行效率高10W级数据毫秒级处理
 - 轻量级，零外部依赖
 
-#### query DEMO
+### DEMO
 
 对象定义
 
@@ -137,9 +162,9 @@ Corresponding SQL
 ```
 
 ### 后续迭代计划
-
-- group by 支持自定义分组 key 格式化
-- 支持 having
+> 大家的支持才是持续迭代的动力！
 - 支持多个查询结果集进行组合: UNION ALL、UNION、INTERSECT、EXCEPT、UNION BY NAME
 - 支持窗口函数
-- 支持自定义条件 join
+- 支持 Nested loop join
+- 支持 having
+- group by 支持自定义分组 key 格式化
