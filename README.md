@@ -105,7 +105,9 @@ public class ObjectQuery{
     }
     
     public void groupBy(){
-        Linq.from(source).groupBy(TestSource::getName)
+        Linq.from(source)
+            .groupBy(TestSource::getName)
+            .orderBy(TestSource::getAge)
             .select(
                 Columns.of(TestSource::getName, "name"),
                 Columns.min(TestSource::getDate, "min"),
@@ -113,7 +115,7 @@ public class ObjectQuery{
                 Columns.count("count"),
                 Columns.count(TestSource::getName, "countName"),
                 Columns.countDistinct(TestSource::getName, "countDistinct")
-        ).orderBy(TestSource::getName);
+            );
     }
     
     public void write(){
