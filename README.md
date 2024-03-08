@@ -133,8 +133,8 @@ public class ObjectQuery{
         String name = Linq.from(source)
                 .select(TestSource::getName)
                 .distinct()
-                .limit(1)
-                .offset(offset)
+                .limit(2)
+                .offset(5)
                 .orderBy(TestSource::getName)
                 .orderByDesc(TestSource::getAge)
                 .writeOne(String.class);
