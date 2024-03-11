@@ -159,6 +159,7 @@ public class LinqTest {
         Integer isNotNull = Linq.from(source).isNotNull(TestSource::getId).select(Columns.count(countAlias)).writeOne(Integer.class);
         Integer blank = Linq.from(source).isBlank(TestSource::getName).select(Columns.count(countAlias)).writeOne(Integer.class);
         Integer notBlank = Linq.from(source).isNotBlank(TestSource::getName).select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer fieldWhere = Linq.from(source).where(TestSource::getId, id -> null != id && id >= 5).select(Columns.count(countAlias)).writeOne(Integer.class);
         assert eq == source.stream().filter(it -> it.getName().equals("Thanos")).count();
         assert ne == source.stream().filter(it -> !it.getName().equals("Thanos")).count();
         assert gt == source.stream().filter(it -> null != it.getId() && it.getId() > 2).count();
@@ -173,6 +174,7 @@ public class LinqTest {
         assert isNotNull == source.stream().filter(it -> null != it.getId()).count();
         assert blank == source.stream().filter(it -> null == it.getName() || it.getName().trim().isEmpty()).count();
         assert notBlank == source.stream().filter(it -> null != it.getName() && !it.getName().trim().isEmpty()).count();
+        assert fieldWhere == source.stream().filter(it -> null != it.getId() && it.getId() >= 5).count();
     }
 
     @Test

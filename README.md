@@ -104,6 +104,10 @@ public class ObjectQuery{
         Linq.from(source).like(TestSource::getName, "a");
         // is null
         Linq.from(source).isNull(TestSource::getId);
+        
+        // customer single field where
+        Linq.from(source).where(TestSource::getId, id -> id >= 5);
+        
         // customer condition or multi field
         Linq.from(source).condition(data -> {
             String name = data.get(TestSource::getName);
