@@ -115,7 +115,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public Linq condition(Function<Row, Boolean> fun) {
+    public Linq where(Function<Row, Boolean> fun) {
         this.dql.getConditions().add(fun);
         return this;
     }

@@ -36,10 +36,9 @@ public class DatasetCustomerTest {
 
     @Test
     public void query() {
-        Long curr = System.currentTimeMillis();
         List<Map<String, Object>> result = Linq.from(dataset)
                 .distinct()
-//                .rightJoin(customerInfos, CustomerInfo::getCustomerId, CustomerChurnModel::getCustomerId)
+                .leftJoin(customerInfos, CustomerInfo::getCustomerId, CustomerChurnModel::getCustomerId)
                 .select(
                         Columns.of(CustomerChurnModel::getAge),
                         Columns.of(CustomerChurnModel::getGender),
@@ -49,10 +48,10 @@ public class DatasetCustomerTest {
                 .like(CustomerChurnModel::getGender, "Male")
                 .between(CustomerChurnModel::getAge, 10, 20)
                 .eq(CustomerChurnModel::getExited, true)
-//                .groupBy(Columns.of(CustomerChurnModel::getAge), Columns.of(CustomerChurnModel::getGender))
+                .groupBy(CustomerChurnModel::getAge, CustomerChurnModel::getGender)
                 .orderBy(CustomerChurnModel::getAge)
                 .writeMap();
-        System.out.println("process time " + (System.currentTimeMillis() - curr) + "ms");
+        System.out.println("result size " + result.size());
     }
 
 }

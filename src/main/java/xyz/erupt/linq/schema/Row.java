@@ -32,8 +32,8 @@ public class Row extends HashMap<Column, Object> {
         return null;
     }
 
-    public <T, R> Object get(SFunction<T, R> alias) {
-        return super.get(Columns.of(alias));
+    public <T, R> R get(SFunction<T, R> alias) {
+        return (R) super.get(Columns.of(alias));
     }
 
 }

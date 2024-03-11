@@ -40,6 +40,13 @@
 - 轻量级，零外部依赖
 
 ### DEMO
+```javascript
+var strings = Linq.from("C", "A", "B", "B").gt(Th::is, "A").orderByDesc(Th::is).write(String.class);
+// [C, B, B]
+var integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(Th::is).write(Integer.class);
+// [1, 2, 3, 5, 6, 7]
+```
+
 
 ```java
 public class ObjectQuery{
@@ -47,14 +54,10 @@ public class ObjectQuery{
     private final List<TestSource> source = mysql.query("select * form source");
 
     private final List<TestSourceExt> target = mongo.query("db.target.find()");
-
-    public void simple(){
-        List<String> strings = Linq.from("C", "A", "B", "B").gt(Th::is, "A").orderByDesc(Th::is).write(String.class);
-        // [C, B, B]
-        List<Integer> integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(Th::is).write(Integer.class);
-        // [1, 2, 3, 5, 6, 7]
-    }
     
+    /**
+     * select demo
+     */
     public void select(){
         Linq.from(source).select(Columns.all(TestSource.class));
         
@@ -68,7 +71,10 @@ public class ObjectQuery{
                 .select(Columns.sum(TestSource::getId, "sum"))
                 .select(Columns.max(TestSource::getId, "max"));
     }
-    
+
+    /**
+     * join demo
+     */
     public void join(){
         // left join
         Linq.from(source).leftJoin(target, TestSourceExt::getId, TestSource::getId).select(
@@ -83,8 +89,10 @@ public class ObjectQuery{
         // full join
         Linq.from(source).fullJoin(target, TestSourceExt::getId, TestSource::getId);
     }
-    
-    
+
+    /**
+     * where demo
+     */
     public void where() {
         // =
         Linq.from(source).eq(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
@@ -98,13 +106,16 @@ public class ObjectQuery{
         Linq.from(source).isNull(TestSource::getId);
         // customer condition or multi field
         Linq.from(source).condition(data -> {
-            Object name = data.get(TestSource::getName);
+            String name = data.get(TestSource::getName);
             Integer age = (Integer)data.get(TestSource::getAge);
             // name = 'xxx' or age > 10
             return "xxx".equals(name) || age > 10;
         });
     }
-    
+
+    /**
+     * group by demo
+     */
     public void groupBy(){
         Linq.from(source)
             .groupBy(TestSource::getName)
@@ -118,7 +129,10 @@ public class ObjectQuery{
                 Columns.countDistinct(TestSource::getName, "countDistinct")
             );
     }
-    
+
+    /**
+     * result write demo
+     */
     public void write(){
         // write List<Object>
         List<TestSource> list = Linq.from(source).orderByAsc(TestSource::getDate).write(TestSource.class);

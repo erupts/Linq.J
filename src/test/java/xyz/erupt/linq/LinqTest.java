@@ -143,7 +143,7 @@ public class LinqTest {
     }
 
     @Test
-    public void conditionTest() {
+    public void whereTest() {
         String countAlias = "count";
         Integer eq = Linq.from(source).eq(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
         Integer ne = Linq.from(source).ne(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
@@ -180,11 +180,11 @@ public class LinqTest {
         // name = 'Thanos' or id = 4
         List<Map<String, Object>> res = Linq.from(source)
                 .leftJoin(target, TestSourceExt::getId, TestSource::getId).select(Columns.all(TestSource.class))
-                .condition(data -> {
-                    Object name = data.get(TestSource::getName);
-                    Object id = data.get(TestSource::getId);
+                .where(data -> {
+                    String name = data.get(TestSource::getName);
+                    Integer id = data.get(TestSource::getId);
                     if (null != name && null != id) {
-                        return name.toString().equals("Thanos") || Integer.parseInt(id.toString()) == 4;
+                        return name.equals("Thanos") || id == 4;
                     }
                     return false;
                 }).writeMap();
