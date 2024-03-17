@@ -116,17 +116,31 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
 
     @Override
     public Linq where(Function<Row, Boolean> fun) {
-        this.dql.getConditions().add(fun);
+        this.dql.getWheres().add(fun);
+        return this;
+    }
+
+    @Override
+    public Linq groupBy(Column... columns) {
+        for (Column col : columns) {
+            this.dql.getGroupBys().add(col);
+        }
         return this;
     }
 
     @SafeVarargs
     @Override
-    public final <T> Linq groupBy(SFunction<T, ?> column, SFunction<T, ?>... columns) {
-        this.dql.getGroupBys().add(Columns.of(column));
-        for (SFunction<T, ?> col : columns) {
-            this.dql.getGroupBys().add(Columns.of(col));
+    public final <T> Linq groupBy(SFunction<T, ?>... columns) {
+        Column[] cols = new Column[columns.length];
+        for (int i = 0; i < columns.length; i++) {
+            cols[i] = Columns.of(columns[i]);
         }
+        return groupBy(cols);
+    }
+
+    @Override
+    public Linq having(Function<Row, Boolean> condition) {
+        this.dql.getHaving().add(condition);
         return this;
     }
 

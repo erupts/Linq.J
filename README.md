@@ -3,7 +3,7 @@
 
 > 可以通过最少的代码对数据源进行关联、筛选、排序和分组等操作。这些操作可以在单个查询中组合起来，以获得更复杂的结果
 
-> 学习成本低，有 SQL 基础即可操作任意对象
+> 学习成本低，有 SQL 基础即可操作任意对象，配合 Lombok 对象可快速支持 lambda 语法 
 
 
 允许编写Java代码以查询数据库相同的方式操作内存数据，例如
@@ -55,6 +55,7 @@ public class ObjectQuery{
 
     private final List<TestSourceExt> target = mongo.query("db.target.find()");
     
+    
     /**
      * select demo
      */
@@ -62,9 +63,9 @@ public class ObjectQuery{
         Linq.from(source).select(Columns.all(TestSource.class));
         
         Linq.from(source)
-                .select(TestSource::getId, TestSource::getName, TestSource::getDate)
-                .select(Columns.of(TestSource::getTags))
-                .select(Columns.of(TestSource::getTags, "tag2"));
+                .select(TestSource::getName, TestSource::getDate,TestSource::getTags)
+                .select(Columns.of(TestSource::getTags, "tag2")) // alias
+                .select(Columns.ofx(TestSource::getId, id -> id + "xxx")); // value convert
         
         Linq.from(source)
                 .select(Columns.count("count"))
@@ -72,6 +73,7 @@ public class ObjectQuery{
                 .select(Columns.max(TestSource::getId, "max"));
     }
 
+    
     /**
      * join demo
      */
@@ -90,6 +92,7 @@ public class ObjectQuery{
         Linq.from(source).fullJoin(target, TestSourceExt::getId, TestSource::getId);
     }
 
+    
     /**
      * where demo
      */
@@ -117,13 +120,13 @@ public class ObjectQuery{
         });
     }
 
+    
     /**
      * group by demo
      */
     public void groupBy(){
         Linq.from(source)
             .groupBy(TestSource::getName)
-            .orderBy(TestSource::getAge)
             .select(
                 Columns.of(TestSource::getName, "name"),
                 Columns.min(TestSource::getDate, "min"),
@@ -131,9 +134,12 @@ public class ObjectQuery{
                 Columns.count("count"),
                 Columns.count(TestSource::getName, "countName"),
                 Columns.countDistinct(TestSource::getName, "countDistinct")
-            );
+            )
+            .having(row -> Integer.parseInt(row.get("avg").toString()) > 2)
+            .orderBy(TestSource::getAge);
     }
 
+    
     /**
      * result write demo
      */
@@ -148,6 +154,7 @@ public class ObjectQuery{
         Map<String, Object> mapOne = Linq.from(source).writeMapOne();
     }
 
+    
     public void other(){
         String name = Linq.from(source)
                 .select(TestSource::getName)
@@ -166,8 +173,8 @@ public class ObjectQuery{
 ### 后续迭代计划
 > 大家的支持才是持续迭代的动力！
 
-- 支持多个查询结果集进行组合: UNION ALL、UNION、INTERSECT、EXCEPT、UNION BY NAME
-- 支持窗口函数
-- 支持 Nested loop join
-- 支持 having
-- group by 支持自定义分组 key 格式化
+- [ ] 支持多个查询结果集进行组合: UNION ALL、UNION、INTERSECT、EXCEPT、UNION BY NAME
+- [ ] 支持窗口函数
+- [ ] 支持 Nested loop join
+- [x] 支持 having
+- [x] 支持分组列格式化 group by date(created_at)

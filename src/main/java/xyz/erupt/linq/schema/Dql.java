@@ -10,16 +10,20 @@ public class Dql {
     private Collection<?> from;
 
     // columns definition
-    private Set<Column> columns = new HashSet<>();
+    private List<Column> columns = new ArrayList<>();
 
     // json definition
     private final List<JoinSchema<?>> joinSchemas = new ArrayList<>();
 
-    // definition definition
-    private final List<Function<Row, Boolean>> conditions = new ArrayList<>();
+    // where definition
+    private final List<Function<Row, Boolean>> wheres = new ArrayList<>();
 
     // group by definition
     private final List<Column> groupBys = new ArrayList<>();
+
+    // having definition
+    private final List<Function<Row, Boolean>> having = new ArrayList<>();
+
 
     // order by definition
     private final List<OrderBySchema> orderBys = new ArrayList<>();
@@ -45,16 +49,16 @@ public class Dql {
         this.distinct = distinct;
     }
 
-    public Set<Column> getColumns() {
+    public List<Column> getColumns() {
         return columns;
     }
 
-    public void setColumns(Set<Column> columns) {
+    public void setColumns(List<Column> columns) {
         this.columns = columns;
     }
 
-    public List<Function<Row, Boolean>> getConditions() {
-        return conditions;
+    public List<Function<Row, Boolean>> getWheres() {
+        return wheres;
     }
 
     public List<JoinSchema<?>> getJoinSchemas() {
@@ -63,6 +67,10 @@ public class Dql {
 
     public List<Column> getGroupBys() {
         return groupBys;
+    }
+
+    public List<Function<Row, Boolean>> getHaving() {
+        return having;
     }
 
     public Integer getLimit() {

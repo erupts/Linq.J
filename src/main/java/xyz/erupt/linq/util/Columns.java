@@ -15,16 +15,17 @@ import java.util.function.Function;
 
 public class Columns {
 
+    private static <T> Column fromLambda(SFunction<T, ?> fun) {
+        LambdaInfo lambdaInfo = LambdaReflect.getInfo(fun);
+        return fromLambda(fun, lambdaInfo.getField());
+    }
+
     private static <T> Column fromLambda(SFunction<T, ?> fun, String alias) {
         LambdaInfo lambdaInfo = LambdaReflect.getInfo(fun);
         Column column = new Column();
         column.setTable(lambdaInfo.getClazz());
         column.setField(lambdaInfo.getField());
-        if (null == alias) {
-            column.setAlias(lambdaInfo.getField());
-        } else {
-            column.setAlias(alias);
-        }
+        column.setAlias(alias);
         return column;
     }
 
@@ -41,8 +42,24 @@ public class Columns {
         return column;
     }
 
+    public static <R, S> Column ofx(SFunction<R, S> fun, Function<S, Object> convert, String alias) {
+        Column column = Columns.fromLambda(fun);
+        column.setAlias(alias);
+        column.setRowConvert(row -> convert.apply(row.get(fun)));
+        return column;
+    }
+
+    public static <R, S, A> Column ofx(SFunction<R, S> fun, Function<S, Object> convert, SFunction<A, ?> alias) {
+        return ofx(fun, convert, LambdaReflect.getInfo(alias).getField());
+    }
+
+    public static <R, S> Column ofx(SFunction<R, S> fun, Function<S, Object> convert) {
+        return ofx(fun, convert, LambdaReflect.getInfo(fun).getField());
+    }
+
+
     public static <R> Column of(SFunction<R, ?> fun) {
-        return Columns.fromLambda(fun, null);
+        return Columns.fromLambda(fun);
     }
 
     public static <R> Column of(SFunction<R, ?> fun, String alias) {
@@ -66,7 +83,7 @@ public class Columns {
         column.setTable(VirtualColumn.class);
         column.setField(VirtualColumn.lambdaInfo().getField());
         column.setAlias(alias);
-        column.setRowValueProcess(fun);
+        column.setRowConvert(fun);
         return column;
     }
 
@@ -204,9 +221,9 @@ public class Columns {
     }
 
     // custom group by logic
-    public static <R> Column groupByProcess(SFunction<R, ?> fun, String alias, BiFunction<Column, List<Row>, Object> groupByFun) {
+    public static <R> Column groupByProcess(SFunction<R, ?> fun, String alias, BiFunction<Column, List<Row>, Object> groupByProcess) {
         Column column = Columns.of(fun, alias);
-        column.setGroupByFun(it -> groupByFun.apply(column.getRawColumn(), it));
+        column.setGroupByFun(it -> groupByProcess.apply(column.getRawColumn(), it));
         return column;
     }
 

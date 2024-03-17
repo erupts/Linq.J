@@ -21,23 +21,19 @@ public class LambdaReflect {
         try {
             if (S_FUNCTION_CACHE.containsKey(func)) {
                 return S_FUNCTION_CACHE.get(func);
-            } else {
-                synchronized (LambdaReflect.class) {
-                    if (S_FUNCTION_CACHE.containsKey(func)) return S_FUNCTION_CACHE.get(func);
-                }
+            } else synchronized (LambdaReflect.class) {
+                if (S_FUNCTION_CACHE.containsKey(func)) return S_FUNCTION_CACHE.get(func);
             }
             Method method = func.getClass().getDeclaredMethod(WRITE_REPLACE);
+            boolean accessible = method.isAccessible();
             method.setAccessible(true);
             SerializedLambda serializedLambda = (SerializedLambda) method.invoke(func);
             String fieldName = serializedLambda.getImplMethodName();
-            if (fieldName.startsWith(GET) && fieldName.length() != GET.length())
-                fieldName = fieldName.substring(GET.length());
-            if (fieldName.startsWith(IS) && fieldName.length() != IS.length())
-                fieldName = fieldName.substring(IS.length());
-            LambdaInfo lambdaInfo = new LambdaInfo(
-                    Class.forName(serializedLambda.getImplClass().replace("/", ".")),
-                    fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1)
-            );
+            if (fieldName.startsWith(GET) && fieldName.length() != GET.length()) fieldName = fieldName.substring(GET.length());
+            if (fieldName.startsWith(IS) && fieldName.length() != IS.length()) fieldName = fieldName.substring(IS.length());
+            Class<?> clazz = Class.forName(serializedLambda.getImplClass().replace("/", "."));
+            LambdaInfo lambdaInfo = new LambdaInfo(clazz, clazz.getDeclaredField(fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1)));
+            method.setAccessible(accessible);
             S_FUNCTION_CACHE.put(func, lambdaInfo);
             return lambdaInfo;
         } catch (ReflectiveOperationException e) {

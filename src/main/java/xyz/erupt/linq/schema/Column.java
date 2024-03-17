@@ -17,7 +17,7 @@ public class Column {
     private Supplier<List<Column>> unfold;
 
     // Column value convert handler
-    private Function<Row, ?> rowValueProcess;
+    private Function<Row, ?> rowConvert;
 
     // The handler functions listed in the grouping scenario
     private Function<List<Row>, Object> groupByFun;
@@ -35,7 +35,7 @@ public class Column {
     public Column getRawColumn() {
         Column column = new Column(this.table, this.field, this.field);
         column.setGroupByFun(this.getGroupByFun());
-        column.setRowValueProcess(this.getRowValueProcess());
+        column.setRowConvert(this.getRowConvert());
         column.setUnfold(this.unfold);
         return column;
     }
@@ -72,12 +72,12 @@ public class Column {
         this.groupByFun = groupByFun;
     }
 
-    public Function<Row, ?> getRowValueProcess() {
-        return rowValueProcess;
+    public Function<Row, ?> getRowConvert() {
+        return rowConvert;
     }
 
-    public void setRowValueProcess(Function<Row, ?> rowValueProcess) {
-        this.rowValueProcess = rowValueProcess;
+    public void setRowConvert(Function<Row, ?> rowConvert) {
+        this.rowConvert = rowConvert;
     }
 
     public Supplier<List<Column>> getUnfold() {

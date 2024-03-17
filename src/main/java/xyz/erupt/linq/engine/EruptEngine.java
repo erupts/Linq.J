@@ -49,7 +49,7 @@ public class EruptEngine extends Engine {
         }
         // condition process
         dataset.removeIf(it -> {
-            for (Function<Row, Boolean> condition : dql.getConditions()) {
+            for (Function<Row, Boolean> condition : dql.getWheres()) {
                 if (!condition.apply(it)) return true;
             }
             return false;
@@ -70,8 +70,8 @@ public class EruptEngine extends Engine {
                     } else {
                         newRow.put(column, row.get(column.getRawColumn()));
                     }
-                    if (null != column.getRowValueProcess()) {
-                        newRow.put(column, column.getRowValueProcess().apply(row));
+                    if (null != column.getRowConvert()) {
+                        newRow.put(column, column.getRowConvert().apply(row));
                     }
                 }
                 $table.add(newRow);
@@ -80,6 +80,13 @@ public class EruptEngine extends Engine {
             dataset.clear();
             dataset.addAll($table);
         }
+        // having process
+        dataset.removeIf(it -> {
+            for (Function<Row, Boolean> condition : dql.getHaving()) {
+                if (!condition.apply(it)) return true;
+            }
+            return false;
+        });
         // order by process
         this.orderBy(dql, dataset);
         // limit
@@ -128,8 +135,8 @@ public class EruptEngine extends Engine {
         for (Row row : dataset) {
             StringBuilder key = new StringBuilder();
             for (Column groupBy : dql.getGroupBys()) {
-                if (null != groupBy.getRowValueProcess()) {
-                    key.append(groupBy.getRawColumn().getRowValueProcess().apply(row));
+                if (null != groupBy.getRowConvert()) {
+                    key.append(groupBy.getRawColumn().getRowConvert().apply(row));
                 } else {
                     key.append(row.get(groupBy.getRawColumn()));
                 }

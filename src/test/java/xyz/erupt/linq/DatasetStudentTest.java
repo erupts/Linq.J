@@ -66,7 +66,7 @@ public class DatasetStudentTest {
         Linq.from(students)
                 .innerJoin(studentScores, StudentScore::getStudentId, Student::getId)
                 .innerJoin(studentSubjects, StudentSubject::getId, StudentScore::getSubjectId)
-                .groupBy(Student::getName)
+                .groupBy(Student::getName, Student::getAge)
                 .select(
                         Columns.of(Student::getName, StudentScoreAnalysis::getName),
                         Columns.avg(StudentScore::getScore, StudentScoreAnalysis::getAvgScore),
@@ -79,7 +79,7 @@ public class DatasetStudentTest {
     }
 
     @Test
-    public void allAnalysisTest(){
+    public void allAnalysisTest() {
         Integer r = Linq.from(students)
                 .innerJoin(studentScores, StudentScore::getStudentId, Student::getId)
                 .select(Columns.count(StudentScoreAnalysis::getSubjectCount))

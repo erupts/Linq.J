@@ -20,9 +20,7 @@ public class LambdaTest {
             LambdaReflect.getInfo(TestSource::name);
             LambdaReflect.getInfo(TestSource::getId);
             LambdaReflect.getInfo(TestSource::getDate);
-            LambdaReflect.getInfo(TestSource::getClass);
         }
-        LambdaReflect.getInfo(TestSource::getClass);
     }
 
 }

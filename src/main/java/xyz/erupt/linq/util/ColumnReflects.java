@@ -6,8 +6,6 @@ import xyz.erupt.linq.schema.Column;
 import xyz.erupt.linq.schema.Row;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -83,7 +81,7 @@ public class ColumnReflects {
         }
     }
 
-    private static Object bigDecimalConvert(BigDecimal bigDecimal, Class<?> target) {
+    public static Object bigDecimalConvert(BigDecimal bigDecimal, Class<?> target) {
         if (Integer.class == target) {
             return bigDecimal.intValue();
         } else if (Short.class == target) {
@@ -116,12 +114,6 @@ public class ColumnReflects {
         } else {
             return BigDecimal.valueOf(number.doubleValue());
         }
-    }
-
-    public static Class<?> getActualType(Object o, int index) {
-        Type clazz = o.getClass().getGenericSuperclass();
-        ParameterizedType pt = (ParameterizedType) clazz;
-        return pt.getActualTypeArguments()[index].getClass();
     }
 
 }

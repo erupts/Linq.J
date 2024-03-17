@@ -71,12 +71,24 @@ public class LinqTest {
     @Test
     public void selectTest() {
         List<Map<String, Object>> list = Linq.from(source)
-                .select(TestSource::getId, TestSource::getName, TestSource::getDate)
+                .select(TestSource::getName, TestSource::getDate)
                 .select(Columns.of(TestSource::getTags))
                 .select(Columns.of(TestSource::getTags, "tag2"))
+                .select(Columns.ofx(TestSource::getId, id -> id + "xxxx"))
                 .writeMap();
         assert Objects.equals(source.get(0).getDate().toString(), list.get(0).get("date").toString());
         assert Objects.equals(list.get(0).get("tags"), list.get(0).get("tag2"));
+    }
+
+    @Test
+    public void selectProcessTest2() {
+        List<Map<String, Object>> list = Linq.from(source)
+                .select(Columns.ofx(TestSource::getId, id -> id + "xxxx"))
+                .select(Columns.sum(TestSource::getId, "sum"))
+                .groupBy(Columns.ofx(TestSource::getId, id -> id))
+                .having(row -> Integer.parseInt(row.get("sum").toString()) > 4)
+                .writeMap();
+        System.out.println(list);
     }
 
     @Test
@@ -207,6 +219,7 @@ public class LinqTest {
                         Columns.count(TestSource::getName, TestSourceGroupByVo::getNameCount),
                         Columns.count(TestSourceGroupByVo::getCount)
                 )
+                .having(TestSourceGroupByVo::getAvg, avg -> avg >= 1)
                 .orderBy(TestSource::getName).write(TestSourceGroupByVo.class);
         System.out.println(result);
     }

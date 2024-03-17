@@ -1,8 +1,11 @@
 package xyz.erupt.linq.schema;
 
+import xyz.erupt.linq.lambda.LambdaInfo;
+import xyz.erupt.linq.lambda.LambdaReflect;
 import xyz.erupt.linq.lambda.SFunction;
-import xyz.erupt.linq.util.Columns;
+import xyz.erupt.linq.util.ColumnReflects;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 
 public class Row extends HashMap<Column, Object> {
@@ -33,7 +36,13 @@ public class Row extends HashMap<Column, Object> {
     }
 
     public <T, R> R get(SFunction<T, R> alias) {
-        return (R) super.get(Columns.of(alias));
+        LambdaInfo lambdaInfo = LambdaReflect.getInfo(alias);
+        Object val = this.get(lambdaInfo.getField());
+        if (val instanceof BigDecimal) {
+            return (R) ColumnReflects.bigDecimalConvert((BigDecimal) val, lambdaInfo.getFieldClazz().getType());
+        } else {
+            return (R) val;
+        }
     }
 
 }
