@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>xyz.erupt</groupId>
-    <artifactId>linq</artifactId>
+    <artifactId>linq.j</artifactId>
     <version>0.0.2</version>
     <name>Linq.j</name>
 

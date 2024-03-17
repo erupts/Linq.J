@@ -27,8 +27,8 @@
 ```xml
 <dependency>
     <groupId>xyz.erupt</groupId>
-    <artifactId>linq</artifactId>
-    <version>0.0.1</version>
+    <artifactId>linq.j</artifactId>
+    <version>0.0.2</version>
 </dependency>
 ```
 
