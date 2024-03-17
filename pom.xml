@@ -7,9 +7,9 @@
     <groupId>xyz.erupt</groupId>
     <artifactId>linq</artifactId>
     <version>0.0.2</version>
-    <name>linq</name>
+    <name>Linq.j</name>
 
-    <description>LINQ capabilities in Java</description>
+    <description>Linq.J A JVM → Lambda based federated analysis library</description>
     <url>https://github.com/erupts/Linq.J</url>
 
     <properties>
