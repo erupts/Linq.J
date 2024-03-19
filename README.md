@@ -1,28 +1,28 @@
-# Linq.J 基于 JVM → Lambda 特性的的联邦分析库
-> Linq 是面向对象的 sql，linq实际上是对内存中数据的查询，使开发人员能够更容易地编写查询。这些查询表达式看起来很像SQL
+# Linq.J 基于 JVM → Lambda 特性的的对象查询语言(LINQ)库
+
+### Linq 是面向对象的 sql，linq实际上是对内存中数据的查询，使开发人员能够更容易地编写查询。这些查询表达式看起来很像SQL
 
 > 可以通过最少的代码对数据源进行关联、筛选、排序和分组等操作。这些操作可以在单个查询中组合起来，以获得更复杂的结果
 
-> 学习成本低，有 SQL 基础即可操作任意对象，配合 Lombok 对象可快速支持 lambda 语法 
-
-
-允许编写Java代码以查询数据库相同的方式操作内存数据，例如
+#### 允许编写Java代码以查询数据库相同的方式操作内存数据，例如
 - List 集合、Array 数组中的数据
 - SQL 结果的数据
 - CSV、XML、JSON 文档数据集
 - Stream、File 流
 
-### 应用场景
+#### 应用场景
 - 分布式开发时 Feign / Dubbo 等 RPC 的结果关联
+- 异构系统数据的内存计算
 - 使用代码组织 SQL 结果数据
 - 多个结果对象的排序聚合与内存分页
 - 语义化对象转换与映射
+- 代码简洁，无需for循环与分支操作数据
 - 跨数据源的联邦访问
 
-### 操作语法
+#### 操作语法
 > From、Select、Distinct、Join、Where、Group By、Order By、Limit、Offset、...
 
-### 使用方法
+#### 使用方法
 包内零外部依赖，体积仅仅50kb
 ```xml
 <dependency>
@@ -32,41 +32,49 @@
 </dependency>
 ```
 
-### 优点
-
-- 学习成本低，有SQL基础即可操作任意对象
-- 代码简洁，无需for循环与分支操作数据
-- 执行效率高10W级数据毫秒级处理
-- 轻量级，零外部依赖
-
-### DEMO
+#### Example 1
 ```javascript
 var strings = Linq.from("C", "A", "B", "B").gt(Th::is, "A").orderByDesc(Th::is).write(String.class);
 // [C, B, B]
+
 var integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(Th::is).write(Integer.class);
 // [1, 2, 3, 5, 6, 7]
+
+var name = Linq.from(data)
+    // left join
+    .innerJoin(target, Target::getId, Data::getId)
+    // where like
+    .like(Data::getName, "a")
+    // select name
+    .select(Data::getName)
+    // distinct
+    .distinct()
+    // order by 
+    .orderBy(Data::getName)
+    .write(String.class);
+
 ```
 
-
+#### Example 2
 ```java
 public class ObjectQuery{
 
-    private final List<TestSource> source = mysql.query("select * form source");
+    private final List<TestSource> source = http.get("https://gw.alipayobjects.com/os/antfincdn/v6MvZBUBsQ/column-data.json");
 
-    private final List<TestSourceExt> target = mongo.query("db.target.find()");
-    
+    private final List<TestSourceExt> target = mongodb.query("db.target.find()");
     
     /**
      * select demo
      */
     public void select(){
+        // select *
         Linq.from(source).select(Columns.all(TestSource.class));
-        
+        // select a, b, c
         Linq.from(source)
-                .select(TestSource::getName, TestSource::getDate,TestSource::getTags)
+                .select(TestSource::getName, TestSource::getDate, TestSource::getTags)
                 .select(Columns.of(TestSource::getTags, "tag2")) // alias
                 .select(Columns.ofx(TestSource::getId, id -> id + "xxx")); // value convert
-        
+        // select count(*), sum(id), max(id) 
         Linq.from(source)
                 .select(Columns.count("count"))
                 .select(Columns.sum(TestSource::getId, "sum"))
@@ -153,25 +161,12 @@ public class ObjectQuery{
         // write Map
         Map<String, Object> mapOne = Linq.from(source).writeMapOne();
     }
-
-    
-    public void other(){
-        String name = Linq.from(source)
-                .select(TestSource::getName)
-                .distinct()
-                .limit(2)
-                .offset(5)
-                .orderBy(TestSource::getName)
-                .orderByDesc(TestSource::getAge)
-                .writeOne(String.class);
-    }
     
 }
 
 ```
 
-### 后续迭代计划
-> 大家的支持才是持续迭代的动力！
+#### 后续迭代计划
 
 - [ ] 支持多个查询结果集进行组合: UNION ALL、UNION、INTERSECT、EXCEPT、UNION BY NAME
 - [ ] 支持窗口函数
