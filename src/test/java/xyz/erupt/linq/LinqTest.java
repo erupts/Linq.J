@@ -112,7 +112,7 @@ public class LinqTest {
 
     @Test
     public void customerSelect() {
-        List<String> result = Linq.from(source).select(Columns.ofs(it -> it.get("name") + " Borg", "Hello")).write(String.class);
+        List<String> result = Linq.from(source).select(Columns.ofs(it -> it.get(TestSource::getName) + " Borg", "Hello")).write(String.class);
         for (int i = 0; i < result.size(); i++) {
             assert (source.get(i).getName() + " Borg").equals(result.get(i));
         }
