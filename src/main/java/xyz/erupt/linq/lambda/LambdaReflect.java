@@ -9,11 +9,7 @@ import java.util.Map;
 
 public class LambdaReflect {
 
-    private static final String GET = "get";
-
-    private static final String IS = "is";
-
-    private static final String WRITE_REPLACE = "writeReplace";
+    private static final String GET = "get", IS = "is", WRITE_REPLACE = "writeReplace";
 
     private static final Map<SFunction<?, ?>, LambdaInfo> S_FUNCTION_CACHE = new HashMap<>();
 
@@ -29,8 +25,10 @@ public class LambdaReflect {
             method.setAccessible(true);
             SerializedLambda serializedLambda = (SerializedLambda) method.invoke(func);
             String fieldName = serializedLambda.getImplMethodName();
-            if (fieldName.startsWith(GET) && fieldName.length() != GET.length()) fieldName = fieldName.substring(GET.length());
-            if (fieldName.startsWith(IS) && fieldName.length() != IS.length()) fieldName = fieldName.substring(IS.length());
+            if (fieldName.startsWith(GET) && fieldName.length() != GET.length())
+                fieldName = fieldName.substring(GET.length());
+            if (fieldName.startsWith(IS) && fieldName.length() != IS.length())
+                fieldName = fieldName.substring(IS.length());
             Class<?> clazz = Class.forName(serializedLambda.getImplClass().replace("/", "."));
             LambdaInfo lambdaInfo = new LambdaInfo(clazz, clazz.getDeclaredField(fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1)));
             method.setAccessible(accessible);
