@@ -1,19 +1,14 @@
 package xyz.erupt.linq.lambda;
 
-import java.lang.reflect.Field;
-
 public class LambdaInfo {
 
     private final Class<?> clazz;
 
-    private final Field fieldClazz;
-
     private final String field;
 
-    public LambdaInfo(Class<?> clazz, Field field) {
+    public LambdaInfo(Class<?> clazz, String field) {
         this.clazz = clazz;
-        this.fieldClazz = field;
-        this.field = field.getName();
+        this.field = field;
     }
 
     public Class<?> getClazz() {
@@ -24,7 +19,4 @@ public class LambdaInfo {
         return field;
     }
 
-    public Field getFieldClazz() {
-        return fieldClazz;
-    }
 }

@@ -1,5 +1,6 @@
 package xyz.erupt.linq.schema;
 
+import xyz.erupt.linq.exception.LinqException;
 import xyz.erupt.linq.lambda.LambdaInfo;
 import xyz.erupt.linq.lambda.LambdaReflect;
 import xyz.erupt.linq.lambda.SFunction;
@@ -38,10 +39,14 @@ public class Row extends HashMap<Column, Object> {
     public <T, R> R get(SFunction<T, R> alias) {
         LambdaInfo lambdaInfo = LambdaReflect.getInfo(alias);
         Object val = this.get(lambdaInfo.getField());
-        if (val instanceof BigDecimal) {
-            return (R) ColumnReflects.bigDecimalConvert((BigDecimal) val, lambdaInfo.getFieldClazz().getType());
-        } else {
-            return (R) val;
+        try {
+            if (val instanceof BigDecimal) {
+                return (R) ColumnReflects.bigDecimalConvert((BigDecimal) val, lambdaInfo.getClazz().getDeclaredField(lambdaInfo.getField()).getType());
+            } else {
+                return (R) val;
+            }
+        } catch (Exception e) {
+            throw new LinqException(e);
         }
     }
 

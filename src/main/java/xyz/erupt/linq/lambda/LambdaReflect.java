@@ -30,7 +30,7 @@ public class LambdaReflect {
             if (fieldName.startsWith(IS) && fieldName.length() != IS.length())
                 fieldName = fieldName.substring(IS.length());
             Class<?> clazz = Class.forName(serializedLambda.getImplClass().replace("/", "."));
-            LambdaInfo lambdaInfo = new LambdaInfo(clazz, clazz.getDeclaredField(fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1)));
+            LambdaInfo lambdaInfo = new LambdaInfo(clazz, fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1));
             method.setAccessible(accessible);
             S_FUNCTION_CACHE.put(func, lambdaInfo);
             return lambdaInfo;

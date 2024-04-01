@@ -35,6 +35,17 @@ public class DatasetCustomerTest {
     }
 
     @Test
+    public void allData() {
+        List<Map<String, Object>> result = Linq.from(dataset)
+                .select(
+                        Columns.of(CustomerChurnModel::getAge),
+                        Columns.of(CustomerChurnModel::getGender)
+                )
+                .writeMap();
+        System.out.println(result.size());
+    }
+
+    @Test
     public void query() {
         List<Map<String, Object>> result = Linq.from(dataset)
                 .distinct()
