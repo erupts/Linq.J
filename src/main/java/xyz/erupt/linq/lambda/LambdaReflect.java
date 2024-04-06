@@ -28,9 +28,7 @@ public class LambdaReflect {
             } else synchronized (LambdaReflect.class) {
                 if (S_FUNCTION_CACHE.containsKey(func)) return S_FUNCTION_CACHE.get(func);
             }
-            if (!func.getClass().isSynthetic()) {
-                throw new LinqException("该方法仅能传入 lambda 表达式产生的合成类");
-            }
+            if (!func.getClass().isSynthetic()) throw new LinqException("Synthetic classes produced by non-lambda expressions");
             Method method = func.getClass().getDeclaredMethod(WRITE_REPLACE);
             method.setAccessible(true);
             SerializedLambda serializedLambda = (SerializedLambda) method.invoke(func);
