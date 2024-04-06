@@ -4,22 +4,11 @@ import java.util.Date;
 
 public class TestSource extends TestSourceParent {
 
-    private Integer id;
-
     private String name;
 
     private Date date;
 
     private String[] tags;
-
-    @Override
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
