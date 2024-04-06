@@ -16,12 +16,12 @@ import java.util.function.Function;
 public class Columns {
 
     private static <T> Column fromLambda(SFunction<T, ?> fun) {
-        LambdaInfo lambdaInfo = LambdaReflect.getInfo(fun);
+        LambdaInfo lambdaInfo = LambdaReflect.info(fun);
         return fromLambda(fun, lambdaInfo.getField());
     }
 
     private static <T> Column fromLambda(SFunction<T, ?> fun, String alias) {
-        LambdaInfo lambdaInfo = LambdaReflect.getInfo(fun);
+        LambdaInfo lambdaInfo = LambdaReflect.info(fun);
         Column column = new Column();
         column.setTable(lambdaInfo.getClazz());
         column.setField(lambdaInfo.getField());
@@ -34,7 +34,7 @@ public class Columns {
         Column column = new Column();
         column.setUnfold(() -> {
             List<Column> columns = new ArrayList<>();
-            for (Field field : r.getDeclaredFields()) {
+            for (Field field : ReflectField.getFields(r)) {
                 columns.add(new Column(r, field.getName(), field.getName()));
             }
             return columns;
@@ -50,11 +50,11 @@ public class Columns {
     }
 
     public static <R, S, A> Column ofx(SFunction<R, S> fun, Function<S, Object> convert, SFunction<A, ?> alias) {
-        return ofx(fun, convert, LambdaReflect.getInfo(alias).getField());
+        return ofx(fun, convert, LambdaReflect.field(alias));
     }
 
     public static <R, S> Column ofx(SFunction<R, S> fun, Function<S, Object> convert) {
-        return ofx(fun, convert, LambdaReflect.getInfo(fun).getField());
+        return ofx(fun, convert, LambdaReflect.field(fun));
     }
 
 
@@ -67,15 +67,7 @@ public class Columns {
     }
 
     public static <R, A> Column of(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return of(fun, LambdaReflect.getInfo(alias).getField());
-    }
-
-    public static Column of(Field field) {
-        Column column = new Column();
-        column.setTable(field.getDeclaringClass());
-        column.setField(field.getName());
-        column.setAlias(field.getName());
-        return column;
+        return of(fun, LambdaReflect.field(alias));
     }
 
     public static Column ofs(Function<Row, ?> fun, String alias) {
@@ -88,7 +80,7 @@ public class Columns {
     }
 
     public static <A> Column ofs(Function<Row, ?> fun, SFunction<A, ?> alias) {
-        return ofs(fun, LambdaReflect.getInfo(alias).getField());
+        return ofs(fun, LambdaReflect.field(alias));
     }
 
     public static Column count(String alias) {
@@ -98,7 +90,7 @@ public class Columns {
     }
 
     public static <A> Column count(SFunction<A, ?> alias) {
-        return count(LambdaReflect.getInfo(alias).getField());
+        return count(LambdaReflect.field(alias));
     }
 
     public static <R> Column count(SFunction<R, ?> fun, String alias) {
@@ -112,7 +104,7 @@ public class Columns {
     }
 
     public static <R, A> Column count(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return count(fun, LambdaReflect.getInfo(alias).getField());
+        return count(fun, LambdaReflect.field(alias));
     }
 
     public static <R> Column countDistinct(SFunction<R, ?> fun, String alias) {
@@ -126,7 +118,7 @@ public class Columns {
     }
 
     public static <R, A> Column countDistinct(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return countDistinct(fun, LambdaReflect.getInfo(alias).getField());
+        return countDistinct(fun, LambdaReflect.field(alias));
     }
 
     public static <R> Column max(SFunction<R, ?> fun, String alias) {
@@ -147,7 +139,7 @@ public class Columns {
 
 
     public static <R, A> Column max(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return max(fun, LambdaReflect.getInfo(alias).getField());
+        return max(fun, LambdaReflect.field(alias));
     }
 
     public static <R> Column min(SFunction<R, ?> fun, String alias) {
@@ -167,7 +159,7 @@ public class Columns {
     }
 
     public static <R, A> Column min(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return min(fun, LambdaReflect.getInfo(alias).getField());
+        return min(fun, LambdaReflect.field(alias));
     }
 
     public static <R> Column avg(SFunction<R, ?> fun, String alias) {
@@ -186,7 +178,7 @@ public class Columns {
     }
 
     public static <R, A> Column avg(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return avg(fun, LambdaReflect.getInfo(alias).getField());
+        return avg(fun, LambdaReflect.field(alias));
     }
 
     public static <R> Column sum(SFunction<R, ?> fun, String alias) {
@@ -203,7 +195,7 @@ public class Columns {
     }
 
     public static <R, A> Column sum(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return sum(fun, LambdaReflect.getInfo(alias).getField());
+        return sum(fun, LambdaReflect.field(alias));
     }
 
     public static <R> Column groupArray(SFunction<R, ?> fun, String alias) {
@@ -217,7 +209,7 @@ public class Columns {
     }
 
     public static <R, A> Column groupArray(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return groupArray(fun, LambdaReflect.getInfo(alias).getField());
+        return groupArray(fun, LambdaReflect.field(alias));
     }
 
     // custom group by logic

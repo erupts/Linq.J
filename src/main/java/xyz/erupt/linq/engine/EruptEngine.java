@@ -48,12 +48,14 @@ public class EruptEngine extends Engine {
             }
         }
         // condition process
-        dataset.removeIf(it -> {
-            for (Function<Row, Boolean> condition : dql.getWheres()) {
-                if (!condition.apply(it)) return true;
-            }
-            return false;
-        });
+        if (!dql.getWheres().isEmpty()){
+            dataset.removeIf(it -> {
+                for (Function<Row, Boolean> condition : dql.getWheres()) {
+                    if (!condition.apply(it)) return true;
+                }
+                return false;
+            });
+        }
         // group by process
         if (null != dql.getGroupBys() && !dql.getGroupBys().isEmpty()) {
             dataset = this.groupBy(dql, dataset);
@@ -81,12 +83,14 @@ public class EruptEngine extends Engine {
             dataset.addAll($table);
         }
         // having process
-        dataset.removeIf(it -> {
-            for (Function<Row, Boolean> condition : dql.getHaving()) {
-                if (!condition.apply(it)) return true;
-            }
-            return false;
-        });
+        if (!dql.getHaving().isEmpty()){
+            dataset.removeIf(it -> {
+                for (Function<Row, Boolean> condition : dql.getHaving()) {
+                    if (!condition.apply(it)) return true;
+                }
+                return false;
+            });
+        }
         // order by process
         this.orderBy(dql, dataset);
         // limit

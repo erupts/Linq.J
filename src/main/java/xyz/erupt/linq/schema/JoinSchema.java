@@ -31,7 +31,7 @@ public class JoinSchema<T> {
         this.target = target;
         this.lon = lon;
         this.ron = ron;
-        this.clazz = (Class<T>) LambdaReflect.getInfo(lon).getClazz();
+        this.clazz = (Class<T>) LambdaReflect.info(lon).getClazz();
         this.joinExchange = JoinExchange.HASH;
     }
 

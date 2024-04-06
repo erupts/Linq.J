@@ -23,6 +23,11 @@ public class Row extends HashMap<Column, Object> {
         super();
     }
 
+    @Override
+    public Object put(Column column, Object value) {
+        return super.put(column, value);
+    }
+
     public Object get(Column column) {
         return super.get(column);
     }
@@ -37,7 +42,7 @@ public class Row extends HashMap<Column, Object> {
     }
 
     public <T, R> R get(SFunction<T, R> alias) {
-        LambdaInfo lambdaInfo = LambdaReflect.getInfo(alias);
+        LambdaInfo lambdaInfo = LambdaReflect.info(alias);
         Object val = this.get(lambdaInfo.getField());
         try {
             if (val instanceof BigDecimal) {

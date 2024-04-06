@@ -2,7 +2,7 @@ package xyz.erupt.linq.data.student;
 
 import java.time.LocalDateTime;
 
-public class Student {
+public class Student extends BaseModel{
 
     private Long id;
 
