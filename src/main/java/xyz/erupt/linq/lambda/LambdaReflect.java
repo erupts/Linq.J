@@ -13,7 +13,7 @@ public class LambdaReflect {
 
     private static final String GET = "get", IS = "is", WRITE_REPLACE = "writeReplace";
 
-    private static final Pattern RETURN_TYPE_PATTERN = Pattern.compile("\\(L(.*);\\).*");
+    private static final Pattern CLASS_TYPE_PATTERN = Pattern.compile("\\(L(.*);\\).*");
 
     private static final Map<SFunction<?, ?>, LambdaInfo> S_FUNCTION_CACHE = new ConcurrentHashMap<>();
 
@@ -34,7 +34,7 @@ public class LambdaReflect {
             Method method = func.getClass().getDeclaredMethod(WRITE_REPLACE);
             method.setAccessible(true);
             SerializedLambda serializedLambda = (SerializedLambda) method.invoke(func);
-            Matcher matcher = RETURN_TYPE_PATTERN.matcher(serializedLambda.getInstantiatedMethodType());
+            Matcher matcher = CLASS_TYPE_PATTERN.matcher(serializedLambda.getInstantiatedMethodType());
             if (!matcher.find() || matcher.groupCount() != 1) throw new RuntimeException("Failed to get Lambda information");
             Class<?> clazz = Class.forName(matcher.group(1).replace("/", "."));
             LambdaInfo lambdaInfo = getserializedLambdaInfo(serializedLambda, clazz);
