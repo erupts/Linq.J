@@ -1,4 +1,4 @@
-# Linq.J 基于 JVM → Lambda 特性的的对象查询语言(LINQ)库
+# Linq.J 基于内存的对象查询语言
 
 ### Linq 是面向对象的 sql，linq实际上是对内存中数据的查询，使开发人员能够更容易地编写查询。这些查询表达式看起来很像SQL
 
@@ -28,7 +28,7 @@
 <dependency>
     <groupId>xyz.erupt</groupId>
     <artifactId>linq.j</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
 </dependency>
 ```
 
