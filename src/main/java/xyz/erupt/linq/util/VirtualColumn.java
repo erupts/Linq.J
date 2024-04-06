@@ -12,7 +12,7 @@ public class VirtualColumn {
     private Boolean bool;
 
     public static LambdaInfo lambdaInfo() {
-        return LambdaReflect.getInfo(VirtualColumn::getString);
+        return LambdaReflect.info(VirtualColumn::getString);
     }
 
     public Integer getNumber() {

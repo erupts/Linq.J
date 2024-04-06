@@ -7,39 +7,35 @@ import xyz.erupt.linq.schema.Row;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.time.temporal.Temporal;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ColumnReflects {
 
     public static final Class<?>[] SIMPLE_CLASS = {
-            String.class, Character.class, Byte.class, Short.class, Integer.class, Float.class, Double.class, BigDecimal.class
-    };
-
-    public static final Class<?>[] SIMPLE_ARR_CLASS = {
-            String[].class, Character[].class, Byte[].class, Short[].class, Integer[].class, Float[].class, Double[].class, BigDecimal[].class
+            CharSequence.class, Character.class, Number.class, Date.class, Temporal.class, Boolean.class,
+            CharSequence[].class, Character[].class, Number[].class, Date[].class, Temporal[].class, Boolean[].class
     };
 
     public static List<Row> listToRow(Collection<?> objects) {
         List<Row> list = new ArrayList<>(objects.size());
-        for (Object object : objects) {
-            Optional.ofNullable(object).ifPresent(it -> list.add(objectToRow(it)));
-        }
+        objects.forEach(obj -> Optional.ofNullable(obj).ifPresent(it -> list.add(objectToRow(it))));
         return list;
     }
 
     public static Row objectToRow(Object obj) {
         Row row = new Row();
-        for (Class<?> clazz : SIMPLE_CLASS) {
-            if (obj.getClass() == clazz) {
+        for (Class<?> sc : SIMPLE_CLASS) {
+            if (sc.isAssignableFrom(obj.getClass())) {
                 row.put(Columns.of(Th::is), obj);
                 return row;
             }
         }
         try {
-            for (Field field : obj.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                row.put(Columns.of(field), field.get(obj));
+            for (Field field : ReflectField.getFields(obj.getClass())) {
+                if (!field.isAccessible()) field.setAccessible(true);
+                row.put(new Column(obj.getClass(), field.getName(), field.getName()), field.get(obj));
             }
         } catch (Exception e) {
             throw new LinqException(e);
@@ -48,26 +44,22 @@ public class ColumnReflects {
     }
 
     public static <T> T rowToObject(Row row, Class<T> clazz) {
-        for (Class<?> sc : SIMPLE_CLASS) {
-            if (sc == clazz) {
-                Object val = row.get(row.keySet().iterator().next());
-                if (val instanceof BigDecimal) {
-                    return (T) bigDecimalConvert((BigDecimal) val, clazz);
-                } else {
-                    return (T) val;
+        if (row.size() == 1) {
+            Object val = row.get(row.keySet().iterator().next());
+            if (null != val && clazz == val.getClass()) return (T) val;
+            for (Class<?> sc : SIMPLE_CLASS) {
+                if (sc.isAssignableFrom(clazz)) {
+                    return (T) (val instanceof BigDecimal ? bigDecimalConvert((BigDecimal) val, clazz) : val);
                 }
             }
         }
-        for (Class<?> arr : SIMPLE_ARR_CLASS) {
-            if (arr == clazz) return (T) row.get(row.keySet().iterator().next());
-        }
         try {
             T instance = clazz.getDeclaredConstructor().newInstance();
-            Map<String, Field> fieldMap = Arrays.stream(clazz.getDeclaredFields()).collect(Collectors.toMap(Field::getName, it -> it));
+            Map<String, Field> fieldMap = ReflectField.getFields(clazz).stream().collect(Collectors.toMap(Field::getName, it -> it));
             for (Map.Entry<Column, Object> entry : row.entrySet()) {
                 if (fieldMap.containsKey(entry.getKey().getAlias())) {
                     Field field = fieldMap.get(entry.getKey().getAlias());
-                    field.setAccessible(true);
+                    if (!field.isAccessible()) field.setAccessible(true);
                     if (entry.getValue() instanceof BigDecimal) {
                         field.set(instance, bigDecimalConvert((BigDecimal) entry.getValue(), field.getType()));
                     } else {

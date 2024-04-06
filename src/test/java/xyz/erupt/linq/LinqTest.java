@@ -40,6 +40,12 @@ public class LinqTest {
     }
 
     @Test
+    public void selectId() {
+        List<Long> longs = Linq.from(source).select(TestSource::getId).write(Long.class);
+        System.out.println(longs);
+    }
+
+    @Test
     public void fromSingletonObject() {
         TestSource source = new TestSource(1, "Thanos", new Date(), new String[]{"x", "y", "z"});
         String name = Linq.from(source).select(Columns.of(TestSource::getName)).writeOne(String.class);

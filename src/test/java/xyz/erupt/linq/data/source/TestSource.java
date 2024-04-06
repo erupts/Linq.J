@@ -2,7 +2,7 @@ package xyz.erupt.linq.data.source;
 
 import java.util.Date;
 
-public class TestSource {
+public class TestSource extends TestSourceParent {
 
     private Integer id;
 
@@ -12,6 +12,7 @@ public class TestSource {
 
     private String[] tags;
 
+    @Override
     public Integer getId() {
         return id;
     }
@@ -49,7 +50,7 @@ public class TestSource {
     }
 
     public TestSource(Integer id, String name, Date date, String[] tags) {
-        this.id = id;
+        super.setId(id);
         this.name = name;
         this.date = date;
         this.tags = tags;
