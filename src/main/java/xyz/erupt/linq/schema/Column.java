@@ -103,7 +103,7 @@ public class Column {
 
     @Override
     public String toString() {
-        return table.getSimpleName() + "." + field + "(" + alias + ")";
+        return table.getName() + "." + field + "(" + alias + ")";
     }
 
 

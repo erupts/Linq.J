@@ -59,27 +59,12 @@ public class JoinSchema<T> {
         return clazz;
     }
 
-    public BiFunction<T, Row, Boolean> getOn() {
-        return on;
-    }
-
-    public void setOn(BiFunction<T, Row, Boolean> on) {
-        this.on = on;
-    }
-
     public SFunction<T, ?> getLon() {
         return lon;
-    }
-
-    public void setLon(SFunction<T, ?> lon) {
-        this.lon = lon;
     }
 
     public SFunction<?, ?> getRon() {
         return ron;
     }
 
-    public void setRon(SFunction<?, ?> ron) {
-        this.ron = ron;
-    }
 }

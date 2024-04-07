@@ -24,7 +24,6 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
 
     private final Dql dql = new Dql();
 
-
     public static Linq from(Collection<?> data) {
         Linq linq = new Linq();
         linq.dql.setFrom(data);
