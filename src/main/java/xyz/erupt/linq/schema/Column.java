@@ -98,7 +98,7 @@ public class Column {
 
     @Override
     public int hashCode() {
-        return Objects.hash(table.getName(), field, alias);
+        return Objects.hash(table, field, alias);
     }
 
     @Override

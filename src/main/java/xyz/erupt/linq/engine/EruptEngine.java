@@ -94,7 +94,8 @@ public class EruptEngine extends Engine {
                         break;
                     case RIGHT:
                         this.crossHashJoin(targetData, lon, dataset, ron);
-                        dataset = targetData;
+                        dataset.clear();
+                        dataset.addAll(targetData);
                         break;
                     case INNER:
                         this.crossHashJoin(dataset, ron, targetData, lon);

@@ -199,7 +199,8 @@ public class LinqTest {
     public void orConditionTest() {
         // name = 'Thanos' or id = 4
         List<Map<String, Object>> res = Linq.from(source)
-                .leftJoin(target, TestSourceExt::getId, TestSource::getId).select(Columns.all(TestSource.class))
+                .leftJoin(target, TestSourceExt::getId, TestSource::getId)
+                .select(Columns.all(TestSource.class))
                 .where(data -> {
                     String name = data.get(TestSource::getName);
                     Integer id = data.get(TestSource::getId);
