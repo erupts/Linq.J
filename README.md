@@ -32,8 +32,9 @@
 </dependency>
 ```
 
-#### 使用限制
-操作的对象字段必须存在 get 方法便于 lambda 查找，建议配合 **Lombok** 的 @Getter 注解快速创建字段的 get 访问
+#### 使用提示
+
+* 操作的对象字段必须存在 get 方法便于 lambda 查找，建议配合 **Lombok** 的 @Getter 注解快速创建字段的 get 访问
 
 #### Example 1
 ```javascript
