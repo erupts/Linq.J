@@ -130,7 +130,7 @@ public class Columns {
                 if (CompareUtil.compare(val, result, CompareSymbol.GT)) result = val;
             }
             if (result instanceof Number) {
-                return ColumnReflects.numberToBigDecimal((Number) result);
+                return RowUtil.numberToBigDecimal((Number) result);
             } else {
                 return result;
             }
@@ -151,7 +151,7 @@ public class Columns {
                 if (CompareUtil.compare(val, result, CompareSymbol.LT)) result = val;
             }
             if (result instanceof Number) {
-                return ColumnReflects.numberToBigDecimal((Number) result);
+                return RowUtil.numberToBigDecimal((Number) result);
             } else {
                 return result;
             }

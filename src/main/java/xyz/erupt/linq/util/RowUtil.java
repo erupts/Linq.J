@@ -11,7 +11,7 @@ import java.time.temporal.Temporal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ColumnReflects {
+public class RowUtil {
 
     public static final Class<?>[] SIMPLE_CLASS = {
             CharSequence.class, Character.class, Number.class, Date.class, Temporal.class, Boolean.class,

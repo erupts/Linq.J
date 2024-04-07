@@ -93,12 +93,12 @@ public class Column {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Column column = (Column) o;
-        return Objects.equals(table.getSimpleName(), column.table.getSimpleName()) && Objects.equals(field, column.field) && Objects.equals(alias, column.alias);
+        return Objects.equals(table.getName(), column.table.getName()) && Objects.equals(field, column.field) && Objects.equals(alias, column.alias);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(table, field, alias);
+        return Objects.hash(table.getName(), field, alias);
     }
 
     @Override

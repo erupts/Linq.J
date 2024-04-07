@@ -4,7 +4,7 @@ import xyz.erupt.linq.engine.Engine;
 import xyz.erupt.linq.exception.LinqException;
 import xyz.erupt.linq.schema.Dql;
 import xyz.erupt.linq.schema.Row;
-import xyz.erupt.linq.util.ColumnReflects;
+import xyz.erupt.linq.util.RowUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +23,7 @@ public interface Write {
     default <T> List<T> write(Class<T> clazz) {
         wEngine().preprocessor(this.wDQL());
         List<Row> table = wEngine().query(this.wDQL());
-        return table.stream().map(it -> ColumnReflects.rowToObject(it, clazz)).collect(Collectors.toList());
+        return table.stream().map(it -> RowUtil.rowToObject(it, clazz)).collect(Collectors.toList());
     }
 
     default <T> T writeOne(Class<T> clazz) {
@@ -32,7 +32,7 @@ public interface Write {
         if (result.isEmpty()) {
             return null;
         } else if (result.size() == 1) {
-            return ColumnReflects.rowToObject(result.get(0), clazz);
+            return RowUtil.rowToObject(result.get(0), clazz);
         } else {
             throw new LinqException(MULTI_VAL_ERROR + result.size());
         }
