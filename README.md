@@ -22,6 +22,9 @@
 #### 操作语法
 > From、Select、Distinct、Join、Where、Group By、Order By、Limit、Offset、...
 
+#### 使用提示
+⚠️ 注意：操作的对象字段必须存在 get 方法便于 lambda 查找，建议配合 **Lombok** 的 @Getter 注解快速创建字段的 get 访问
+
 #### 使用方法
 包内零外部依赖，体积仅仅50kb
 ```xml
@@ -31,10 +34,6 @@
     <version>0.0.3</version>
 </dependency>
 ```
-
-#### 使用提示
-
-* 操作的对象字段必须存在 get 方法便于 lambda 查找，建议配合 **Lombok** 的 @Getter 注解快速创建字段的 get 访问
 
 #### Example 1
 ```javascript
