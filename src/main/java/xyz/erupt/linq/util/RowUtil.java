@@ -18,7 +18,7 @@ public class RowUtil {
             CharSequence[].class, Character[].class, Number[].class, Date[].class, Temporal[].class, Boolean[].class
     };
 
-    public static List<Row> listToRow(Collection<?> objects) {
+    public static List<Row> listObjectToRow(Collection<?> objects) {
         List<Row> list = new ArrayList<>(objects.size());
         objects.forEach(obj -> Optional.ofNullable(obj).ifPresent(it -> list.add(objectToRow(it))));
         return list;

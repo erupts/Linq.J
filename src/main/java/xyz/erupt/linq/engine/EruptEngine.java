@@ -15,7 +15,7 @@ public class EruptEngine extends Engine {
 
     @Override
     public List<Row> query(Dql dql) {
-        List<Row> dataset = RowUtil.listToRow(dql.getFrom());
+        List<Row> dataset = RowUtil.listObjectToRow(dql.getFrom());
         // join process
         if (!dql.getJoinSchemas().isEmpty()) {
             this.join(dql, dataset);
@@ -87,7 +87,7 @@ public class EruptEngine extends Engine {
             Column lon = Columns.of(joinSchema.getLon());
             Column ron = Columns.of(joinSchema.getRon());
             if (joinSchema.getJoinExchange() == JoinExchange.HASH) {
-                List<Row> targetData = RowUtil.listToRow(joinSchema.getTarget());
+                List<Row> targetData = RowUtil.listObjectToRow(joinSchema.getTarget());
                 switch (joinSchema.getJoinMethod()) {
                     case LEFT:
                         this.crossHashJoin(dataset, ron, targetData, lon);
