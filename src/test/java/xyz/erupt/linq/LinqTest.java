@@ -235,6 +235,7 @@ public class LinqTest {
     public void orderBy() {
         List<TestSource> result = Linq.from(source)
                 .select(Columns.all(TestSource.class))
+                .selectExclude(TestSource::getTags, TestSource::getName)
                 .orderBy(TestSource::getId, OrderByDirection.DESC)
                 .orderBy(TestSource::getName)
                 .write(TestSource.class);
