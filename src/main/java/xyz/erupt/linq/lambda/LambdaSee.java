@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LambdaReflect {
+public class LambdaSee {
 
     private static final String GET = "get", IS = "is", WRITE_REPLACE = "writeReplace";
 
@@ -21,19 +21,25 @@ public class LambdaReflect {
         return info(func).getField();
     }
 
+    public static <T, R> String method(SFunction<T, R> func) {
+        return info(func).getMethod();
+    }
+
     public static <T, R> LambdaInfo info(SFunction<T, R> func) {
         try {
             if (S_FUNCTION_CACHE.containsKey(func)) {
                 return S_FUNCTION_CACHE.get(func);
-            } else synchronized (LambdaReflect.class) {
+            } else synchronized (LambdaSee.class) {
                 if (S_FUNCTION_CACHE.containsKey(func)) return S_FUNCTION_CACHE.get(func);
             }
-            if (!func.getClass().isSynthetic()) throw new LinqException("Synthetic classes produced by non-lambda expressions");
+            if (!func.getClass().isSynthetic())
+                throw new LinqException("Synthetic classes produced by non-lambda expressions");
             Method method = func.getClass().getDeclaredMethod(WRITE_REPLACE);
             method.setAccessible(true);
             SerializedLambda serializedLambda = (SerializedLambda) method.invoke(func);
             Matcher matcher = CLASS_TYPE_PATTERN.matcher(serializedLambda.getInstantiatedMethodType());
-            if (!matcher.find() || matcher.groupCount() != 1) throw new RuntimeException("Failed to get Lambda information");
+            if (!matcher.find() || matcher.groupCount() != 1)
+                throw new RuntimeException("Failed to get Lambda information");
             Class<?> clazz = Class.forName(matcher.group(1).replace("/", "."));
             LambdaInfo lambdaInfo = getserializedLambdaInfo(serializedLambda, clazz);
             S_FUNCTION_CACHE.put(func, lambdaInfo);

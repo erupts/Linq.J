@@ -1,7 +1,7 @@
 package xyz.erupt.linq.util;
 
 import xyz.erupt.linq.lambda.LambdaInfo;
-import xyz.erupt.linq.lambda.LambdaReflect;
+import xyz.erupt.linq.lambda.LambdaSee;
 
 public class VirtualColumn {
 
@@ -12,7 +12,7 @@ public class VirtualColumn {
     private Boolean bool;
 
     public static LambdaInfo lambdaInfo() {
-        return LambdaReflect.info(VirtualColumn::getString);
+        return LambdaSee.info(VirtualColumn::getString);
     }
 
     public Integer getNumber() {
