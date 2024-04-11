@@ -24,7 +24,6 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
 
     private final Dql dql = new Dql();
 
-
     public static Linq from(Collection<?> data) {
         Linq linq = new Linq();
         linq.dql.setFrom(data);
@@ -80,16 +79,28 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public Linq select(Column column, Column... columns) {
-        this.dql.getColumns().addAll(Columns.columnsUnfold(column));
+    public Linq select(Column... columns) {
         this.dql.getColumns().addAll(Columns.columnsUnfold(columns));
+        return this;
+    }
+
+    @SafeVarargs
+    @Override
+    public final <T> Linq selectExclude(SFunction<T, ?>... columns) {
+        this.dql.getColumns().removeIf(it -> {
+            for (SFunction<T, ?> column : columns) {
+                if (Columns.of(column).equals(it)) {
+                    return true;
+                }
+            }
+            return false;
+        });
         return this;
     }
 
     @Override
     @SafeVarargs
-    public final <T> Linq select(SFunction<T, ?> column, SFunction<T, ?>... columns) {
-        this.dql.getColumns().add(Columns.of(column));
+    public final <T> Linq select(SFunction<T, ?>... columns) {
         for (SFunction<T, ?> col : columns) {
             this.dql.getColumns().add(Columns.of(col));
         }

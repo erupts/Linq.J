@@ -10,7 +10,7 @@ public class Dql {
     private Collection<?> from;
 
     // columns definition
-    private List<Column> columns = new ArrayList<>();
+    private final List<Column> columns = new ArrayList<>();
 
     // json definition
     private final List<JoinSchema<?>> joinSchemas = new ArrayList<>();
@@ -51,10 +51,6 @@ public class Dql {
 
     public List<Column> getColumns() {
         return columns;
-    }
-
-    public void setColumns(List<Column> columns) {
-        this.columns = columns;
     }
 
     public List<Function<Row, Boolean>> getWheres() {

@@ -4,7 +4,7 @@ import xyz.erupt.linq.consts.JoinExchange;
 import xyz.erupt.linq.consts.OrderByDirection;
 import xyz.erupt.linq.exception.LinqException;
 import xyz.erupt.linq.schema.*;
-import xyz.erupt.linq.util.ColumnReflects;
+import xyz.erupt.linq.util.RowUtil;
 import xyz.erupt.linq.util.Columns;
 
 import java.util.*;
@@ -15,40 +15,13 @@ public class EruptEngine extends Engine {
 
     @Override
     public List<Row> query(Dql dql) {
-        List<Row> dataset = ColumnReflects.listToRow(dql.getFrom());
+        List<Row> dataset = RowUtil.listObjectToRow(dql.getFrom());
         // join process
         if (!dql.getJoinSchemas().isEmpty()) {
-            for (JoinSchema<?> joinSchema : dql.getJoinSchemas()) {
-                Column lon = Columns.of(joinSchema.getLon());
-                Column ron = Columns.of(joinSchema.getRon());
-                if (joinSchema.getJoinExchange() == JoinExchange.HASH) {
-                    List<Row> targetData = ColumnReflects.listToRow(joinSchema.getTarget());
-                    switch (joinSchema.getJoinMethod()) {
-                        case LEFT:
-                            this.crossHashJoin(dataset, ron, targetData, lon);
-                            break;
-                        case RIGHT:
-                            this.crossHashJoin(targetData, lon, dataset, ron);
-                            dataset = targetData;
-                            break;
-                        case INNER:
-                            this.crossHashJoin(dataset, ron, targetData, lon);
-                            dataset.removeIf(it -> !it.containsKey(lon));
-                            break;
-                        case FULL:
-                            this.crossHashJoin(dataset, ron, targetData, lon);
-                            this.crossHashJoin(targetData, lon, dataset, ron);
-                            targetData.removeIf(it -> it.containsKey(ron));
-                            dataset.addAll(targetData);
-                            break;
-                    }
-                } else {
-                    throw new LinqException(joinSchema.getJoinExchange().name() + " is not supported yet");
-                }
-            }
+            this.join(dql, dataset);
         }
-        // condition process
-        if (!dql.getWheres().isEmpty()){
+        // where process
+        if (!dql.getWheres().isEmpty()) {
             dataset.removeIf(it -> {
                 for (Function<Row, Boolean> condition : dql.getWheres()) {
                     if (!condition.apply(it)) return true;
@@ -83,7 +56,7 @@ public class EruptEngine extends Engine {
             dataset.addAll($table);
         }
         // having process
-        if (!dql.getHaving().isEmpty()){
+        if (!dql.getHaving().isEmpty()) {
             dataset.removeIf(it -> {
                 for (Function<Row, Boolean> condition : dql.getHaving()) {
                     if (!condition.apply(it)) return true;
@@ -92,7 +65,9 @@ public class EruptEngine extends Engine {
             });
         }
         // order by process
-        this.orderBy(dql, dataset);
+        if (!dql.getOrderBys().isEmpty()) {
+            this.orderBy(dql, dataset);
+        }
         // limit
         if (null != dql.getOffset()) {
             dataset = dql.getOffset() > dataset.size() ? new ArrayList<>(0) : dataset.subList(dql.getOffset(), dataset.size());
@@ -105,6 +80,38 @@ public class EruptEngine extends Engine {
             dataset = dataset.stream().distinct().collect(Collectors.toList());
         }
         return dataset;
+    }
+
+    public void join(Dql dql, List<Row> dataset) {
+        for (JoinSchema<?> joinSchema : dql.getJoinSchemas()) {
+            Column lon = Columns.of(joinSchema.getLon());
+            Column ron = Columns.of(joinSchema.getRon());
+            if (joinSchema.getJoinExchange() == JoinExchange.HASH) {
+                List<Row> targetData = RowUtil.listObjectToRow(joinSchema.getTarget());
+                switch (joinSchema.getJoinMethod()) {
+                    case LEFT:
+                        this.crossHashJoin(dataset, ron, targetData, lon);
+                        break;
+                    case RIGHT:
+                        this.crossHashJoin(targetData, lon, dataset, ron);
+                        dataset.clear();
+                        dataset.addAll(targetData);
+                        break;
+                    case INNER:
+                        this.crossHashJoin(dataset, ron, targetData, lon);
+                        dataset.removeIf(it -> !it.containsKey(lon));
+                        break;
+                    case FULL:
+                        this.crossHashJoin(dataset, ron, targetData, lon);
+                        this.crossHashJoin(targetData, lon, dataset, ron);
+                        targetData.removeIf(it -> it.containsKey(ron));
+                        dataset.addAll(targetData);
+                        break;
+                }
+            } else {
+                throw new LinqException(joinSchema.getJoinExchange().name() + " is not supported yet");
+            }
+        }
     }
 
     //Cartesian product case
@@ -171,23 +178,21 @@ public class EruptEngine extends Engine {
     }
 
     public void orderBy(Dql dql, List<Row> dataset) {
-        if (null != dql.getOrderBys() && !dql.getOrderBys().isEmpty()) {
-            dataset.sort((a, b) -> {
-                int i = 0;
-                for (OrderBySchema orderBy : dql.getOrderBys()) {
-                    if (null == a.get(orderBy.getColumn()) || null == b.get(orderBy.getColumn())) return 0;
-                    if (a.get(orderBy.getColumn()) instanceof Comparable) {
-                        Comparable<Object> comparable = (Comparable<Object>) a.get(orderBy.getColumn());
-                        i = comparable.compareTo(b.get(orderBy.getColumn()));
-                        if (orderBy.getDirection() == OrderByDirection.DESC) i = ~i + 1;
-                        if (i != 0) return i;
-                    } else {
-                        throw new LinqException(orderBy.getColumn().getTable() + "." + orderBy.getColumn().getField() + " sort does not implement the Comparable interface");
-                    }
+        dataset.sort((a, b) -> {
+            int i = 0;
+            for (OrderBySchema orderBy : dql.getOrderBys()) {
+                if (null == a.get(orderBy.getColumn()) || null == b.get(orderBy.getColumn())) return 0;
+                if (a.get(orderBy.getColumn()) instanceof Comparable) {
+                    Comparable<Object> comparable = (Comparable<Object>) a.get(orderBy.getColumn());
+                    i = comparable.compareTo(b.get(orderBy.getColumn()));
+                    if (orderBy.getDirection() == OrderByDirection.DESC) i = ~i + 1;
+                    if (i != 0) return i;
+                } else {
+                    throw new LinqException(orderBy.getColumn().getTable() + "." + orderBy.getColumn().getField() + " sort does not implement the Comparable interface");
                 }
-                return i;
-            });
-        }
+            }
+            return i;
+        });
     }
 
 }

@@ -93,7 +93,7 @@ public class Column {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Column column = (Column) o;
-        return Objects.equals(table.getSimpleName(), column.table.getSimpleName()) && Objects.equals(field, column.field) && Objects.equals(alias, column.alias);
+        return Objects.equals(table.getName(), column.table.getName()) && Objects.equals(field, column.field) && Objects.equals(alias, column.alias);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class Column {
 
     @Override
     public String toString() {
-        return table.getSimpleName() + "." + field + "(" + alias + ")";
+        return table.getName() + "." + field + "(" + alias + ")";
     }
 
 

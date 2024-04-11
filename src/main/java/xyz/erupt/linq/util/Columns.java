@@ -2,7 +2,7 @@ package xyz.erupt.linq.util;
 
 import xyz.erupt.linq.consts.CompareSymbol;
 import xyz.erupt.linq.lambda.LambdaInfo;
-import xyz.erupt.linq.lambda.LambdaReflect;
+import xyz.erupt.linq.lambda.LambdaSee;
 import xyz.erupt.linq.lambda.SFunction;
 import xyz.erupt.linq.schema.Column;
 import xyz.erupt.linq.schema.Row;
@@ -16,12 +16,12 @@ import java.util.function.Function;
 public class Columns {
 
     private static <T> Column fromLambda(SFunction<T, ?> fun) {
-        LambdaInfo lambdaInfo = LambdaReflect.info(fun);
+        LambdaInfo lambdaInfo = LambdaSee.info(fun);
         return fromLambda(fun, lambdaInfo.getField());
     }
 
     private static <T> Column fromLambda(SFunction<T, ?> fun, String alias) {
-        LambdaInfo lambdaInfo = LambdaReflect.info(fun);
+        LambdaInfo lambdaInfo = LambdaSee.info(fun);
         Column column = new Column();
         column.setTable(lambdaInfo.getClazz());
         column.setField(lambdaInfo.getField());
@@ -50,11 +50,11 @@ public class Columns {
     }
 
     public static <R, S, A> Column ofx(SFunction<R, S> fun, Function<S, Object> convert, SFunction<A, ?> alias) {
-        return ofx(fun, convert, LambdaReflect.field(alias));
+        return ofx(fun, convert, LambdaSee.field(alias));
     }
 
     public static <R, S> Column ofx(SFunction<R, S> fun, Function<S, Object> convert) {
-        return ofx(fun, convert, LambdaReflect.field(fun));
+        return ofx(fun, convert, LambdaSee.field(fun));
     }
 
 
@@ -67,7 +67,7 @@ public class Columns {
     }
 
     public static <R, A> Column of(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return of(fun, LambdaReflect.field(alias));
+        return of(fun, LambdaSee.field(alias));
     }
 
     public static Column ofs(Function<Row, ?> fun, String alias) {
@@ -80,7 +80,7 @@ public class Columns {
     }
 
     public static <A> Column ofs(Function<Row, ?> fun, SFunction<A, ?> alias) {
-        return ofs(fun, LambdaReflect.field(alias));
+        return ofs(fun, LambdaSee.field(alias));
     }
 
     public static Column count(String alias) {
@@ -90,7 +90,7 @@ public class Columns {
     }
 
     public static <A> Column count(SFunction<A, ?> alias) {
-        return count(LambdaReflect.field(alias));
+        return count(LambdaSee.field(alias));
     }
 
     public static <R> Column count(SFunction<R, ?> fun, String alias) {
@@ -104,7 +104,7 @@ public class Columns {
     }
 
     public static <R, A> Column count(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return count(fun, LambdaReflect.field(alias));
+        return count(fun, LambdaSee.field(alias));
     }
 
     public static <R> Column countDistinct(SFunction<R, ?> fun, String alias) {
@@ -118,7 +118,7 @@ public class Columns {
     }
 
     public static <R, A> Column countDistinct(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return countDistinct(fun, LambdaReflect.field(alias));
+        return countDistinct(fun, LambdaSee.field(alias));
     }
 
     public static <R> Column max(SFunction<R, ?> fun, String alias) {
@@ -130,7 +130,7 @@ public class Columns {
                 if (CompareUtil.compare(val, result, CompareSymbol.GT)) result = val;
             }
             if (result instanceof Number) {
-                return ColumnReflects.numberToBigDecimal((Number) result);
+                return RowUtil.numberToBigDecimal((Number) result);
             } else {
                 return result;
             }
@@ -139,7 +139,7 @@ public class Columns {
 
 
     public static <R, A> Column max(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return max(fun, LambdaReflect.field(alias));
+        return max(fun, LambdaSee.field(alias));
     }
 
     public static <R> Column min(SFunction<R, ?> fun, String alias) {
@@ -151,7 +151,7 @@ public class Columns {
                 if (CompareUtil.compare(val, result, CompareSymbol.LT)) result = val;
             }
             if (result instanceof Number) {
-                return ColumnReflects.numberToBigDecimal((Number) result);
+                return RowUtil.numberToBigDecimal((Number) result);
             } else {
                 return result;
             }
@@ -159,7 +159,7 @@ public class Columns {
     }
 
     public static <R, A> Column min(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return min(fun, LambdaReflect.field(alias));
+        return min(fun, LambdaSee.field(alias));
     }
 
     public static <R> Column avg(SFunction<R, ?> fun, String alias) {
@@ -178,7 +178,7 @@ public class Columns {
     }
 
     public static <R, A> Column avg(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return avg(fun, LambdaReflect.field(alias));
+        return avg(fun, LambdaSee.field(alias));
     }
 
     public static <R> Column sum(SFunction<R, ?> fun, String alias) {
@@ -195,7 +195,7 @@ public class Columns {
     }
 
     public static <R, A> Column sum(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return sum(fun, LambdaReflect.field(alias));
+        return sum(fun, LambdaSee.field(alias));
     }
 
     public static <R> Column groupArray(SFunction<R, ?> fun, String alias) {
@@ -209,7 +209,7 @@ public class Columns {
     }
 
     public static <R, A> Column groupArray(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return groupArray(fun, LambdaReflect.field(alias));
+        return groupArray(fun, LambdaSee.field(alias));
     }
 
     // custom group by logic

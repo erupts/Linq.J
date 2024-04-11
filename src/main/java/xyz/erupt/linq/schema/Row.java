@@ -2,9 +2,9 @@ package xyz.erupt.linq.schema;
 
 import xyz.erupt.linq.exception.LinqException;
 import xyz.erupt.linq.lambda.LambdaInfo;
-import xyz.erupt.linq.lambda.LambdaReflect;
+import xyz.erupt.linq.lambda.LambdaSee;
 import xyz.erupt.linq.lambda.SFunction;
-import xyz.erupt.linq.util.ColumnReflects;
+import xyz.erupt.linq.util.RowUtil;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -42,11 +42,11 @@ public class Row extends HashMap<Column, Object> {
     }
 
     public <T, R> R get(SFunction<T, R> alias) {
-        LambdaInfo lambdaInfo = LambdaReflect.info(alias);
+        LambdaInfo lambdaInfo = LambdaSee.info(alias);
         Object val = this.get(lambdaInfo.getField());
         try {
             if (val instanceof BigDecimal) {
-                return (R) ColumnReflects.bigDecimalConvert((BigDecimal) val, lambdaInfo.getClazz().getDeclaredField(lambdaInfo.getField()).getType());
+                return (R) RowUtil.bigDecimalConvert((BigDecimal) val, lambdaInfo.getClazz().getDeclaredField(lambdaInfo.getField()).getType());
             } else {
                 return (R) val;
             }

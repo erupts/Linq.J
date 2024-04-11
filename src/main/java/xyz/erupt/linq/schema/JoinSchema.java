@@ -2,7 +2,7 @@ package xyz.erupt.linq.schema;
 
 import xyz.erupt.linq.consts.JoinExchange;
 import xyz.erupt.linq.consts.JoinMethod;
-import xyz.erupt.linq.lambda.LambdaReflect;
+import xyz.erupt.linq.lambda.LambdaSee;
 import xyz.erupt.linq.lambda.SFunction;
 
 import java.util.Collection;
@@ -31,7 +31,7 @@ public class JoinSchema<T> {
         this.target = target;
         this.lon = lon;
         this.ron = ron;
-        this.clazz = (Class<T>) LambdaReflect.info(lon).getClazz();
+        this.clazz = (Class<T>) LambdaSee.info(lon).getClazz();
         this.joinExchange = JoinExchange.HASH;
     }
 
@@ -59,27 +59,12 @@ public class JoinSchema<T> {
         return clazz;
     }
 
-    public BiFunction<T, Row, Boolean> getOn() {
-        return on;
-    }
-
-    public void setOn(BiFunction<T, Row, Boolean> on) {
-        this.on = on;
-    }
-
     public SFunction<T, ?> getLon() {
         return lon;
-    }
-
-    public void setLon(SFunction<T, ?> lon) {
-        this.lon = lon;
     }
 
     public SFunction<?, ?> getRon() {
         return ron;
     }
 
-    public void setRon(SFunction<?, ?> ron) {
-        this.ron = ron;
-    }
 }

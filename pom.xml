@@ -6,10 +6,10 @@
 
     <groupId>xyz.erupt</groupId>
     <artifactId>linq.j</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <name>Linq.j</name>
 
-    <description>Linq.J A JVM → Lambda based federated analysis library</description>
+    <description>Linq.J in Java , Lambda Language Integrated Query library</description>
     <url>https://github.com/erupts/Linq.J</url>
 
     <properties>

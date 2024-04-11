@@ -11,14 +11,14 @@ import java.time.temporal.Temporal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ColumnReflects {
+public class RowUtil {
 
     public static final Class<?>[] SIMPLE_CLASS = {
             CharSequence.class, Character.class, Number.class, Date.class, Temporal.class, Boolean.class,
             CharSequence[].class, Character[].class, Number[].class, Date[].class, Temporal[].class, Boolean[].class
     };
 
-    public static List<Row> listToRow(Collection<?> objects) {
+    public static List<Row> listObjectToRow(Collection<?> objects) {
         List<Row> list = new ArrayList<>(objects.size());
         objects.forEach(obj -> Optional.ofNullable(obj).ifPresent(it -> list.add(objectToRow(it))));
         return list;
