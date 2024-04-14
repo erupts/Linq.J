@@ -14,29 +14,30 @@
 
 ### Linq 是面向对象的 sql，linq实际上是对内存中数据的查询，使开发人员能够更容易地编写查询。这些查询表达式看起来很像SQL
 
-> 可以通过最少的代码对数据源进行关联、筛选、排序和分组等操作。这些操作可以在单个查询中组合起来，以获得更复杂的结果
+> 可以通过最少的代码对数据源进行关联、筛选、排序和分组等操作。这些操作可以在单个查询中组合起来，以获得更复杂的结果，无需for循环与if分支操作数据，内置查询引擎性能卓越
 
 #### 允许编写Java代码以查询数据库相同的方式操作内存数据，例如
 - List 集合、Array 数组中的数据
-- SQL 结果的数据
 - CSV、XML、JSON 文档数据集
 - Stream、File 流
+- Redis、SQL、MongoDB数据库结果集
 
 #### 应用场景
-- 分布式开发时 Feign / Dubbo 等 RPC 的结果关联
+- 分布式开发时 Feign / Dubbo / gRPC / WebService 等 RPC 结果的关联/筛选/聚合/分页
+- 语义化对象转换与映射，团队协作代码更清晰敏捷
 - 异构系统数据的内存计算
 - 使用代码组织 SQL 结果数据
-- 多个结果对象的排序聚合与内存分页
-- 语义化对象转换与映射
-- 代码简洁，无需for循环与分支操作数据
 - 跨数据源的联邦访问
 
 #### 操作语法
 `From` `Select` `Distinct`、`Join`、`Where`、`Group By`、`Order By`、`Limit`、`Offset`、`...`
 
+#### 使用提示
+⚠️ 注意：操作的对象字段必须存在 get 方法便于 lambda 查找，建议配合 **Lombok** 的 @Getter 注解快速创建字段的 get 访问
+
 #### 使用方法
-包内零外部依赖，体积仅仅50kb
 ```xml
+<!--包内零外部依赖，体积仅仅50kb-->
 <dependency>
     <groupId>xyz.erupt</groupId>
     <artifactId>linq.j</artifactId>
