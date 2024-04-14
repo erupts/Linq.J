@@ -1,7 +1,7 @@
-# Linq.J 基于内存的对象查询语言
-中文 / [English](./README-en.md)
+# Linq.J A Memory-based Object Query language
+[中文](./README-zh.md) / English
 
-`Java 中使用类似 C# 的 Linq 能力 ` [C# Linq](https://learn.microsoft.com/zh-cn/dotnet/csharp/linq/)
+`Java uses Linq capabilities similar to C#` [C# Linq](https://learn.microsoft.com/zh-cn/dotnet/csharp/linq/)
 
 <p>
     <a href="https://www.erupt.xyz" target="_blank"><img src="https://img.shields.io/badge/Linq.J-brightgreen" alt="Erupt Framework"></a>
@@ -12,34 +12,34 @@
     <a href="https://github.com/erupts/linq.j"><img src="https://img.shields.io/github/stars/erupts/linq.j?style=social" alt="GitHub stars"></a>
 </p>
 
+### Linq is Object oriented sql, linq is actually a query on the data in memory, enabling developers to write queries more easily. These query expressions look a lot like SQL
 
+> You can join, filter, sort, and group data sources with minimal code. These operations can be combined in a single query to obtain more complex results
 
-### Linq 是面向对象的 sql，linq实际上是对内存中数据的查询，使开发人员能够更容易地编写查询。这些查询表达式看起来很像SQL
+#### allows you to write Java code that manipulates in-memory data in the same way that you query a database, for example
+- List, Array
+- SQL result data
+- CSV, XML, JSON document datasets
+- Stream, File stream
 
-> 可以通过最少的代码对数据源进行关联、筛选、排序和分组等操作。这些操作可以在单个查询中组合起来，以获得更复杂的结果，无需for循环与if分支操作数据，内置查询引擎性能卓越
+#### Application Scenarios
+- Result association for RPCS such as Feign/Dubbo during distributed development
+- In-memory computation of heterogeneous system data
+- Use code to organize SQL result data
+- Sorted aggregation of multiple result objects with in-memory paging
+- Semantic object transformation and mapping
+- Clean code, no need for loops and branches to manipulate data
+- Federated access across data sources
 
-#### 允许编写Java代码以查询数据库相同的方式操作内存数据，例如
-- List 集合、Array 数组中的数据
-- CSV、XML、JSON 文档数据集
-- Stream、File 流
-- Redis、SQL、MongoDB数据库结果集
-
-#### 应用场景
-- 分布式开发时 Feign / Dubbo / gRPC / WebService 等 RPC 结果的关联/筛选/聚合/分页
-- 语义化对象转换与映射，团队协作代码更清晰敏捷
-- 异构系统数据的内存计算
-- 使用代码组织 SQL 结果数据
-- 跨数据源的联邦访问
-
-#### 操作语法
+#### Operation syntax
 `From` `Select` `Distinct`、`Join`、`Where`、`Group By`、`Order By`、`Limit`、`Offset`、`...`
 
-#### 使用提示
-⚠️ 注意：操作的对象字段必须存在 get 方法便于 lambda 查找，建议配合 **Lombok** 的 @Getter 注解快速创建字段的 get 访问
+#### Tips
+⚠️ Note: The object field must have a get method to facilitate lambda lookup. It is recommended to use the **Lombok** @Getter annotation to quickly create get access to the field
 
-#### 使用方法
+#### How to Use
+It has zero external dependencies and is only 50kb in size
 ```xml
-<!--包内零外部依赖，体积仅仅50kb-->
 <dependency>
     <groupId>xyz.erupt</groupId>
     <artifactId>linq.j</artifactId>
@@ -181,10 +181,10 @@ public class ObjectQuery{
 
 ```
 
-#### 后续迭代计划
+#### Next iteration plan
 
-- [ ] 支持多个查询结果集进行组合: UNION ALL、UNION、INTERSECT、EXCEPT、UNION BY NAME
-- [ ] 支持窗口函数
-- [ ] 支持 Nested loop join
-- [x] 支持 having
-- [x] 支持分组列格式化 group by date(created_at)
+- [ ] Supports combining multiple query result sets: UNION ALL, UNION, INTERSECT, EXCEPT, UNION BY NAME
+- [ ] Supports window functions
+- [ ] Support Nested loop join
+- [x] supports having
+- [x] Support group column format group by date(created_at)
