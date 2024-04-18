@@ -14,7 +14,6 @@ import xyz.erupt.linq.util.ReflectField;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,7 +27,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
 
     private final Dql dql = new Dql();
 
-    public static Linq from(Collection<?> data) {
+    public static Linq from(List<?> data) {
         Linq linq = new Linq();
         linq.dql.setFrom(data);
         return linq;
@@ -142,7 +141,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public <T, S> Linq join(JoinMethod joinMethod, Collection<T> target, SFunction<T, Object> onL, SFunction<S, Object> onR) {
+    public <T, S> Linq join(JoinMethod joinMethod, List<T> target, SFunction<T, Object> onL, SFunction<S, Object> onR) {
         this.dql.getJoinSchemas().add(new JoinSchema<>(joinMethod, target, onL, onR));
         return this;
     }

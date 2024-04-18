@@ -5,7 +5,7 @@ import xyz.erupt.linq.consts.JoinMethod;
 import xyz.erupt.linq.lambda.LambdaSee;
 import xyz.erupt.linq.lambda.SFunction;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.function.BiFunction;
 
 public class JoinSchema<T> {
@@ -14,7 +14,7 @@ public class JoinSchema<T> {
 
     private final JoinExchange joinExchange;
 
-    private final Collection<T> target;
+    private final List<T> target;
 
     private final Class<T> clazz;
 
@@ -26,7 +26,7 @@ public class JoinSchema<T> {
     private SFunction<?, ?> ron;
 
 
-    public JoinSchema(JoinMethod joinMethod, Collection<T> target, SFunction<T, ?> lon, SFunction<?, ?> ron) {
+    public JoinSchema(JoinMethod joinMethod, List<T> target, SFunction<T, ?> lon, SFunction<?, ?> ron) {
         this.joinMethod = joinMethod;
         this.target = target;
         this.lon = lon;
@@ -35,7 +35,7 @@ public class JoinSchema<T> {
         this.joinExchange = JoinExchange.HASH;
     }
 
-    public JoinSchema(JoinMethod joinMethod, Collection<T> target, BiFunction<T, Row, Boolean> on) {
+    public JoinSchema(JoinMethod joinMethod, List<T> target, BiFunction<T, Row, Boolean> on) {
         this.joinMethod = joinMethod;
         this.target = target;
         this.on = on;
@@ -51,7 +51,7 @@ public class JoinSchema<T> {
         return joinExchange;
     }
 
-    public Collection<T> getTarget() {
+    public List<T> getTarget() {
         return target;
     }
 

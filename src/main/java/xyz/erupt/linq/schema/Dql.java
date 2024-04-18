@@ -1,13 +1,14 @@
 package xyz.erupt.linq.schema;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 public class Dql {
 
     private boolean distinct = false;
 
-    private Collection<?> from;
+    private List<?> from;
 
     // columns definition
     private final List<Column> columns = new ArrayList<>();
@@ -37,11 +38,11 @@ public class Dql {
         return distinct;
     }
 
-    public Collection<?> getFrom() {
+    public List<?> getFrom() {
         return from;
     }
 
-    public void setFrom(Collection<?> from) {
+    public void setFrom(List<?> from) {
         this.from = from;
     }
 

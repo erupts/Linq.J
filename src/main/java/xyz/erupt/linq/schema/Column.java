@@ -3,7 +3,6 @@ package xyz.erupt.linq.schema;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class Column {
 
@@ -12,9 +11,6 @@ public class Column {
     private String field;
 
     private String alias;
-
-    // Column unfold process
-    private Supplier<List<Column>> unfold;
 
     // Column value convert handler
     private Function<Row, ?> rowConvert;
@@ -89,7 +85,7 @@ public class Column {
 
     @Override
     public int hashCode() {
-        return Objects.hash(table, field, alias);
+        return Objects.hash(table.getName(), field, alias);
     }
 
     @Override

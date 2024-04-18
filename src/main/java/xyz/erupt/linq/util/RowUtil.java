@@ -8,7 +8,10 @@ import xyz.erupt.linq.schema.Row;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.temporal.Temporal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class RowUtil {
@@ -18,29 +21,41 @@ public class RowUtil {
             CharSequence[].class, Character[].class, Number[].class, Date[].class, Temporal[].class, Boolean[].class
     };
 
-    public static List<Row> listObjectToRow(Collection<?> objects) {
+    public static List<Row> listToTable(List<?> objects) {
         List<Row> list = new ArrayList<>(objects.size());
-        objects.forEach(obj -> Optional.ofNullable(obj).ifPresent(it -> list.add(objectToRow(it))));
+        Class<?> clazz = null;
+        List<Field> fields = null;
+        boolean simpleClass = false;
+        boolean first = true;
+        for (Object obj : objects) {
+            if (null != obj) {
+                if (first) {
+                    clazz = obj.getClass();
+                    fields = ReflectField.getFields(clazz);
+                    for (Class<?> sc : SIMPLE_CLASS) {
+                        if (sc.isAssignableFrom(clazz)) simpleClass = true;
+                    }
+                    first = false;
+                }
+                if (simpleClass) {
+                    list.add(new Row(1) {{
+                        this.put(Columns.of(Th::is), obj);
+                    }});
+                } else {
+                    Row row = new Row(fields.size());
+                    try {
+                        for (Field field : fields) {
+                            if (!field.isAccessible()) field.setAccessible(true);
+                            row.put(new Column(clazz, field.getName(), field.getName()), field.get(obj));
+                        }
+                    } catch (Exception e) {
+                        throw new LinqException(e);
+                    }
+                    list.add(row);
+                }
+            }
+        }
         return list;
-    }
-
-    public static Row objectToRow(Object obj) {
-        Row row = new Row();
-        for (Class<?> sc : SIMPLE_CLASS) {
-            if (sc.isAssignableFrom(obj.getClass())) {
-                row.put(Columns.of(Th::is), obj);
-                return row;
-            }
-        }
-        try {
-            for (Field field : ReflectField.getFields(obj.getClass())) {
-                if (!field.isAccessible()) field.setAccessible(true);
-                row.put(new Column(obj.getClass(), field.getName(), field.getName()), field.get(obj));
-            }
-        } catch (Exception e) {
-            throw new LinqException(e);
-        }
-        return row;
     }
 
     public static <T> T rowToObject(Row row, Class<T> clazz) {
