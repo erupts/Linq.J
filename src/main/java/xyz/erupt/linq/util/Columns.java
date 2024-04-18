@@ -7,7 +7,6 @@ import xyz.erupt.linq.lambda.SFunction;
 import xyz.erupt.linq.schema.Column;
 import xyz.erupt.linq.schema.Row;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -50,7 +49,7 @@ public class Columns {
     public static Column ofs(Function<Row, ?> fun, String alias) {
         Column column = new Column();
         column.setTable(VirtualColumn.class);
-        column.setField(VirtualColumn.lambdaInfo().getField());
+        column.setField(VirtualColumn.lambdaStr().getField());
         column.setAlias(alias);
         column.setRowConvert(fun);
         return column;
@@ -62,7 +61,7 @@ public class Columns {
 
 
     public static Column count(String alias) {
-        Column column = new Column(VirtualColumn.class, VirtualColumn.lambdaInfo().getField(), alias);
+        Column column = new Column(VirtualColumn.class, VirtualColumn.lambdaStr().getField(), alias);
         column.setGroupByFun(it -> BigDecimal.valueOf(it.size()));
         return column;
     }

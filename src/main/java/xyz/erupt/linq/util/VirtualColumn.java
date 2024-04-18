@@ -4,26 +4,20 @@ import xyz.erupt.linq.lambda.LambdaInfo;
 import xyz.erupt.linq.lambda.LambdaSee;
 
 public class VirtualColumn {
-
-    private Integer number;
-
-    private String string;
-
-    private Boolean bool;
-
-    public static LambdaInfo lambdaInfo() {
-        return LambdaSee.info(VirtualColumn::getString);
+    public Integer number() {
+        return null;
     }
 
-    public Integer getNumber() {
-        return number;
+    public String string() {
+        return null;
     }
 
-    public String getString() {
-        return string;
+    public static LambdaInfo lambdaStr() {
+        return LambdaSee.info(VirtualColumn::string);
     }
 
-    public Boolean getBool() {
-        return bool;
+    public static LambdaInfo lambdaNumber() {
+        return LambdaSee.info(VirtualColumn::number);
     }
+
 }
