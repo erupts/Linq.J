@@ -37,10 +37,7 @@ public class DatasetCustomerTest {
     @Test
     public void allData() {
         List<Map<String, Object>> result = Linq.from(dataset)
-                .select(
-                        Columns.of(CustomerChurnModel::getAge),
-                        Columns.of(CustomerChurnModel::getGender)
-                )
+                .select(CustomerChurnModel::getAge, CustomerChurnModel::getGender)
                 .writeMap();
         System.out.println(result.size());
     }
@@ -50,12 +47,8 @@ public class DatasetCustomerTest {
         List<Map<String, Object>> result = Linq.from(dataset)
                 .distinct()
                 .leftJoin(customerInfos, CustomerInfo::getCustomerId, CustomerChurnModel::getCustomerId)
-                .select(
-                        Columns.of(CustomerChurnModel::getAge),
-                        Columns.of(CustomerChurnModel::getGender),
-                        Columns.of(CustomerInfo::getNickName)
-//                        Columns.sum(CustomerChurnModel::getAge, "sum")
-                )
+                .select(CustomerChurnModel::getAge, CustomerChurnModel::getGender)
+                .select(CustomerInfo::getNickName)
                 .like(CustomerChurnModel::getGender, "Male")
                 .between(CustomerChurnModel::getAge, 10, 20)
                 .eq(CustomerChurnModel::getExited, true)

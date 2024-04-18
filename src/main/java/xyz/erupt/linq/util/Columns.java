@@ -15,12 +15,11 @@ import java.util.function.Function;
 
 public class Columns {
 
-    private static <T> Column fromLambda(SFunction<T, ?> fun) {
-        LambdaInfo lambdaInfo = LambdaSee.info(fun);
-        return fromLambda(fun, lambdaInfo.getField());
+    public static <R> Column of(SFunction<R, ?> fun) {
+        return of(fun, LambdaSee.field(fun));
     }
 
-    private static <T> Column fromLambda(SFunction<T, ?> fun, String alias) {
+    public static <R> Column of(SFunction<R, ?> fun, String alias) {
         LambdaInfo lambdaInfo = LambdaSee.info(fun);
         Column column = new Column();
         column.setTable(lambdaInfo.getClazz());
@@ -29,21 +28,12 @@ public class Columns {
         return column;
     }
 
-    // Column.All → select *
-    public static <R> Column all(Class<R> r) {
-        Column column = new Column();
-        column.setUnfold(() -> {
-            List<Column> columns = new ArrayList<>();
-            for (Field field : ReflectField.getFields(r)) {
-                columns.add(new Column(r, field.getName(), field.getName()));
-            }
-            return columns;
-        });
-        return column;
+    public static <R, A> Column of(SFunction<R, ?> fun, SFunction<A, ?> alias) {
+        return of(fun, LambdaSee.field(alias));
     }
 
     public static <R, S> Column ofx(SFunction<R, S> fun, Function<S, Object> convert, String alias) {
-        Column column = Columns.fromLambda(fun);
+        Column column = Columns.of(fun);
         column.setAlias(alias);
         column.setRowConvert(row -> convert.apply(row.get(fun)));
         return column;
@@ -55,19 +45,6 @@ public class Columns {
 
     public static <R, S> Column ofx(SFunction<R, S> fun, Function<S, Object> convert) {
         return ofx(fun, convert, LambdaSee.field(fun));
-    }
-
-
-    public static <R> Column of(SFunction<R, ?> fun) {
-        return Columns.fromLambda(fun);
-    }
-
-    public static <R> Column of(SFunction<R, ?> fun, String alias) {
-        return Columns.fromLambda(fun, alias);
-    }
-
-    public static <R, A> Column of(SFunction<R, ?> fun, SFunction<A, ?> alias) {
-        return of(fun, LambdaSee.field(alias));
     }
 
     public static Column ofs(Function<Row, ?> fun, String alias) {
@@ -82,6 +59,7 @@ public class Columns {
     public static <A> Column ofs(Function<Row, ?> fun, SFunction<A, ?> alias) {
         return ofs(fun, LambdaSee.field(alias));
     }
+
 
     public static Column count(String alias) {
         Column column = new Column(VirtualColumn.class, VirtualColumn.lambdaInfo().getField(), alias);
@@ -198,6 +176,7 @@ public class Columns {
         return sum(fun, LambdaSee.field(alias));
     }
 
+    // select object[]
     public static <R> Column groupArray(SFunction<R, ?> fun, String alias) {
         return groupByProcess(fun, alias, (column, list) -> {
             List<Object> result = new ArrayList<>();
@@ -217,19 +196,6 @@ public class Columns {
         Column column = Columns.of(fun, alias);
         column.setGroupByFun(it -> groupByProcess.apply(column.getRawColumn(), it));
         return column;
-    }
-
-    // column common process
-    public static List<Column> columnsUnfold(Column... columns) {
-        List<Column> cols = new ArrayList<>();
-        for (Column column : columns) {
-            if (null == column.getUnfold()) {
-                cols.add(column);
-            } else {
-                cols.addAll(column.getUnfold().get());
-            }
-        }
-        return cols;
     }
 
 }

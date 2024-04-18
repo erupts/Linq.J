@@ -52,11 +52,9 @@ public class DatasetStudentTest {
         List<StudentVo> studentVos = Linq.from(students)
                 .innerJoin(studentScores, StudentScore::getStudentId, Student::getId)
                 .innerJoin(studentSubjects, StudentSubject::getId, StudentScore::getSubjectId)
-                .select(
-                        Columns.of(Student::getName, StudentVo::getName),
-                        Columns.of(StudentSubject::getName, StudentVo::getSubjectName),
-                        Columns.of(StudentScore::getScore, StudentVo::getScore)
-                )
+                .select(Student::getName, StudentVo::getName)
+                .select(StudentSubject::getName, StudentVo::getSubjectName)
+                .select(StudentScore::getScore, StudentVo::getScore)
                 .write(StudentVo.class);
         assert studentScores.size() == studentVos.size();
     }
@@ -92,7 +90,7 @@ public class DatasetStudentTest {
         Object s = Linq.from(students)
                 .orderBy(Student::getAge, OrderByDirection.DESC)
                 .orderBy(Student::getId, OrderByDirection.DESC)
-                .select(Columns.all(Student.class))
+                .select(Student.class)
                 .writeMap();
     }
 

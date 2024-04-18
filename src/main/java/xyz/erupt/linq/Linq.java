@@ -4,11 +4,15 @@ import xyz.erupt.linq.consts.JoinMethod;
 import xyz.erupt.linq.engine.Engine;
 import xyz.erupt.linq.engine.EruptEngine;
 import xyz.erupt.linq.grammar.*;
+import xyz.erupt.linq.lambda.LambdaSee;
 import xyz.erupt.linq.lambda.SFunction;
 import xyz.erupt.linq.lambda.Th;
 import xyz.erupt.linq.schema.*;
 import xyz.erupt.linq.util.Columns;
+import xyz.erupt.linq.util.ReflectField;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -36,40 +40,40 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     public static Linq from(Boolean... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
     }
 
     public static Linq from(Byte... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
     }
 
     public static Linq from(Character... table) {
-        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Columns.of(Th::is));
+        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Th::is);
     }
 
     public static Linq from(String... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
     }
 
     public static Linq from(Short... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
     }
 
     public static Linq from(Integer... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
     }
 
     public static Linq from(Long... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
     }
 
     public static Linq from(Float... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
     }
 
 
     public static Linq from(Double... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Columns.of(Th::is));
+        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
     }
 
     @Override
@@ -80,7 +84,19 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
 
     @Override
     public Linq select(Column... columns) {
-        this.dql.getColumns().addAll(Columns.columnsUnfold(columns));
+        for (Column column : columns) {
+            this.dql.getColumns().add(column);
+        }
+        return this;
+    }
+
+    @Override
+    public <T> Linq select(Class<T> table) {
+        List<Column> columns = new ArrayList<>();
+        for (Field field : ReflectField.getFields(table)) {
+            columns.add(new Column(table, field.getName(), field.getName()));
+        }
+        this.dql.getColumns().addAll(columns);
         return this;
     }
 
@@ -104,6 +120,18 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
         for (SFunction<T, ?> col : columns) {
             this.dql.getColumns().add(Columns.of(col));
         }
+        return this;
+    }
+
+    @Override
+    public <T> Linq select(SFunction<T, ?> column, String alias) {
+        this.dql.getColumns().add(Columns.of(column, alias));
+        return this;
+    }
+
+    @Override
+    public <T, A> Linq select(SFunction<T, ?> column, SFunction<A, ?> alias) {
+        this.dql.getColumns().add(Columns.of(column, LambdaSee.field(alias)));
         return this;
     }
 

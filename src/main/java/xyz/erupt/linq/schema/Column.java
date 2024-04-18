@@ -36,7 +36,6 @@ public class Column {
         Column column = new Column(this.table, this.field, this.field);
         column.setGroupByFun(this.getGroupByFun());
         column.setRowConvert(this.getRowConvert());
-        column.setUnfold(this.unfold);
         return column;
     }
 
@@ -78,14 +77,6 @@ public class Column {
 
     public void setRowConvert(Function<Row, ?> rowConvert) {
         this.rowConvert = rowConvert;
-    }
-
-    public Supplier<List<Column>> getUnfold() {
-        return unfold;
-    }
-
-    public void setUnfold(Supplier<List<Column>> unfold) {
-        this.unfold = unfold;
     }
 
     @Override
