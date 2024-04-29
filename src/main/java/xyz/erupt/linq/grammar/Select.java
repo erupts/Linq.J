@@ -13,13 +13,14 @@ public interface Select {
     //select *
     <T> Linq select(Class<T> table);
 
-    <T> Linq selectExclude(SFunction<T, ?>... columns);
-
     <T> Linq select(SFunction<T, ?>... columns);
 
     <T> Linq select(SFunction<T, ?> column, String alias);
 
-    <T, A> Linq select(SFunction<T, ?> column, SFunction<A, ?> alias);
+    <T, A> Linq selectAs(SFunction<T, ?> column, SFunction<A, ?> alias);
+
+    <T> Linq selectExclude(SFunction<T, ?>... columns);
+
 
 
 }

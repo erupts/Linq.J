@@ -52,9 +52,9 @@ public class DatasetStudentTest {
         List<StudentVo> studentVos = Linq.from(students)
                 .innerJoin(studentScores, StudentScore::getStudentId, Student::getId)
                 .innerJoin(studentSubjects, StudentSubject::getId, StudentScore::getSubjectId)
-                .select(Student::getName, StudentVo::getName)
-                .select(StudentSubject::getName, StudentVo::getSubjectName)
-                .select(StudentScore::getScore, StudentVo::getScore)
+                .selectAs(Student::getName, StudentVo::getName)
+                .selectAs(StudentSubject::getName, StudentVo::getSubjectName)
+                .selectAs(StudentScore::getScore, StudentVo::getScore)
                 .write(StudentVo.class);
         assert studentScores.size() == studentVos.size();
     }

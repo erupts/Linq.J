@@ -90,7 +90,7 @@ public class Column {
 
     @Override
     public String toString() {
-        return table.getName() + "." + field + "(" + alias + ")";
+        return table.getName() + "." + field + " as " + alias;
     }
 
 

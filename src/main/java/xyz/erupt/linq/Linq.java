@@ -101,6 +101,15 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
 
     @SafeVarargs
     @Override
+    public final <T> Linq select(SFunction<T, ?>... columns) {
+        for (SFunction<T, ?> column : columns) {
+            this.dql.getColumns().add(Columns.of(column));
+        }
+        return this;
+    }
+
+    @SafeVarargs
+    @Override
     public final <T> Linq selectExclude(SFunction<T, ?>... columns) {
         this.dql.getColumns().removeIf(it -> {
             for (SFunction<T, ?> column : columns) {
@@ -114,22 +123,13 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    @SafeVarargs
-    public final <T> Linq select(SFunction<T, ?>... columns) {
-        for (SFunction<T, ?> col : columns) {
-            this.dql.getColumns().add(Columns.of(col));
-        }
-        return this;
-    }
-
-    @Override
     public <T> Linq select(SFunction<T, ?> column, String alias) {
         this.dql.getColumns().add(Columns.of(column, alias));
         return this;
     }
 
     @Override
-    public <T, A> Linq select(SFunction<T, ?> column, SFunction<A, ?> alias) {
+    public <T, A> Linq selectAs(SFunction<T, ?> column, SFunction<A, ?> alias) {
         this.dql.getColumns().add(Columns.of(column, LambdaSee.field(alias)));
         return this;
     }
