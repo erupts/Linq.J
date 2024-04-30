@@ -15,7 +15,7 @@ public interface Select {
 
     <T> Linq select(SFunction<T, ?>... columns);
 
-    <T> Linq select(SFunction<T, ?> column, String alias);
+    <T> Linq selectAs(SFunction<T, ?> column, String alias);
 
     <T, A> Linq selectAs(SFunction<T, ?> column, SFunction<A, ?> alias);
 

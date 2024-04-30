@@ -78,7 +78,7 @@ public class LinqTest {
     public void selectTest() {
         List<Map<String, Object>> list = Linq.from(source)
                 .select(TestSource::getName, TestSource::getDate, TestSource::getTags)
-                .select(TestSource::getTags, "tag2")
+                .selectAs(TestSource::getTags, "tag2")
                 .select(Columns.ofx(TestSource::getId, id -> id + "xxxx"))
                 .writeMap();
         assert Objects.equals(source.get(0).getDate().toString(), list.get(0).get("date").toString());
@@ -128,21 +128,21 @@ public class LinqTest {
         List<Map<String, Object>> leftJoinRes = Linq.from(source)
                 .leftJoin(target, TestSourceExt::getId, TestSource::getId)
                 .select(TestSource.class)
-                .select(TestSourceExt::getName, "name2")
+                .selectAs(TestSourceExt::getName, "name2")
                 .writeMap();
         assert source.size() == leftJoinRes.size();
 
         List<Map<String, Object>> rightJoinRes = Linq.from(source)
                 .rightJoin(target, TestSourceExt::getId, TestSource::getId)
                 .select(TestSource.class)
-                .select(TestSourceExt::getName, "name2")
+                .selectAs(TestSourceExt::getName, "name2")
                 .writeMap();
         assert target.size() == rightJoinRes.size();
 
         List<Map<String, Object>> innerJoin = Linq.from(source)
                 .innerJoin(target, TestSourceExt::getId, TestSource::getTags)
                 .select(TestSource.class)
-                .select(TestSourceExt::getName, "name2")
+                .selectAs(TestSourceExt::getName, "name2")
                 .writeMap();
         assert innerJoin.isEmpty();
     }
@@ -153,8 +153,8 @@ public class LinqTest {
                 .leftJoin(target, TestSourceExt::getId, TestSource::getId)
                 .leftJoin(target2, TestSourceExt2::getId, TestSource::getId)
                 .select(TestSource.class)
-                .select(TestSourceExt::getName, "name2")
                 .select(TestSourceExt2::getValue)
+                .selectAs(TestSourceExt::getName, "name2")
                 .writeMap();
         assert testSourceInfo.size() > source.size();
     }

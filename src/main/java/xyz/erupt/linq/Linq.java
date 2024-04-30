@@ -123,7 +123,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public <T> Linq select(SFunction<T, ?> column, String alias) {
+    public <T> Linq selectAs(SFunction<T, ?> column, String alias) {
         this.dql.getColumns().add(Columns.of(column, alias));
         return this;
     }
