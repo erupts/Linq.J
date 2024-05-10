@@ -50,9 +50,9 @@ public class DatasetStudentTest {
     @Test
     public void joinTest() {
         List<StudentVo> studentVos = Linq.from(students)
-                .innerJoin(studentScores, StudentScore::getStudentId, Student::getId)
-                .innerJoin(studentSubjects, StudentSubject::getId, StudentScore::getSubjectId)
-                .selectAs(Student::getName, StudentVo::getName)
+                .leftJoin(studentScores, StudentScore::getStudentId, Student::getId)
+                .leftJoin(studentSubjects, StudentSubject::getId, StudentScore::getSubjectId)
+                .selectAs(Student::getName, (row, name) -> name + row.get(Student::getAge), StudentVo::getName)
                 .selectAs(StudentSubject::getName, StudentVo::getSubjectName)
                 .selectAs(StudentScore::getScore, StudentVo::getScore)
                 .write(StudentVo.class);

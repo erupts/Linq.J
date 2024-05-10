@@ -14,10 +14,12 @@ import java.util.function.Function;
 
 public class Columns {
 
+    @Deprecated
     public static <R> Column of(SFunction<R, ?> fun) {
         return of(fun, LambdaSee.field(fun));
     }
 
+    @Deprecated
     public static <R> Column of(SFunction<R, ?> fun, String alias) {
         LambdaInfo lambdaInfo = LambdaSee.info(fun);
         Column column = new Column();
@@ -27,16 +29,19 @@ public class Columns {
         return column;
     }
 
+    @Deprecated
     public static <R, A> Column of(SFunction<R, ?> fun, SFunction<A, ?> alias) {
         return of(fun, LambdaSee.field(alias));
     }
 
+    @Deprecated
     public static <R, S> Column ofx(SFunction<R, S> fun, Function<S, Object> convert, String alias) {
         Column column = Columns.of(fun);
         column.setAlias(alias);
         column.setRowConvert(row -> convert.apply(row.get(fun)));
         return column;
     }
+
 
     public static <R, S, A> Column ofx(SFunction<R, S> fun, Function<S, Object> convert, SFunction<A, ?> alias) {
         return ofx(fun, convert, LambdaSee.field(alias));
@@ -46,22 +51,24 @@ public class Columns {
         return ofx(fun, convert, LambdaSee.field(fun));
     }
 
+    @Deprecated
     public static Column ofs(Function<Row, ?> fun, String alias) {
         Column column = new Column();
         column.setTable(VirtualColumn.class);
-        column.setField(VirtualColumn.lambdaStr().getField());
+        column.setField(VirtualColumn.lambdaColumn().getField());
         column.setAlias(alias);
         column.setRowConvert(fun);
         return column;
     }
 
+    @Deprecated
     public static <A> Column ofs(Function<Row, ?> fun, SFunction<A, ?> alias) {
         return ofs(fun, LambdaSee.field(alias));
     }
 
 
     public static Column count(String alias) {
-        Column column = new Column(VirtualColumn.class, VirtualColumn.lambdaStr().getField(), alias);
+        Column column = new Column(VirtualColumn.class, VirtualColumn.lambdaColumn().getField(), alias);
         column.setGroupByFun(it -> BigDecimal.valueOf(it.size()));
         return column;
     }

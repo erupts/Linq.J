@@ -10,11 +10,13 @@ import xyz.erupt.linq.lambda.Th;
 import xyz.erupt.linq.schema.*;
 import xyz.erupt.linq.util.Columns;
 import xyz.erupt.linq.util.ReflectField;
+import xyz.erupt.linq.util.VirtualColumn;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -131,6 +133,38 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     @Override
     public <T, A> Linq selectAs(SFunction<T, ?> column, SFunction<A, ?> alias) {
         this.dql.getColumns().add(Columns.of(column, LambdaSee.field(alias)));
+        return this;
+    }
+
+    @Override
+    public <T, F> Linq selectAs(SFunction<T, F> column, BiFunction<Row, F, Object> convert, String alias) {
+        Column col = Columns.of(column, alias);
+        col.setRowConvert(row -> convert.apply(row, row.get(column)));
+        this.dql.getColumns().add(col);
+        return this;
+    }
+
+    @Override
+    public <T, A, F> Linq selectAs(SFunction<T, F> column, BiFunction<Row, F, Object> convert, SFunction<A, ?> alias) {
+        Column col = Columns.of(column, LambdaSee.field(alias));
+        col.setRowConvert(row -> convert.apply(row, row.get(column)));
+        this.dql.getColumns().add(col);
+        return this;
+    }
+
+    @Override
+    public Linq selectRowAs(Function<Row, Object> convert, String alias) {
+        Column column = Columns.of(VirtualColumn::col, alias);
+        column.setRowConvert(convert);
+        this.dql.getColumns().add(column);
+        return this;
+    }
+
+    @Override
+    public <A> Linq selectRowAs(Function<Row, Object> convert, SFunction<A, ?> alias) {
+        Column column = Columns.of(VirtualColumn::col, alias);
+        column.setRowConvert(convert);
+        this.dql.getColumns().add(column);
         return this;
     }
 

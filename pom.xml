@@ -6,7 +6,7 @@
 
     <groupId>xyz.erupt</groupId>
     <artifactId>linq.j</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.5-1.0</version>
     <name>Linq.j</name>
 
     <description>Linq.J in Java , Lambda Language Integrated Query library</description>
@@ -167,5 +167,10 @@
         </profile>
     </profiles>
 
-
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <url>http://nexus.ideamake.cn/repository/maven-public/</url>
+        </repository>
+    </distributionManagement>
 </project>

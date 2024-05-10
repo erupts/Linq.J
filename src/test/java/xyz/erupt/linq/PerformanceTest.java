@@ -23,7 +23,7 @@ public class PerformanceTest {
 
     @Before
     public void before() {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000000; i++) {
             testTos.add(new TestTo(i, String.valueOf((char) i)));
         }
     }

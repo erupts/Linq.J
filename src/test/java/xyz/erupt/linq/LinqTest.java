@@ -37,6 +37,7 @@ public class LinqTest {
         target2.add(new TestSourceExt2(1, "A"));
         target2.add(new TestSourceExt2(1, 1));
         target2.add(new TestSourceExt2(1, true));
+        target2.add(new TestSourceExt2(8, "Berg"));
     }
 
     @Test
@@ -117,10 +118,20 @@ public class LinqTest {
 
     @Test
     public void customerSelect() {
-        List<String> result = Linq.from(source).select(Columns.ofs(it -> it.get(TestSource::getName) + " Borg", "Hello")).write(String.class);
+        List<String> result = Linq.from(source).selectRowAs(it -> it.get(TestSource::getName) + " Borg", "Hello").write(String.class);
         for (int i = 0; i < result.size(); i++) {
             assert (source.get(i).getName() + " Borg").equals(result.get(i));
         }
+    }
+
+    @Test
+    public void strJoinTest() {
+        List<Map<String, Object>> join = Linq.from(source)
+                .leftJoin(target2, TestSourceExt2::getValue, TestSource::getName)
+                .select(TestSource.class)
+                .select(TestSourceExt2::getValue)
+                .writeMap();
+        System.out.println(join);
     }
 
     @Test
