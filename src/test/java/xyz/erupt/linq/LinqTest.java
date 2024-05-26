@@ -80,7 +80,7 @@ public class LinqTest {
         List<Map<String, Object>> list = Linq.from(source)
                 .select(TestSource::getName, TestSource::getDate, TestSource::getTags)
                 .selectAs(TestSource::getTags, "tag2")
-                .select(Columns.ofx(TestSource::getId, id -> id + "xxxx"))
+                .select(TestSource::getId, (row, id) -> id + "xxxx")
                 .writeMap();
         assert Objects.equals(source.get(0).getDate().toString(), list.get(0).get("date").toString());
         assert Objects.equals(list.get(0).get("tags"), list.get(0).get("tag2"));
@@ -89,9 +89,9 @@ public class LinqTest {
     @Test
     public void selectProcessTest2() {
         List<Map<String, Object>> list = Linq.from(source)
-                .select(Columns.ofx(TestSource::getId, id -> id + "xxxx"))
+                .select(TestSource::getId, (row, id) -> id + "xxxx")
                 .select(Columns.sum(TestSource::getId, "sum"))
-                .groupBy(Columns.ofx(TestSource::getId, id -> id))
+                .groupBy(TestSource::getId, (row, id) -> id)
                 .having(row -> Integer.parseInt(row.get("sum").toString()) > 4)
                 .writeMap();
         System.out.println(list);

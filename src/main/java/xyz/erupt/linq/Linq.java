@@ -110,6 +110,14 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
         return this;
     }
 
+    @Override
+    public <T, F> Linq select(SFunction<T, F> column, BiFunction<Row, F, Object> convert) {
+        Column col = Columns.of(column);
+        col.setRowConvert(row -> convert.apply(row, row.get(column)));
+        this.dql.getColumns().add(col);
+        return this;
+    }
+
     @SafeVarargs
     @Override
     public final <T> Linq selectExclude(SFunction<T, ?>... columns) {
@@ -146,10 +154,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
 
     @Override
     public <T, A, F> Linq selectAs(SFunction<T, F> column, BiFunction<Row, F, Object> convert, SFunction<A, ?> alias) {
-        Column col = Columns.of(column, LambdaSee.field(alias));
-        col.setRowConvert(row -> convert.apply(row, row.get(column)));
-        this.dql.getColumns().add(col);
-        return this;
+        return selectAs(column, convert, LambdaSee.field(alias));
     }
 
     @Override
@@ -162,10 +167,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
 
     @Override
     public <A> Linq selectRowAs(Function<Row, Object> convert, SFunction<A, ?> alias) {
-        Column column = Columns.of(VirtualColumn::col, alias);
-        column.setRowConvert(convert);
-        this.dql.getColumns().add(column);
-        return this;
+        return selectRowAs(convert, LambdaSee.field(alias));
     }
 
     @Override
@@ -208,6 +210,13 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
             cols[i] = Columns.of(columns[i]);
         }
         return groupBy(cols);
+    }
+
+    @Override
+    public <T, F> Linq groupBy(SFunction<T, F> column, BiFunction<Row, F, Object> convert) {
+        Column col = Columns.of(column);
+        col.setRowConvert(row -> convert.apply(row, row.get(column)));
+        return groupBy(col);
     }
 
     @Override

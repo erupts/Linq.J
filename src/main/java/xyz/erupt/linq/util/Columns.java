@@ -14,12 +14,10 @@ import java.util.function.Function;
 
 public class Columns {
 
-    @Deprecated
     public static <R> Column of(SFunction<R, ?> fun) {
         return of(fun, LambdaSee.field(fun));
     }
 
-    @Deprecated
     public static <R> Column of(SFunction<R, ?> fun, String alias) {
         LambdaInfo lambdaInfo = LambdaSee.info(fun);
         Column column = new Column();
@@ -29,7 +27,6 @@ public class Columns {
         return column;
     }
 
-    @Deprecated
     public static <R, A> Column of(SFunction<R, ?> fun, SFunction<A, ?> alias) {
         return of(fun, LambdaSee.field(alias));
     }
@@ -42,11 +39,7 @@ public class Columns {
         return column;
     }
 
-
-    public static <R, S, A> Column ofx(SFunction<R, S> fun, Function<S, Object> convert, SFunction<A, ?> alias) {
-        return ofx(fun, convert, LambdaSee.field(alias));
-    }
-
+    @Deprecated
     public static <R, S> Column ofx(SFunction<R, S> fun, Function<S, Object> convert) {
         return ofx(fun, convert, LambdaSee.field(fun));
     }
