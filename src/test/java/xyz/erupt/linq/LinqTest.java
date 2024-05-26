@@ -37,6 +37,7 @@ public class LinqTest {
         target2.add(new TestSourceExt2(1, "A"));
         target2.add(new TestSourceExt2(1, 1));
         target2.add(new TestSourceExt2(1, true));
+        target2.add(new TestSourceExt2(8, "Berg"));
     }
 
     @Test
@@ -48,8 +49,8 @@ public class LinqTest {
     @Test
     public void fromSingletonObject() {
         TestSource source = new TestSource(1, "Thanos", new Date(), new String[]{"x", "y", "z"});
-        String name = Linq.from(source).select(Columns.of(TestSource::getName)).writeOne(String.class);
-        TestSource testSourceResult = Linq.from(source).select(Columns.all(TestSource.class)).writeOne(TestSource.class);
+        String name = Linq.from(source).select(TestSource::getName).writeOne(String.class);
+        TestSource testSourceResult = Linq.from(source).select(TestSource.class).writeOne(TestSource.class);
         assert "Thanos".equals(name);
         assert source.getId().equals(testSourceResult.getId());
         assert source.getName().equals(testSourceResult.getName());
@@ -67,20 +68,19 @@ public class LinqTest {
 
     @Test
     public void writeSimpleType() {
-        List<String[]> arrays = Linq.from(source).select(Columns.of(TestSource::getTags)).write(String[].class);
-        List<Date> dates = Linq.from(source).select(Columns.of(TestSource::getId)).write(Date.class);
-        List<Integer> integers = Linq.from(source).select(Columns.of(TestSource::getId)).write(Integer.class);
-        List<String> strings = Linq.from(source).select(Columns.of(TestSource::getName)).write(String.class);
+        List<String[]> arrays = Linq.from(source).select(TestSource::getTags).write(String[].class);
+        List<Date> dates = Linq.from(source).select(TestSource::getId).write(Date.class);
+        List<Integer> integers = Linq.from(source).select(TestSource::getId).write(Integer.class);
+        List<String> strings = Linq.from(source).select(TestSource::getName).write(String.class);
         assert !arrays.isEmpty() && !dates.isEmpty() && !integers.isEmpty() && !strings.isEmpty();
     }
 
     @Test
     public void selectTest() {
         List<Map<String, Object>> list = Linq.from(source)
-                .select(TestSource::getName, TestSource::getDate)
-                .select(Columns.of(TestSource::getTags))
-                .select(Columns.of(TestSource::getTags, "tag2"))
-                .select(Columns.ofx(TestSource::getId, id -> id + "xxxx"))
+                .select(TestSource::getName, TestSource::getDate, TestSource::getTags)
+                .selectAs(TestSource::getTags, "tag2")
+                .select(TestSource::getId, (row, id) -> id + "xxxx")
                 .writeMap();
         assert Objects.equals(source.get(0).getDate().toString(), list.get(0).get("date").toString());
         assert Objects.equals(list.get(0).get("tags"), list.get(0).get("tag2"));
@@ -89,9 +89,9 @@ public class LinqTest {
     @Test
     public void selectProcessTest2() {
         List<Map<String, Object>> list = Linq.from(source)
-                .select(Columns.ofx(TestSource::getId, id -> id + "xxxx"))
+                .select(TestSource::getId, (row, id) -> id + "xxxx")
                 .select(Columns.sum(TestSource::getId, "sum"))
-                .groupBy(Columns.ofx(TestSource::getId, id -> id))
+                .groupBy(TestSource::getId, (row, id) -> id)
                 .having(row -> Integer.parseInt(row.get("sum").toString()) > 4)
                 .writeMap();
         System.out.println(list);
@@ -118,32 +118,42 @@ public class LinqTest {
 
     @Test
     public void customerSelect() {
-        List<String> result = Linq.from(source).select(Columns.ofs(it -> it.get(TestSource::getName) + " Borg", "Hello")).write(String.class);
+        List<String> result = Linq.from(source).selectRowAs(it -> it.get(TestSource::getName) + " Borg", "Hello").write(String.class);
         for (int i = 0; i < result.size(); i++) {
             assert (source.get(i).getName() + " Borg").equals(result.get(i));
         }
     }
 
     @Test
+    public void strJoinTest() {
+        List<Map<String, Object>> join = Linq.from(source)
+                .leftJoin(target2, TestSourceExt2::getValue, TestSource::getName)
+                .select(TestSource.class)
+                .select(TestSourceExt2::getValue)
+                .writeMap();
+        System.out.println(join);
+    }
+
+    @Test
     public void joinTest() {
         List<Map<String, Object>> leftJoinRes = Linq.from(source)
                 .leftJoin(target, TestSourceExt::getId, TestSource::getId)
-                .select(Columns.all(TestSource.class))
-                .select(Columns.of(TestSourceExt::getName, "name2"))
+                .select(TestSource.class)
+                .selectAs(TestSourceExt::getName, "name2")
                 .writeMap();
         assert source.size() == leftJoinRes.size();
 
         List<Map<String, Object>> rightJoinRes = Linq.from(source)
                 .rightJoin(target, TestSourceExt::getId, TestSource::getId)
-                .select(Columns.all(TestSource.class))
-                .select(Columns.of(TestSourceExt::getName, "name2"))
+                .select(TestSource.class)
+                .selectAs(TestSourceExt::getName, "name2")
                 .writeMap();
         assert target.size() == rightJoinRes.size();
 
         List<Map<String, Object>> innerJoin = Linq.from(source)
                 .innerJoin(target, TestSourceExt::getId, TestSource::getTags)
-                .select(Columns.all(TestSource.class))
-                .select(Columns.of(TestSourceExt::getName, "name2"))
+                .select(TestSource.class)
+                .selectAs(TestSourceExt::getName, "name2")
                 .writeMap();
         assert innerJoin.isEmpty();
     }
@@ -153,9 +163,9 @@ public class LinqTest {
         List<Map<String, Object>> testSourceInfo = Linq.from(source)
                 .leftJoin(target, TestSourceExt::getId, TestSource::getId)
                 .leftJoin(target2, TestSourceExt2::getId, TestSource::getId)
-                .select(Columns.all(TestSource.class),
-                        Columns.of(TestSourceExt::getName, "name2"),
-                        Columns.of(TestSourceExt2::getValue))
+                .select(TestSource.class)
+                .select(TestSourceExt2::getValue)
+                .selectAs(TestSourceExt::getName, "name2")
                 .writeMap();
         assert testSourceInfo.size() > source.size();
     }
@@ -200,7 +210,7 @@ public class LinqTest {
         // name = 'Thanos' or id = 4
         List<Map<String, Object>> res = Linq.from(source)
                 .leftJoin(target, TestSourceExt::getId, TestSource::getId)
-                .select(Columns.all(TestSource.class))
+                .select(TestSource.class)
                 .where(data -> {
                     String name = data.get(TestSource::getName);
                     Integer id = data.get(TestSource::getId);
@@ -234,7 +244,7 @@ public class LinqTest {
     @Test
     public void orderBy() {
         List<TestSource> result = Linq.from(source)
-                .select(Columns.all(TestSource.class))
+                .select(TestSource.class)
                 .selectExclude(TestSource::getTags, TestSource::getName)
                 .orderBy(TestSource::getId, OrderByDirection.DESC)
                 .orderBy(TestSource::getName)

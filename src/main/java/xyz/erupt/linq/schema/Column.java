@@ -3,7 +3,6 @@ package xyz.erupt.linq.schema;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class Column {
 
@@ -12,9 +11,6 @@ public class Column {
     private String field;
 
     private String alias;
-
-    // Column unfold process
-    private Supplier<List<Column>> unfold;
 
     // Column value convert handler
     private Function<Row, ?> rowConvert;
@@ -36,7 +32,6 @@ public class Column {
         Column column = new Column(this.table, this.field, this.field);
         column.setGroupByFun(this.getGroupByFun());
         column.setRowConvert(this.getRowConvert());
-        column.setUnfold(this.unfold);
         return column;
     }
 
@@ -80,14 +75,6 @@ public class Column {
         this.rowConvert = rowConvert;
     }
 
-    public Supplier<List<Column>> getUnfold() {
-        return unfold;
-    }
-
-    public void setUnfold(Supplier<List<Column>> unfold) {
-        this.unfold = unfold;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -98,12 +85,12 @@ public class Column {
 
     @Override
     public int hashCode() {
-        return Objects.hash(table, field, alias);
+        return Objects.hash(table.getName(), field, alias);
     }
 
     @Override
     public String toString() {
-        return table.getName() + "." + field + "(" + alias + ")";
+        return table.getName() + "." + field + " as " + alias;
     }
 
 

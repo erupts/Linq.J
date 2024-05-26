@@ -4,8 +4,8 @@ import xyz.erupt.linq.consts.JoinExchange;
 import xyz.erupt.linq.consts.OrderByDirection;
 import xyz.erupt.linq.exception.LinqException;
 import xyz.erupt.linq.schema.*;
-import xyz.erupt.linq.util.RowUtil;
 import xyz.erupt.linq.util.Columns;
+import xyz.erupt.linq.util.RowUtil;
 
 import java.util.*;
 import java.util.function.Function;
@@ -15,7 +15,7 @@ public class EruptEngine extends Engine {
 
     @Override
     public List<Row> query(Dql dql) {
-        List<Row> dataset = RowUtil.listObjectToRow(dql.getFrom());
+        List<Row> dataset = RowUtil.listToTable(dql.getFrom());
         // join process
         if (!dql.getJoinSchemas().isEmpty()) {
             this.join(dql, dataset);
@@ -87,7 +87,7 @@ public class EruptEngine extends Engine {
             Column lon = Columns.of(joinSchema.getLon());
             Column ron = Columns.of(joinSchema.getRon());
             if (joinSchema.getJoinExchange() == JoinExchange.HASH) {
-                List<Row> targetData = RowUtil.listObjectToRow(joinSchema.getTarget());
+                List<Row> targetData = RowUtil.listToTable(joinSchema.getTarget());
                 switch (joinSchema.getJoinMethod()) {
                     case LEFT:
                         this.crossHashJoin(dataset, ron, targetData, lon);

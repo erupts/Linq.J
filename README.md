@@ -43,7 +43,7 @@ It has zero external dependencies and is only 50kb in size
 <dependency>
     <groupId>xyz.erupt</groupId>
     <artifactId>linq.j</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
 </dependency>
 ```
 
@@ -83,11 +83,11 @@ public class ObjectQuery{
      */
     public void select(){
         // select *
-        Linq.from(source).select(Columns.all(TestSource.class));
+        Linq.from(source).select(TestSource.class);
         // select a, b, c
         Linq.from(source)
                 .select(TestSource::getName, TestSource::getDate, TestSource::getTags)
-                .select(Columns.of(TestSource::getTags, "tag2")) // alias
+                .select(TestSource::getTags, "tag2") // alias
                 .select(Columns.ofx(TestSource::getId, id -> id + "xxx")); // value convert
         // select count(*), sum(id), max(id) 
         Linq.from(source)
@@ -102,11 +102,10 @@ public class ObjectQuery{
      */
     public void join(){
         // left join
-        Linq.from(source).leftJoin(target, TestSourceExt::getId, TestSource::getId).select(
-            Columns.all(TestSource.class),
-            Columns.of(TestSourceExt::getName),
-            Columns.of(TestSourceExt2::getValue)
-        );
+        Linq.from(source).leftJoin(target, TestSourceExt::getId, TestSource::getId)
+                .select(TestSource.class)
+                .select(TestSourceExt::getName)
+                .select(TestSourceExt2::getValue);
         // right join
         Linq.from(source).rightJoin(target, TestSourceExt::getId, TestSource::getId);
         // inner join

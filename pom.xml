@@ -6,7 +6,7 @@
 
     <groupId>xyz.erupt</groupId>
     <artifactId>linq.j</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
     <name>Linq.j</name>
 
     <description>Linq.J in Java , Lambda Language Integrated Query library</description>
@@ -89,7 +89,7 @@
             <!-- java8版本导致javadoc打包编译失败时候，添加-->
             <properties>
                 <javadoc.opts>-Xdoclint:none</javadoc.opts>
-<!--                <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>-->
+                <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
             </properties>
         </profile>
         <profile>
@@ -166,6 +166,5 @@
             </distributionManagement>
         </profile>
     </profiles>
-
 
 </project>
