@@ -134,7 +134,7 @@ public class ObjectQuery{
         Linq.from(source).where(TestSource::getId, id -> id >= 5);
         
         // customer condition or multi field
-        Linq.from(source).condition(data -> {
+        Linq.from(source).where(data -> {
             String name = data.get(TestSource::getName);
             Integer age = (Integer)data.get(TestSource::getAge);
             // name = 'xxx' or age > 10
