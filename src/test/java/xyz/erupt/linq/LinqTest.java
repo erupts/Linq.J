@@ -81,6 +81,7 @@ public class LinqTest {
                 .select(TestSource::getName, TestSource::getDate, TestSource::getTags)
                 .selectAs(TestSource::getTags, "tag2")
                 .select(TestSource::getId, (row, id) -> id + "xxxx")
+                .select(TestSource::getId, (row, id) -> id + "xxx2")
                 .writeMap();
         assert Objects.equals(source.get(0).getDate().toString(), list.get(0).get("date").toString());
         assert Objects.equals(list.get(0).get("tags"), list.get(0).get("tag2"));
