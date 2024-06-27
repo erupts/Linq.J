@@ -44,7 +44,6 @@ public class PerformanceTest {
         integers.stream().collect(Collectors.toList());
     }
 
-
     @Test
     public void linqSimpleSelectTest() {
         Linq.from(integers.toArray()).select(Th::is).write(Integer.class);

@@ -31,9 +31,9 @@ public class Dql {
     // having definition
     private final List<Function<Row, Boolean>> having = new ArrayList<>();
 
-
     // order by definition
     private final List<OrderBySchema> orderBys = new ArrayList<>();
+
 
     private Integer limit = null;
 
