@@ -6,7 +6,7 @@
 
     <groupId>xyz.erupt</groupId>
     <artifactId>linq.j</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
     <name>Linq.j</name>
 
     <description>Linq.J in Java , Lambda Language Integrated Query library</description>
