@@ -4,14 +4,14 @@
 `Java 中使用类似 C# 的 Linq 能力 ` [C# Linq](https://learn.microsoft.com/zh-cn/dotnet/csharp/linq/)
 
 <p>
-    <a href="https://www.erupt.xyz" target="_blank"><img src="https://img.shields.io/badge/Linq.J-brightgreen" alt="Erupt Framework"></a>
-    <a href="https://mvnrepository.com/search?q=linq.j"><img src="https://img.shields.io/maven-central/v/xyz.erupt/linq.j" alt="maven-central"></a>
-    <a href="https://www.oracle.com/technetwork/java/javase/downloads/index.html"><img src="https://img.shields.io/badge/JDK-8+-green.svg" alt="jdk 8+"></a>
+    <a href="https://www.erupt.xyz" target="_blank"><img src="https://img.shields.io/badge/Linq.J-brightgreen" alt="Erupt Framework" /></a>
+    <a href="https://mvnrepository.com/search?q=linq.j"><img src="https://img.shields.io/maven-central/v/xyz.erupt/linq.j" alt="maven-central" /></a>
+    <a href="https://www.oracle.com/technetwork/java/javase/downloads/index.html"><img src="https://img.shields.io/badge/JDK-8+-green.svg" alt="jdk 8+" /></a>
     <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license Apache 2.0"></a>
-    <a href='https://gitee.com/erupt/linq/stargazers'><img src='https://gitee.com/erupt/linq/badge/star.svg?theme=gray' alt='GitEE star' ></img></a>
-    <a href="https://github.com/erupts/linq.j"><img src="https://img.shields.io/github/stars/erupts/linq.j?style=social" alt="GitHub stars"></a>
+    <a href='https://gitcode.com/erupts/Linq.J'><img src='https://gitcode.com/erupts/linq.j/star/badge.svg' alt='GitCode star' /></a>
+    <a href='https://gitee.com/erupt/linq/stargazers'><img src='https://gitee.com/erupt/linq/badge/star.svg?theme=gray' alt='GitEE star' /></a>
+    <a href="https://github.com/erupts/linq.j"><img src="https://img.shields.io/github/stars/erupts/linq.j?style=social" alt="GitHub stars" /></a>
 </p>
-
 
 
 ### Linq 是面向对象的 sql，linq实际上是对内存中数据的查询，使开发人员能够更容易地编写查询。这些查询表达式看起来很像SQL

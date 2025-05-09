@@ -166,7 +166,8 @@ public class LinqTest {
                 .leftJoin(target2, TestSourceExt2::getId, TestSource::getId)
                 .select(TestSource.class)
                 .select(TestSourceExt2::getValue)
-                .selectAs(TestSourceExt::getName, "name2")
+                .select(TestSourceExt::getName)
+                .select(TestSource::getName)
                 .writeMap();
         assert testSourceInfo.size() > source.size();
     }

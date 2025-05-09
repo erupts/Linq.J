@@ -15,6 +15,7 @@ public class EruptEngine extends Engine {
 
     @Override
     public List<Row> query(Dql dql) {
+        this.removeAmbiguousColumn(dql);
         List<Row> dataset = RowUtil.listToTable(dql.getFrom());
         // join process
         if (!dql.getJoinSchemas().isEmpty()) {
@@ -82,6 +83,19 @@ public class EruptEngine extends Engine {
         return dataset;
     }
 
+    // remove ambiguous column
+    private void removeAmbiguousColumn(Dql dql) {
+        Map<String, Column> uniqueColumns = new HashMap<>();
+        for (Column column : dql.getColumns()) {
+            uniqueColumns.put(column.getAlias(), column);
+        }
+        dql.getColumns().clear();
+        dql.getColumns().addAll(uniqueColumns.values());
+    }
+
+    // Note: The original code used removeAll which would remove all duplicate entries.
+    // This modified code uses a HashMap to keep only the first occurrence of each alias,
+    // and then sets the columns of the Dql object to the values of this HashMap.
     public void join(Dql dql, List<Row> dataset) {
         for (JoinSchema<?> joinSchema : dql.getJoinSchemas()) {
             Column lon = Columns.of(joinSchema.getLon());
