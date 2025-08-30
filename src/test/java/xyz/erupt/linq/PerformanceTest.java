@@ -23,9 +23,15 @@ public class PerformanceTest {
 
     @Before
     public void before() {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100000; i++) {
             testTos.add(new TestTo(i, String.valueOf((char) i)));
+            integers.add(i);
         }
+    }
+
+    @Test
+    public void javaSelectTest() {
+        testTos.stream().map(TestTo::getName).collect(Collectors.toList());
     }
 
     @Test
@@ -34,18 +40,13 @@ public class PerformanceTest {
     }
 
     @Test
-    public void linqSelectTestVs() {
-        testTos.stream().map(TestTo::getName).collect(Collectors.toList());
+    public void javaSimpleSelectTest() {
+        integers.stream().collect(Collectors.toList());
     }
 
     @Test
     public void linqSimpleSelectTest() {
         Linq.from(integers.toArray()).select(Th::is).write(Integer.class);
-    }
-
-    @Test
-    public void linqSimpleSelectTestVs() {
-        integers.stream().collect(Collectors.toList());
     }
 
 

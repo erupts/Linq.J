@@ -43,7 +43,7 @@
 <dependency>
     <groupId>xyz.erupt</groupId>
     <artifactId>linq.j</artifactId>
-    <version>0.0.5</version>
+    <version>LATEST</version>
 </dependency>
 ```
 

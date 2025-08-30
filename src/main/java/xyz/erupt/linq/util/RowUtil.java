@@ -99,8 +99,12 @@ public class RowUtil {
             return bigDecimal.doubleValue();
         } else if (Byte.class == target) {
             return bigDecimal.byteValue();
+        } else if (Long.class == target) {
+            return bigDecimal.longValue();
         } else if (BigDecimal.class == target) {
             return bigDecimal;
+        } else if (target.isAssignableFrom(String.class)) {
+            return bigDecimal.toString();
         }
         throw new LinqException("unknown 'bigDecimal' target type: " + target.getName());
     }

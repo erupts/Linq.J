@@ -11,7 +11,13 @@ public class Dql {
     private List<?> from;
 
     // columns definition
-    private final List<Column> columns = new ArrayList<>();
+    private final List<Column> columns = new ArrayList<Column>() {
+        @Override
+        public boolean add(Column column) {
+            super.remove(column);
+            return super.add(column);
+        }
+    };
 
     // json definition
     private final List<JoinSchema<?>> joinSchemas = new ArrayList<>();
@@ -25,9 +31,9 @@ public class Dql {
     // having definition
     private final List<Function<Row, Boolean>> having = new ArrayList<>();
 
-
     // order by definition
     private final List<OrderBySchema> orderBys = new ArrayList<>();
+
 
     private Integer limit = null;
 
