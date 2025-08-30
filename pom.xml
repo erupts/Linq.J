@@ -61,7 +61,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
-                    <namespace>xyz.erupt</namespace>
                 </configuration>
             </plugin>
             <plugin>
