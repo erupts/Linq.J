@@ -2,6 +2,7 @@ package xyz.erupt.linq.lambda;
 
 import xyz.erupt.linq.exception.LinqException;
 
+import java.beans.Introspector;
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -59,7 +60,7 @@ public class LambdaSee {
                 field = methodName.substring(GET.length());
             if (methodName.startsWith(IS) && methodName.length() != IS.length())
                 field = methodName.substring(IS.length());
-            return new LambdaInfo(clazz, methodName, field.substring(0, 1).toLowerCase() + field.substring(1));
+            return new LambdaInfo(clazz, methodName, Introspector.decapitalize(field));
         }
     }
 
