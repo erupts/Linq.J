@@ -61,7 +61,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
-                    <namespace>xyz.erupt</namespace>
                 </configuration>
             </plugin>
             <plugin>
@@ -145,7 +144,7 @@
             </activation>
             <properties>
                 <javadoc.opts>-Xdoclint:none</javadoc.opts>
-                <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
+                <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
             </properties>
         </profile>
     </profiles>
