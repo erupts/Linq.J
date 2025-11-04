@@ -6,7 +6,7 @@
 
     <groupId>xyz.erupt</groupId>
     <artifactId>linq.j</artifactId>
-    <version>0.0.8</version>
+    <version>0.0.9</version>
     <name>Linq.j</name>
 
     <description>Linq.J in Java , Lambda Language Integrated Query library</description>
@@ -144,7 +144,7 @@
             </activation>
             <properties>
                 <javadoc.opts>-Xdoclint:none</javadoc.opts>
-                <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
+                <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
             </properties>
         </profile>
     </profiles>
