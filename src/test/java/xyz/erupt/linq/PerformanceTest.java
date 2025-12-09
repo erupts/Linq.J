@@ -41,7 +41,7 @@ public class PerformanceTest {
 
     @Test
     public void linqSelectMapTest() {
-        Linq.from(testTos).select(TestTo::getName, TestTo::getId).writeMap();
+        Linq.from(testTos).select(TestTo::getName, TestTo::getId).groupBy(TestTo::getName).writeMap();
     }
 //
     @Test

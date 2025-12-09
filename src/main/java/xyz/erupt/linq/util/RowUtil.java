@@ -89,26 +89,27 @@ public class RowUtil {
             }
             // Process objects - use direct array access for better performance
             // Pre-allocate Row capacity to avoid HashMap resizing
-            // Optimize: process in batches and reduce exception handling overhead
-            for (int i = 0; i < size; i++) {
-                Object obj = objects.get(i);
-                if (obj != null) {
-                    Row row = new Row(fieldCount);
-                    // Direct array access - avoid list.get() in inner loop
-                    // Batch put operations for better cache locality
-                    // Inline field access to reduce method call overhead
-                    try {
+            // Optimize: move try-catch outside loop to reduce exception handling overhead
+            // Fields are already set accessible, so IllegalAccessException should not occur
+            try {
+                for (int i = 0; i < size; i++) {
+                    Object obj = objects.get(i);
+                    if (obj != null) {
+                        Row row = new Row(fieldCount);
+                        // Direct array access - avoid list.get() in inner loop
+                        // Batch put operations for better cache locality
+                        // Inline field access to reduce method call overhead
                         for (int j = 0; j < fieldCount; j++) {
                             // Direct field access - avoid repeated method calls
                             Field field = fieldArray[j];
                             Object value = field.get(obj);
                             row.put(columnArray[j], value);
                         }
-                    } catch (IllegalAccessException e) {
-                        throw new LinqException(e);
+                        list.add(row);
                     }
-                    list.add(row);
                 }
+            } catch (IllegalAccessException e) {
+                throw new LinqException(e);
             }
         }
         return list;
