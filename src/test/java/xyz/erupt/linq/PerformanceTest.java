@@ -41,7 +41,7 @@ public class PerformanceTest {
 
     @Test
     public void javaSimpleSelectTest() {
-        integers.stream().collect(Collectors.toList());
+        new ArrayList<>(integers);
     }
 
     @Test

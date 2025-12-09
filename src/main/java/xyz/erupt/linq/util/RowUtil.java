@@ -48,9 +48,8 @@ public class RowUtil {
         List<Field> fields = ReflectField.getFields(clazz);
         // Optimize: check simple class using faster method
         boolean simpleClass = false;
-        int simpleClassCount = SIMPLE_CLASS.length;
-        for (int i = 0; i < simpleClassCount; i++) {
-            if (SIMPLE_CLASS[i].isAssignableFrom(clazz)) {
+        for (Class<?> aClass : SIMPLE_CLASS) {
+            if (aClass.isAssignableFrom(clazz)) {
                 simpleClass = true;
                 break;
             }
@@ -126,9 +125,8 @@ public class RowUtil {
             }
             if (firstVal != null && clazz == firstVal.getClass()) return (T) firstVal;
             // Use array access for better performance
-            int simpleClassCount = SIMPLE_CLASS.length;
-            for (int i = 0; i < simpleClassCount; i++) {
-                if (SIMPLE_CLASS[i].isAssignableFrom(clazz)) {
+            for (Class<?> simpleClass : SIMPLE_CLASS) {
+                if (simpleClass.isAssignableFrom(clazz)) {
                     return (T) (firstVal instanceof BigDecimal ? bigDecimalConvert((BigDecimal) firstVal, clazz) : firstVal);
                 }
             }

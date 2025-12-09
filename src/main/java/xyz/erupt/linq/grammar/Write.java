@@ -52,9 +52,8 @@ public interface Write {
             }
             // Check if target is a simple type - use array access for better performance
             Class<?>[] simpleClasses = RowUtil.SIMPLE_CLASS;
-            int simpleClassCount = simpleClasses.length;
-            for (int i = 0; i < simpleClassCount; i++) {
-                if (simpleClasses[i].isAssignableFrom(clazz)) {
+            for (Class<?> simpleClass : simpleClasses) {
+                if (simpleClass.isAssignableFrom(clazz)) {
                     // Use direct loop instead of Stream for better performance
                     List<T> result = new ArrayList<>(table.size());
                     for (Row row : table) {
