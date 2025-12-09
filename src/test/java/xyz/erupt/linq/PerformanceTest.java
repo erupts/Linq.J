@@ -41,9 +41,9 @@ public class PerformanceTest {
 
     @Test
     public void linqSelectMapTest() {
-        Linq.from(testTos).select(TestTo::getName, TestTo::getId).groupBy(TestTo::getName).writeMap();
+        Linq.from(testTos).select(TestTo::getName, TestTo::getId).orderBy(TestTo::getName).writeMap();
     }
-//
+
     @Test
     public void linqSimpleSelectTest() {
         Linq.from(integers.toArray()).select(Th::is).write(Integer.class);
