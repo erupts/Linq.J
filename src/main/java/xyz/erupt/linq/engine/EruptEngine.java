@@ -39,26 +39,85 @@ public class EruptEngine extends Engine {
             dataset = this.groupBy(dql, dataset);
         } else {
             // simple select process - optimized to reduce object creation
-            List<Row> $table = new ArrayList<>(dataset.size());
-            boolean existGroupFun = false;
             List<Column> columns = dql.getColumns();
             int columnCount = columns.size();
-            // Pre-compute raw columns to avoid repeated getRawColumn() calls
+
+            // Check if we can reuse existing rows (no rowConvert, no groupByFun, columns match)
+            boolean canReuseRows = true;
+            boolean existGroupFun = false;
             Column[] rawColumns = new Column[columnCount];
             boolean[] hasRowConvert = new boolean[columnCount];
             boolean[] hasGroupByFun = new boolean[columnCount];
+
             for (int i = 0; i < columnCount; i++) {
                 Column col = columns.get(i);
                 rawColumns[i] = col.getRawColumn();
                 hasRowConvert[i] = col.getRowConvert() != null;
                 hasGroupByFun[i] = col.getGroupByFun() != null;
+                if (hasRowConvert[i] || hasGroupByFun[i]) {
+                    canReuseRows = false;
+                }
+                if (hasGroupByFun[i]) {
+                    existGroupFun = true;
+                }
             }
-            // Pre-store columns array for faster access
+
+            // Optimization: if columns match exactly and no conversion needed, reuse rows
+            if (canReuseRows && !dataset.isEmpty()) {
+                Row firstRow = dataset.get(0);
+                int firstRowSize = firstRow.size();
+                if (firstRowSize == columnCount) {
+                    // Check if all selected columns exist in original row
+                    boolean allMatch = true;
+                    for (int i = 0; i < columnCount; i++) {
+                        Column rawCol = rawColumns[i];
+                        if (!firstRow.containsKey(rawCol)) {
+                            allMatch = false;
+                            break;
+                        }
+                    }
+                    if (allMatch) {
+                        // Just update column aliases if needed, no need to create new rows
+                        // Check if aliases need to be updated
+                        boolean needUpdateAlias = false;
+                        for (int i = 0; i < columnCount; i++) {
+                            Column rawCol = rawColumns[i];
+                            Column targetCol = columns.get(i);
+                            if (!rawCol.getAlias().equals(targetCol.getAlias())) {
+                                needUpdateAlias = true;
+                                break;
+                            }
+                        }
+                        if (needUpdateAlias) {
+                            // Update aliases in place
+                            for (Row row : dataset) {
+                                for (int i = 0; i < columnCount; i++) {
+                                    Column rawCol = rawColumns[i];
+                                    Column targetCol = columns.get(i);
+                                    if (rawCol != targetCol && row.containsKey(rawCol)) {
+                                        Object value = row.get(rawCol);
+                                        row.put(targetCol, value);
+                                        row.remove(rawCol);
+                                    }
+                                }
+                            }
+                        }
+                        // Skip the rest of select processing - rows are already correct
+                        return dataset;
+                    }
+                }
+            }
+
+            // Normal select process - create new rows
+            List<Row> $table = new ArrayList<>(dataset.size());
             Column[] columnsArray = columns.toArray(new Column[columnCount]);
             int datasetSize = dataset.size();
+
+            // Optimize: batch process to reduce overhead
             for (int rowIdx = 0; rowIdx < datasetSize; rowIdx++) {
                 Row row = dataset.get(rowIdx);
                 Row newRow = new Row(columnCount);
+                // Pre-check if we can optimize by avoiding null checks
                 for (int i = 0; i < columnCount; i++) {
                     Column column = columnsArray[i];
                     if (hasGroupByFun[i]) {

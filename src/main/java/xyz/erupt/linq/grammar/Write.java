@@ -87,9 +87,10 @@ public interface Write {
     default List<Map<String, Object>> writeMap() {
         wEngine().preprocessor(this.wDQL());
         List<Row> table = wEngine().query(this.wDQL());
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<Map<String, Object>> result = new ArrayList<>(table.size());
+        int columnNum = this.wDQL().getColumns().size();
         for (Row row : table) {
-            Map<String, Object> $map = new HashMap<>();
+            Map<String, Object> $map = new HashMap<>(columnNum);
             result.add($map);
             row.forEach((k, v) -> $map.put(k.getAlias(), v));
         }

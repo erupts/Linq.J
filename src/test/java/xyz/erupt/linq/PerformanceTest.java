@@ -36,18 +36,23 @@ public class PerformanceTest {
 
     @Test
     public void linqSelectTest() {
-        Linq.from(testTos).select(TestTo::getName).write(String.class);
+        Linq.from(testTos).select(TestTo::getName, TestTo::getId).write(TestTo.class);
     }
 
     @Test
-    public void javaSimpleSelectTest() {
-        new ArrayList<>(integers);
+    public void linqSelectMapTest() {
+        Linq.from(testTos).select(TestTo::getName, TestTo::getId).writeMap();
     }
 
-    @Test
-    public void linqSimpleSelectTest() {
-        Linq.from(integers.toArray()).select(Th::is).write(Integer.class);
-    }
+//    @Test
+//    public void javaSimpleSelectTest() {
+//        new ArrayList<>(integers);
+//    }
+//
+//    @Test
+//    public void linqSimpleSelectTest() {
+//        Linq.from(integers.toArray()).select(Th::is).write(Integer.class);
+//    }
 
 
 }

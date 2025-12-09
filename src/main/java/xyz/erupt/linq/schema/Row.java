@@ -46,8 +46,7 @@ public class Row extends HashMap<Column, Object> {
     public Object get(String alias) {
         // Build alias cache on first access if not exists
         if (aliasCache == null) {
-            int size = this.size();
-            aliasCache = new HashMap<>(size);
+            aliasCache = new HashMap<>(this.size());
             // Use entrySet for better performance
             for (Map.Entry<Column, Object> entry : this.entrySet()) {
                 aliasCache.put(entry.getKey().getAlias(), entry.getKey());

@@ -6,9 +6,12 @@ package xyz.erupt.linq.data;
  */
 public class TestTo {
 
-    private final Integer id;
+    private Integer id;
 
-    private final String name;
+    private String name;
+
+    public TestTo() {
+    }
 
     public TestTo(Integer id, String name) {
         this.id = id;
