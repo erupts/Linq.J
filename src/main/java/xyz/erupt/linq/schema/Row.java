@@ -8,8 +8,12 @@ import xyz.erupt.linq.util.RowUtil;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Row extends HashMap<Column, Object> {
+
+    // Cache for alias to Column mapping to avoid repeated iteration
+    private transient HashMap<String, Column> aliasCache = null;
 
     public Row(int initialCapacity) {
         super(initialCapacity);
@@ -17,6 +21,9 @@ public class Row extends HashMap<Column, Object> {
 
     public Row(Row row) {
         super(row);
+        if (row.aliasCache != null) {
+            this.aliasCache = new HashMap<>(row.aliasCache);
+        }
     }
 
     public Row() {
@@ -25,6 +32,10 @@ public class Row extends HashMap<Column, Object> {
 
     @Override
     public Object put(Column column, Object value) {
+        // Update alias cache when adding new column (lazy initialization)
+        if (aliasCache != null) {
+            aliasCache.put(column.getAlias(), column);
+        }
         return super.put(column, value);
     }
 
@@ -33,12 +44,16 @@ public class Row extends HashMap<Column, Object> {
     }
 
     public Object get(String alias) {
-        for (Column column : this.keySet()) {
-            if (alias.equals(column.getAlias())) {
-                return super.get(column);
+        // Build alias cache on first access if not exists
+        if (aliasCache == null) {
+            aliasCache = new HashMap<>(this.size());
+            // Use entrySet for better performance
+            for (Map.Entry<Column, Object> entry : this.entrySet()) {
+                aliasCache.put(entry.getKey().getAlias(), entry.getKey());
             }
         }
-        return null;
+        Column column = aliasCache.get(alias);
+        return column != null ? super.get(column) : null;
     }
 
     public <T, R> R get(SFunction<T, R> alias) {

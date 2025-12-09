@@ -9,4 +9,8 @@ public class LinqException extends RuntimeException {
     public LinqException(Throwable cause) {
         super(cause);
     }
+
+    public LinqException(String message, Throwable e) {
+        super(message, e);
+    }
 }
