@@ -2,6 +2,7 @@ package xyz.erupt.linq.grammar;
 
 import xyz.erupt.linq.engine.Engine;
 import xyz.erupt.linq.exception.LinqException;
+import xyz.erupt.linq.schema.Column;
 import xyz.erupt.linq.schema.Dql;
 import xyz.erupt.linq.schema.Row;
 import xyz.erupt.linq.util.RowUtil;
@@ -23,7 +24,53 @@ public interface Write {
     default <T> List<T> write(Class<T> clazz) {
         wEngine().preprocessor(this.wDQL());
         List<Row> table = wEngine().query(this.wDQL());
-        return table.stream().map(it -> RowUtil.rowToObject(it, clazz)).collect(Collectors.toList());
+        if (table.isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        // Optimization: for simple types with single column, directly extract values
+        Row firstRow = table.get(0);
+        int firstRowSize = firstRow.size();
+        if (firstRowSize == 1) {
+            // Cache the first column to avoid repeated iterator creation
+            Column firstColumn = null;
+            Object firstValue = null;
+            for (Map.Entry<Column, Object> entry : firstRow.entrySet()) {
+                firstColumn = entry.getKey();
+                firstValue = entry.getValue();
+                break; // Only need first entry
+            }
+            
+            // Check if it's a simple type that can be directly cast
+            if (firstValue != null && clazz.isAssignableFrom(firstValue.getClass())) {
+                // Use direct loop instead of Stream for better performance
+                List<T> result = new ArrayList<>(table.size());
+                for (Row row : table) {
+                    result.add((T) row.get(firstColumn));
+                }
+                return result;
+            }
+            // Check if target is a simple type - use array access for better performance
+            Class<?>[] simpleClasses = RowUtil.SIMPLE_CLASS;
+            int simpleClassCount = simpleClasses.length;
+            for (int i = 0; i < simpleClassCount; i++) {
+                if (simpleClasses[i].isAssignableFrom(clazz)) {
+                    // Use direct loop instead of Stream for better performance
+                    List<T> result = new ArrayList<>(table.size());
+                    for (Row row : table) {
+                        result.add(RowUtil.rowToObject(row, clazz));
+                    }
+                    return result;
+                }
+            }
+        }
+        
+        // Use direct loop instead of Stream for better performance
+        List<T> result = new ArrayList<>(table.size());
+        for (Row row : table) {
+            result.add(RowUtil.rowToObject(row, clazz));
+        }
+        return result;
     }
 
     default <T> T writeOne(Class<T> clazz) {
@@ -62,3 +109,4 @@ public interface Write {
     }
 
 }
+
