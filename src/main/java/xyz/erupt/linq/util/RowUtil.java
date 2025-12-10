@@ -23,11 +23,11 @@ public class RowUtil {
 
     public static List<Row> listToTable(List<?> objects) {
         int size = objects.size();
-        List<Row> list = new ArrayList<>(Math.min(objects.size(), 10000));
+        List<Row> list = new ArrayList<>(Math.min(size, 10000));
         if (size == 0) {
             return list;
         }
-        
+
         // Find first non-null object to determine class - optimize by checking common case first
         Object firstObj;
         firstObj = objects.get(0);
@@ -43,7 +43,7 @@ public class RowUtil {
         if (firstObj == null) {
             return list;
         }
-        
+
         Class<?> clazz = firstObj.getClass();
         List<Field> fields = ReflectField.getFields(clazz);
         // Optimize: check simple class using faster method
@@ -54,7 +54,7 @@ public class RowUtil {
                 break;
             }
         }
-        
+
         // Pre-create Column objects and set fields accessible
         Map<String, Column> columnCache = null;
         Column simpleColumn = null;
@@ -67,7 +67,7 @@ public class RowUtil {
                 columnCache.put(field.getName(), new Column(clazz, field.getName(), field.getName()));
             }
         }
-        
+
         // Process all objects
         if (simpleClass) {
             // Simple class path - optimized
@@ -89,7 +89,7 @@ public class RowUtil {
             for (int i = 0; i < fieldCount; i++) {
                 columnArray[i] = columnCache.get(fieldArray[i].getName());
             }
-            
+
             // For very large datasets, create Row objects but optimize HashMap initialization
             // Use smaller initial capacity to reduce memory overhead
             try {
@@ -102,7 +102,9 @@ public class RowUtil {
                         for (int j = 0; j < fieldCount; j++) {
                             Field field = fieldArray[j];
                             Object value = field.get(obj);
-                            row.putDirect(columnArray[j], value);
+                            if (null != value) {
+                                row.putDirect(columnArray[j], value);
+                            }
                         }
                         list.add(row);
                     }
@@ -116,7 +118,7 @@ public class RowUtil {
 
     // Cache for field maps to avoid repeated creation
     private static final Map<Class<?>, Map<String, Field>> FIELD_MAP_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
-    
+
     public static <T> T rowToObject(Row row, Class<T> clazz) {
         int rowSize = row.size();
         if (rowSize == 1) {
