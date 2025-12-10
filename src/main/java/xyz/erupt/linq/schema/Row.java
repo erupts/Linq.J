@@ -51,9 +51,9 @@ public class Row extends AbstractMap<Column, Object> {
 
     @Override
     public Object put(Column column, Object value) {
-        // Check if column already exists (identity check for performance)
+        // Check if column already exists (identity check first for performance, then equals)
         for (int i = 0; i < size; i++) {
-            if (columns[i] == column) {
+            if (columns[i] == column || columns[i].equals(column)) {
                 Object oldValue = values[i];
                 values[i] = value;
                 return oldValue;
@@ -89,8 +89,9 @@ public class Row extends AbstractMap<Column, Object> {
 
     public Object get(Column column) {
         // Linear search - fast for small arrays, acceptable for larger ones
+        // Use identity check first for performance, then equals for compatibility
         for (int i = 0; i < size; i++) {
-            if (columns[i] == column) {
+            if (columns[i] == column || columns[i].equals(column)) {
                 return values[i];
             }
         }
@@ -159,12 +160,58 @@ public class Row extends AbstractMap<Column, Object> {
         if (key instanceof Column) {
             Column column = (Column) key;
             for (int i = 0; i < size; i++) {
-                if (columns[i] == column) {
+                // Use equals for compatibility, but prefer identity check for performance
+                if (columns[i] == column || columns[i].equals(column)) {
                     return true;
                 }
             }
         }
         return false;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Map)) return false;
+        Map<?, ?> other = (Map<?, ?>) o;
+        if (size != other.size()) return false;
+        
+        // Compare all entries - for each key in this map, check if other has same key-value
+        for (int i = 0; i < size; i++) {
+            Column key = columns[i];
+            Object value = values[i];
+            
+            // Check if other map contains this key
+            if (!other.containsKey(key)) {
+                return false;
+            }
+            
+            // Compare values
+            Object otherValue = other.get(key);
+            if (value == null) {
+                if (otherValue != null) {
+                    return false;
+                }
+            } else {
+                if (!value.equals(otherValue)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    @Override
+    public int hashCode() {
+        // Standard Map hashCode: sum of (key.hashCode() ^ value.hashCode()) for all entries
+        int result = 0;
+        for (int i = 0; i < size; i++) {
+            Column key = columns[i];
+            Object value = values[i];
+            result += (key == null ? 0 : key.hashCode()) ^ 
+                      (value == null ? 0 : value.hashCode());
+        }
+        return result;
     }
 
     @Override
@@ -230,9 +277,39 @@ public class Row extends AbstractMap<Column, Object> {
     public void putAll(Map<? extends Column, ? extends Object> m) {
         if (m instanceof Row) {
             Row otherRow = (Row) m;
-            // Direct array copy for efficiency
-            for (int i = 0; i < otherRow.size; i++) {
-                put(otherRow.columns[i], otherRow.values[i]);
+            // Direct array copy for efficiency - avoid put() overhead
+            int otherSize = otherRow.size;
+            int newSize = size + otherSize;
+            
+            // Grow arrays if needed
+            if (newSize > columns.length) {
+                int newCapacity = Math.max(newSize, columns.length + (columns.length >> 1) + 1);
+                columns = Arrays.copyOf(columns, newCapacity);
+                values = Arrays.copyOf(values, newCapacity);
+            }
+            
+            // Copy all entries directly
+            for (int i = 0; i < otherSize; i++) {
+                Column col = otherRow.columns[i];
+                // Check if already exists (using identity first, then equals)
+                boolean exists = false;
+                for (int j = 0; j < size; j++) {
+                    if (columns[j] == col || columns[j].equals(col)) {
+                        values[j] = otherRow.values[i];
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    columns[size] = col;
+                    values[size] = otherRow.values[i];
+                    size++;
+                }
+            }
+            
+            // Rebuild alias cache if exists
+            if (aliasKeys != null) {
+                buildAliasCache();
             }
         } else {
             // Fallback for other Map types
@@ -247,7 +324,7 @@ public class Row extends AbstractMap<Column, Object> {
         if (key instanceof Column) {
             Column column = (Column) key;
             for (int i = 0; i < size; i++) {
-                if (columns[i] == column) {
+                if (columns[i] == column || columns[i].equals(column)) {
                     Object oldValue = values[i];
                     // Shift remaining elements
                     System.arraycopy(columns, i + 1, columns, i, size - i - 1);
