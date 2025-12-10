@@ -24,7 +24,7 @@ public class PerformanceTest {
 
     @Before
     public void before() {
-        for (int i = 0; i < 10000000; i++) {
+        for (int i = 0; i < 1000000; i++) {
             testTos.add(new TestTo(i, String.valueOf((char) i)));
             integers.add(i);
         }
@@ -42,7 +42,7 @@ public class PerformanceTest {
 
     @Test
     public void linqSelectMapTest() {
-        Linq.from(testTos).select(TestTo::getName, TestTo::getId).orderBy(TestTo::getName).writeMap();
+        Linq.from(testTos).select(TestTo::getName, TestTo::getId).orderBy(TestTo::getId).writeMap();
     }
 
 

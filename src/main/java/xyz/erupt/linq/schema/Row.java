@@ -60,7 +60,18 @@ public class Row extends AbstractMap<Column, Object> {
             }
         }
 
-        // Add new entry - grow array if needed
+        // Add new entry
+        putDirect(column, value);
+        return null;
+    }
+    
+    /**
+     * Direct put without duplicate check - for performance optimization.
+     * Use this when you know the column doesn't exist (e.g., in listToTable).
+     * This avoids O(n) linear search overhead.
+     */
+    public void putDirect(Column column, Object value) {
+        // Grow array if needed
         if (size >= columns.length) {
             int newCapacity = size + (size >> 1) + 1; // 1.5x growth
             columns = Arrays.copyOf(columns, newCapacity);
@@ -75,8 +86,6 @@ public class Row extends AbstractMap<Column, Object> {
         if (aliasKeys != null) {
             updateAliasCache(column);
         }
-
-        return null;
     }
 
     @Override

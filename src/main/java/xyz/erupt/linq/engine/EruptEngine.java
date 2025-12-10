@@ -109,27 +109,30 @@ public class EruptEngine extends Engine {
             }
 
             // Normal select process - create new rows
-            List<Row> $table = new ArrayList<>(dataset.size());
-            Column[] columnsArray = columns.toArray(new Column[columnCount]);
+            // Don't pre-allocate full capacity for very large datasets to avoid OOM
+            // ArrayList will grow dynamically, which is acceptable for performance
             int datasetSize = dataset.size();
+            List<Row> $table = new ArrayList<>(Math.min(datasetSize, 10000));
+            Column[] columnsArray = columns.toArray(new Column[columnCount]);
 
             // Optimize: batch process to reduce overhead
             for (int rowIdx = 0; rowIdx < datasetSize; rowIdx++) {
                 Row row = dataset.get(rowIdx);
                 Row newRow = new Row(columnCount);
                 // Pre-check if we can optimize by avoiding null checks
+                // Use putDirect for performance - columns are added in order without duplicates
                 for (int i = 0; i < columnCount; i++) {
                     Column column = columnsArray[i];
                     if (hasGroupByFun[i]) {
                         existGroupFun = true;
-                        newRow.put(column, column.getGroupByFun().apply(dataset));
+                        newRow.putDirect(column, column.getGroupByFun().apply(dataset));
                     } else {
                         // Use pre-computed raw column - optimize branch prediction
                         Object value = row.get(rawColumns[i]);
                         if (hasRowConvert[i]) {
-                            newRow.put(column, column.getRowConvert().apply(row));
+                            newRow.putDirect(column, column.getRowConvert().apply(row));
                         } else {
-                            newRow.put(column, value);
+                            newRow.putDirect(column, value);
                         }
                     }
                 }
@@ -263,6 +266,7 @@ public class EruptEngine extends Engine {
         for (Map.Entry<String, List<Row>> entry : groupMap.entrySet()) {
             Row values = new Row(dql.getColumns().size());
             result.add(values);
+            // Use putDirect for performance - columns are added in order without duplicates
             for (Column column : dql.getColumns()) {
                 Object val = null;
                 if (null != column.getGroupByFun()) {
@@ -272,7 +276,7 @@ public class EruptEngine extends Engine {
                         val = entry.getValue().get(0).get(column.getRawColumn());
                     }
                 }
-                values.put(column, val);
+                values.putDirect(column, val);
             }
         }
         return result;

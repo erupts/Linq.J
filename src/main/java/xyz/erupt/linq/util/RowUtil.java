@@ -23,13 +23,13 @@ public class RowUtil {
 
     public static List<Row> listToTable(List<?> objects) {
         int size = objects.size();
-        List<Row> list = new ArrayList<>(size);
+        List<Row> list = new ArrayList<>(Math.min(objects.size(), 10000));
         if (size == 0) {
             return list;
         }
         
         // Find first non-null object to determine class - optimize by checking common case first
-        Object firstObj = null;
+        Object firstObj;
         firstObj = objects.get(0);
         if (firstObj == null && size > 1) {
             // Only search if first is null
@@ -98,11 +98,11 @@ public class RowUtil {
                     if (obj != null) {
                         // Create Row with exact capacity to avoid HashMap resizing
                         Row row = new Row(fieldCount);
-                        // Batch put operations
+                        // Batch put operations - use putDirect for performance (no duplicate check needed)
                         for (int j = 0; j < fieldCount; j++) {
                             Field field = fieldArray[j];
                             Object value = field.get(obj);
-                            row.put(columnArray[j], value);
+                            row.putDirect(columnArray[j], value);
                         }
                         list.add(row);
                     }
@@ -121,10 +121,8 @@ public class RowUtil {
         int rowSize = row.size();
         if (rowSize == 1) {
             // Optimize: get first entry directly - avoid iterator creation
-            Column firstKey = null;
             Object firstVal = null;
             for (Map.Entry<Column, Object> entry : row.entrySet()) {
-                firstKey = entry.getKey();
                 firstVal = entry.getValue();
                 break; // Only need first entry
             }

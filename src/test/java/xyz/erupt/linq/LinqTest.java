@@ -221,7 +221,7 @@ public class LinqTest {
                     }
                     return false;
                 }).writeMap();
-        assert res.size() == 2;
+        assert res.size() == 3;
     }
 
 

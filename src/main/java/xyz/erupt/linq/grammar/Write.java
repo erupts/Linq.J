@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public interface Write {
 
@@ -43,8 +42,7 @@ public interface Write {
             
             // Check if it's a simple type that can be directly cast
             if (firstValue != null && clazz.isAssignableFrom(firstValue.getClass())) {
-                // Use direct loop instead of Stream for better performance
-                List<T> result = new ArrayList<>(table.size());
+                List<T> result = new ArrayList<>(Math.min(table.size(), 10000));
                 for (Row row : table) {
                     result.add((T) row.get(firstColumn));
                 }
@@ -54,8 +52,7 @@ public interface Write {
             Class<?>[] simpleClasses = RowUtil.SIMPLE_CLASS;
             for (Class<?> simpleClass : simpleClasses) {
                 if (simpleClass.isAssignableFrom(clazz)) {
-                    // Use direct loop instead of Stream for better performance
-                    List<T> result = new ArrayList<>(table.size());
+                    List<T> result = new ArrayList<>(Math.min(table.size(), 10000));
                     for (Row row : table) {
                         result.add(RowUtil.rowToObject(row, clazz));
                     }
@@ -63,9 +60,7 @@ public interface Write {
                 }
             }
         }
-        
-        // Use direct loop instead of Stream for better performance
-        List<T> result = new ArrayList<>(table.size());
+        List<T> result = new ArrayList<>(Math.min(table.size(), 10000));
         for (Row row : table) {
             result.add(RowUtil.rowToObject(row, clazz));
         }
@@ -87,7 +82,7 @@ public interface Write {
     default List<Map<String, Object>> writeMap() {
         wEngine().preprocessor(this.wDQL());
         List<Row> table = wEngine().query(this.wDQL());
-        List<Map<String, Object>> result = new ArrayList<>(table.size());
+        List<Map<String, Object>> result = new ArrayList<>(Math.min(table.size(), 10000));
         int columnNum = this.wDQL().getColumns().size();
         for (Row row : table) {
             Map<String, Object> $map = new HashMap<>(columnNum);
