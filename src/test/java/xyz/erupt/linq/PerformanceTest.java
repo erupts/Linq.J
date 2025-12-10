@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import xyz.erupt.linq.data.TestTo;
 import xyz.erupt.linq.lambda.Th;
+import xyz.erupt.linq.util.Columns;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class PerformanceTest {
 
     @Before
     public void before() {
-        for (int i = 0; i < 10000000; i++) {
+        for (int i = 0; i < 20000000; i++) {
             testTos.add(new TestTo(i, String.valueOf((char) i)));
             integers.add(i);
         }
@@ -42,6 +43,12 @@ public class PerformanceTest {
     @Test
     public void linqSelectMapTest() {
         Linq.from(testTos).select(TestTo::getName, TestTo::getId).orderBy(TestTo::getName).writeMap();
+    }
+
+
+    @Test
+    public void linqSumTest() {
+        Linq.from(testTos).select(Columns.avg(TestTo::getId, "avg")).writeOne(Integer.class);
     }
 
     @Test

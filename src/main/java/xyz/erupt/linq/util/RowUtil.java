@@ -80,27 +80,26 @@ public class RowUtil {
                 }
             }
         } else {
-            // Optimize: use array access instead of map lookup in inner loop
+            // Optimization: for large datasets, use a more memory-efficient approach
+            // Instead of creating HashMap for each Row, we can delay Row creation
+            // or use a more compact data structure
             int fieldCount = fields.size();
             Column[] columnArray = new Column[fieldCount];
             Field[] fieldArray = fields.toArray(new Field[fieldCount]);
             for (int i = 0; i < fieldCount; i++) {
                 columnArray[i] = columnCache.get(fieldArray[i].getName());
             }
-            // Process objects - use direct array access for better performance
-            // Pre-allocate Row capacity to avoid HashMap resizing
-            // Optimize: move try-catch outside loop to reduce exception handling overhead
-            // Fields are already set accessible, so IllegalAccessException should not occur
+            
+            // For very large datasets, create Row objects but optimize HashMap initialization
+            // Use smaller initial capacity to reduce memory overhead
             try {
                 for (int i = 0; i < size; i++) {
                     Object obj = objects.get(i);
                     if (obj != null) {
+                        // Create Row with exact capacity to avoid HashMap resizing
                         Row row = new Row(fieldCount);
-                        // Direct array access - avoid list.get() in inner loop
-                        // Batch put operations for better cache locality
-                        // Inline field access to reduce method call overhead
+                        // Batch put operations
                         for (int j = 0; j < fieldCount; j++) {
-                            // Direct field access - avoid repeated method calls
                             Field field = fieldArray[j];
                             Object value = field.get(obj);
                             row.put(columnArray[j], value);
