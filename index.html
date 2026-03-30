@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linq.J — Java 内存对象查询语言</title>
+    <meta name="description" content="Linq.J 是一个轻量级零依赖的 Java 库，在内存集合上用链式 API 实现类 SQL 查询，灵感源自 C# LINQ。">
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav" id="nav">
+        <div class="nav-inner">
+            <a href="#" class="nav-logo">
+                <span class="logo-icon">λ</span>
+                <span class="logo-text">Linq.J</span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="#features">特性</a>
+                <a href="#syntax">语法</a>
+                <a href="#examples">示例</a>
+                <a href="#architecture">架构</a>
+                <a href="#scenarios">场景</a>
+                <a href="#start">快速开始</a>
+                <a href="#roadmap">路线图</a>
+            </div>
+            <div class="nav-actions">
+                <a href="https://github.com/erupts/linq.j" target="_blank" class="btn-github" aria-label="GitHub">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                </a>
+                <a href="https://mvnrepository.com/search?q=linq.j" target="_blank" class="btn-maven">Maven Central</a>
+            </div>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg">
+            <div class="hero-grid"></div>
+            <div class="hero-glow"></div>
+            <div class="hero-glow-2"></div>
+            <div class="hero-orb hero-orb-1"></div>
+            <div class="hero-orb hero-orb-2"></div>
+            <div class="hero-orb hero-orb-3"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                零依赖 · 50KB · JDK 8+ · MIT 开源
+            </div>
+            <h1 class="hero-title">
+                <span class="hero-title-line">用 <span class="gradient-text shimmer">SQL 思维</span></span>
+                <span class="hero-title-line">查询 Java 内存数据</span>
+            </h1>
+            <p class="hero-desc">
+                Linq.J 将 C# LINQ 的强大能力带入 Java 世界。通过优雅的链式 API，<br>
+                像写 SQL 一样对 List、Array、Stream 等内存数据进行关联、筛选、排序和聚合。
+            </p>
+            <div class="hero-actions">
+                <a href="#start" class="btn btn-primary">
+                    快速开始
+                    <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                </a>
+                <a href="#examples" class="btn btn-secondary">查看示例</a>
+            </div>
+            <div class="hero-code">
+                <div class="hero-code-glow"></div>
+                <div class="code-window hero-code-window">
+                    <div class="code-header">
+                        <div class="code-dots">
+                            <span class="dot dot-red"></span>
+                            <span class="dot dot-yellow"></span>
+                            <span class="dot dot-green"></span>
+                        </div>
+                        <span class="code-filename">QueryDemo.java</span>
+                        <div class="code-tag">LIVE EXAMPLE</div>
+                    </div>
+                    <pre class="code-body"><code><span class="kw">var</span> result = <span class="cls">Linq</span>.<span class="fn">from</span>(employees)
+    .<span class="fn">innerJoin</span>(departments, <span class="cls">Dept</span>::getId, <span class="cls">Emp</span>::getDeptId)
+    .<span class="fn">where</span>(<span class="cls">Emp</span>::getSalary, salary <span class="kw">-></span> salary > <span class="num">5000</span>)
+    .<span class="fn">groupBy</span>(<span class="cls">Dept</span>::getName)
+    .<span class="fn">select</span>(
+        <span class="cls">Columns</span>.<span class="fn">of</span>(<span class="cls">Dept</span>::getName, <span class="str">"department"</span>),
+        <span class="cls">Columns</span>.<span class="fn">avg</span>(<span class="cls">Emp</span>::getSalary, <span class="str">"avgSalary"</span>),
+        <span class="cls">Columns</span>.<span class="fn">count</span>(<span class="str">"headcount"</span>)
+    )
+    .<span class="fn">orderByDesc</span>(<span class="cls">Emp</span>::getSalary)
+    .<span class="fn">write</span>(<span class="cls">DeptStats</span>.<span class="kw">class</span>);</code></pre>
+                </div>
+                <div class="hero-code-labels">
+                    <span class="hero-label"><span class="hero-label-dot" style="background:#ff7b72"></span>Java 8+</span>
+                    <span class="hero-label"><span class="hero-label-dot" style="background:#79c0ff"></span>类型安全</span>
+                    <span class="hero-label"><span class="hero-label-dot" style="background:#d2a8ff"></span>链式调用</span>
+                    <span class="hero-label"><span class="hero-label-dot" style="background:#a5d6ff"></span>零依赖</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">外部依赖</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">~50KB</div>
+                    <div class="stat-label">体积大小</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">JDK 8+</div>
+                    <div class="stat-label">最低版本</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">MIT</div>
+                    <div class="stat-label">开源协议</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">核心特性</span>
+                <h2 class="section-title">为什么选择 Linq.J？</h2>
+                <p class="section-desc">轻量、强大、优雅 — 用最少的代码完成最复杂的数据查询</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card" data-aos>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <h3>零依赖 · 极致轻量</h3>
+                    <p>运行时无任何第三方依赖，仅 50KB 大小。引入即用，不会给项目带来任何负担。</p>
+                </div>
+                <div class="feature-card" data-aos>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    </div>
+                    <h3>类 SQL 链式语法</h3>
+                    <p>Select、Join、Where、Group By、Order By、Limit… 用你熟悉的 SQL 思维操作内存数据。</p>
+                </div>
+                <div class="feature-card" data-aos>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <h3>类型安全</h3>
+                    <p>基于 Lambda 方法引用的列操作，编译期检查字段名，IDE 自动补全，告别魔法字符串。</p>
+                </div>
+                <div class="feature-card" data-aos>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                    </div>
+                    <h3>多数据源支持</h3>
+                    <p>List、Array、SQL 结果集、CSV/JSON/XML、Stream… 任何内存中的集合都能查询。</p>
+                </div>
+                <div class="feature-card" data-aos>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    </div>
+                    <h3>可插拔查询引擎</h3>
+                    <p>抽象 Engine 接口，默认 EruptEngine 内置 Hash Join 等高效策略，可自定义扩展。</p>
+                </div>
+                <div class="feature-card" data-aos>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+                    </div>
+                    <h3>丰富的聚合函数</h3>
+                    <p>COUNT、SUM、AVG、MAX、MIN、COUNT DISTINCT… 完整的聚合能力，配合 Group By 使用。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Syntax Section -->
+    <section class="syntax" id="syntax">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">操作语法</span>
+                <h2 class="section-title">完整的 SQL 操作对应</h2>
+                <p class="section-desc">Linq.J 提供了与 SQL 一一对应的操作方法，链式调用一气呵成</p>
+            </div>
+            <div class="syntax-flow">
+                <div class="syntax-node syntax-node-start">FROM</div>
+                <div class="syntax-arrow">→</div>
+                <div class="syntax-node">JOIN</div>
+                <div class="syntax-arrow">→</div>
+                <div class="syntax-node">WHERE</div>
+                <div class="syntax-arrow">→</div>
+                <div class="syntax-node">GROUP BY</div>
+                <div class="syntax-arrow">→</div>
+                <div class="syntax-node">SELECT</div>
+                <div class="syntax-arrow">→</div>
+                <div class="syntax-node">HAVING</div>
+                <div class="syntax-arrow">→</div>
+                <div class="syntax-node">ORDER BY</div>
+                <div class="syntax-arrow">→</div>
+                <div class="syntax-node">LIMIT</div>
+                <div class="syntax-arrow">→</div>
+                <div class="syntax-node syntax-node-end">WRITE</div>
+            </div>
+            <div class="syntax-cards">
+                <div class="syntax-card">
+                    <div class="syntax-card-header">
+                        <span class="syntax-card-tag">JOIN</span>
+                        <span class="syntax-card-title">关联查询</span>
+                    </div>
+                    <div class="syntax-card-items">
+                        <code>leftJoin()</code>
+                        <code>rightJoin()</code>
+                        <code>innerJoin()</code>
+                        <code>fullJoin()</code>
+                    </div>
+                </div>
+                <div class="syntax-card">
+                    <div class="syntax-card-header">
+                        <span class="syntax-card-tag">WHERE</span>
+                        <span class="syntax-card-title">条件过滤</span>
+                    </div>
+                    <div class="syntax-card-items">
+                        <code>eq()</code>
+                        <code>like()</code>
+                        <code>between()</code>
+                        <code>in()</code>
+                        <code>isNull()</code>
+                        <code>gt() / lt()</code>
+                        <code>where(λ)</code>
+                    </div>
+                </div>
+                <div class="syntax-card">
+                    <div class="syntax-card-header">
+                        <span class="syntax-card-tag">SELECT</span>
+                        <span class="syntax-card-title">投影与聚合</span>
+                    </div>
+                    <div class="syntax-card-items">
+                        <code>select(Class)</code>
+                        <code>select(Field...)</code>
+                        <code>count()</code>
+                        <code>sum()</code>
+                        <code>avg()</code>
+                        <code>max() / min()</code>
+                    </div>
+                </div>
+                <div class="syntax-card">
+                    <div class="syntax-card-header">
+                        <span class="syntax-card-tag">WRITE</span>
+                        <span class="syntax-card-title">结果写出</span>
+                    </div>
+                    <div class="syntax-card-items">
+                        <code>write(Class)</code>
+                        <code>writeOne(Class)</code>
+                        <code>writeMap()</code>
+                        <code>writeMapOne()</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Examples Section -->
+    <section class="examples" id="examples">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">代码示例</span>
+                <h2 class="section-title">直观感受 Linq.J 的优雅</h2>
+                <p class="section-desc">像写 SQL 一样操作 Java 对象，代码即文档</p>
+            </div>
+            <div class="examples-tabs">
+                <button class="tab-btn active" data-tab="tab-basic">基础查询</button>
+                <button class="tab-btn" data-tab="tab-join">多表关联</button>
+                <button class="tab-btn" data-tab="tab-where">条件过滤</button>
+                <button class="tab-btn" data-tab="tab-group">分组聚合</button>
+                <button class="tab-btn" data-tab="tab-write">结果写出</button>
+            </div>
+
+            <div class="tab-panel active" id="tab-basic">
+                <div class="example-grid">
+                    <div class="example-info">
+                        <h3>简洁强大的基础查询</h3>
+                        <p>从简单的排序过滤到复合操作，一行代码搞定。支持原始类型和自定义对象。</p>
+                        <ul class="example-points">
+                            <li>支持原始类型直接查询</li>
+                            <li>链式调用自然流畅</li>
+                            <li>结果自动映射到目标类型</li>
+                        </ul>
+                    </div>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <div class="code-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+                            <span class="code-filename">BasicQuery.java</span>
+                        </div>
+                        <pre class="code-body"><code><span class="cmt">// 字符串排序过滤</span>
+<span class="kw">var</span> strings = <span class="cls">Linq</span>.<span class="fn">from</span>(<span class="str">"C"</span>, <span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"B"</span>)
+    .<span class="fn">gt</span>(<span class="cls">Th</span>::is, <span class="str">"A"</span>)
+    .<span class="fn">orderByDesc</span>(<span class="cls">Th</span>::is)
+    .<span class="fn">write</span>(<span class="cls">String</span>.<span class="kw">class</span>);
+<span class="cmt">// 结果: [C, B, B]</span>
+
+<span class="cmt">// 数字排序</span>
+<span class="kw">var</span> integers = <span class="cls">Linq</span>.<span class="fn">from</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">7</span>, <span class="num">6</span>, <span class="num">5</span>)
+    .<span class="fn">orderBy</span>(<span class="cls">Th</span>::is)
+    .<span class="fn">write</span>(<span class="cls">Integer</span>.<span class="kw">class</span>);
+<span class="cmt">// 结果: [1, 2, 3, 5, 6, 7]</span></code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="tab-join">
+                <div class="example-grid">
+                    <div class="example-info">
+                        <h3>强大的多表关联</h3>
+                        <p>支持四种标准 JOIN 操作，使用 Hash 策略实现高效关联，语法与 SQL 完全对应。</p>
+                        <ul class="example-points">
+                            <li>LEFT / RIGHT / INNER / FULL JOIN</li>
+                            <li>Hash Join 高效引擎</li>
+                            <li>Lambda 类型安全关联键</li>
+                        </ul>
+                    </div>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <div class="code-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+                            <span class="code-filename">JoinQuery.java</span>
+                        </div>
+                        <pre class="code-body"><code><span class="cmt">// Left Join + 多表 Select</span>
+<span class="cls">Linq</span>.<span class="fn">from</span>(source)
+    .<span class="fn">leftJoin</span>(target, <span class="cls">Target</span>::getId, <span class="cls">Source</span>::getId)
+    .<span class="fn">select</span>(<span class="cls">Source</span>.<span class="kw">class</span>)
+    .<span class="fn">select</span>(<span class="cls">Target</span>::getName)
+    .<span class="fn">write</span>(<span class="cls">Result</span>.<span class="kw">class</span>);
+
+<span class="cmt">// Inner Join + Where + Distinct</span>
+<span class="kw">var</span> names = <span class="cls">Linq</span>.<span class="fn">from</span>(data)
+    .<span class="fn">innerJoin</span>(target, <span class="cls">Target</span>::getId, <span class="cls">Data</span>::getId)
+    .<span class="fn">like</span>(<span class="cls">Data</span>::getName, <span class="str">"a"</span>)
+    .<span class="fn">select</span>(<span class="cls">Data</span>::getName)
+    .<span class="fn">distinct</span>()
+    .<span class="fn">orderBy</span>(<span class="cls">Data</span>::getName)
+    .<span class="fn">write</span>(<span class="cls">String</span>.<span class="kw">class</span>);</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="tab-where">
+                <div class="example-grid">
+                    <div class="example-info">
+                        <h3>灵活的条件过滤</h3>
+                        <p>从简单的等值比较到复杂的自定义条件，WHERE 子句覆盖你的所有需求。</p>
+                        <ul class="example-points">
+                            <li>eq / between / in / like / isNull</li>
+                            <li>单字段 Lambda 条件</li>
+                            <li>多字段自定义组合条件</li>
+                        </ul>
+                    </div>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <div class="code-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+                            <span class="code-filename">WhereQuery.java</span>
+                        </div>
+                        <pre class="code-body"><code><span class="cmt">// 精确匹配</span>
+<span class="cls">Linq</span>.<span class="fn">from</span>(source).<span class="fn">eq</span>(<span class="cls">User</span>::getName, <span class="str">"Thanos"</span>);
+
+<span class="cmt">// 范围查询</span>
+<span class="cls">Linq</span>.<span class="fn">from</span>(source).<span class="fn">between</span>(<span class="cls">User</span>::getId, <span class="num">1</span>, <span class="num">100</span>);
+
+<span class="cmt">// 自定义单字段条件</span>
+<span class="cls">Linq</span>.<span class="fn">from</span>(source).<span class="fn">where</span>(<span class="cls">User</span>::getId, id <span class="kw">-></span> id >= <span class="num">5</span>);
+
+<span class="cmt">// 多字段组合条件</span>
+<span class="cls">Linq</span>.<span class="fn">from</span>(source).<span class="fn">where</span>(row <span class="kw">-></span> {
+    <span class="cls">String</span> name = row.<span class="fn">get</span>(<span class="cls">User</span>::getName);
+    <span class="cls">Integer</span> age = (<span class="cls">Integer</span>) row.<span class="fn">get</span>(<span class="cls">User</span>::getAge);
+    <span class="kw">return</span> <span class="str">"admin"</span>.<span class="fn">equals</span>(name) || age > <span class="num">18</span>;
+});</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="tab-group">
+                <div class="example-grid">
+                    <div class="example-info">
+                        <h3>分组与聚合</h3>
+                        <p>Group By + 聚合函数 + Having，完整的分组聚合能力，生成统计报表轻而易举。</p>
+                        <ul class="example-points">
+                            <li>GROUP BY 分组</li>
+                            <li>HAVING 过滤</li>
+                            <li>多聚合函数组合</li>
+                        </ul>
+                    </div>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <div class="code-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+                            <span class="code-filename">GroupByQuery.java</span>
+                        </div>
+                        <pre class="code-body"><code><span class="cls">Linq</span>.<span class="fn">from</span>(source)
+    .<span class="fn">groupBy</span>(<span class="cls">Order</span>::getCategory)
+    .<span class="fn">select</span>(
+        <span class="cls">Columns</span>.<span class="fn">of</span>(<span class="cls">Order</span>::getCategory, <span class="str">"name"</span>),
+        <span class="cls">Columns</span>.<span class="fn">min</span>(<span class="cls">Order</span>::getDate, <span class="str">"earliest"</span>),
+        <span class="cls">Columns</span>.<span class="fn">avg</span>(<span class="cls">Order</span>::getPrice, <span class="str">"avgPrice"</span>),
+        <span class="cls">Columns</span>.<span class="fn">count</span>(<span class="str">"total"</span>),
+        <span class="cls">Columns</span>.<span class="fn">countDistinct</span>(
+            <span class="cls">Order</span>::getBuyer, <span class="str">"uniqueBuyers"</span>
+        )
+    )
+    .<span class="fn">having</span>(row <span class="kw">-></span>
+        <span class="cls">Integer</span>.<span class="fn">parseInt</span>(
+            row.<span class="fn">get</span>(<span class="str">"total"</span>).<span class="fn">toString</span>()
+        ) > <span class="num">10</span>
+    )
+    .<span class="fn">orderBy</span>(<span class="cls">Order</span>::getPrice)
+    .<span class="fn">write</span>(<span class="cls">CategoryStats</span>.<span class="kw">class</span>);</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="tab-write">
+                <div class="example-grid">
+                    <div class="example-info">
+                        <h3>灵活的结果写出</h3>
+                        <p>查询结果可以映射为 Java 对象、List、Map 或单个值，满足不同场景需求。</p>
+                        <ul class="example-points">
+                            <li>write() → List&lt;T&gt;</li>
+                            <li>writeOne() → T</li>
+                            <li>writeMap() → List&lt;Map&gt;</li>
+                            <li>writeMapOne() → Map</li>
+                        </ul>
+                    </div>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <div class="code-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+                            <span class="code-filename">WriteResult.java</span>
+                        </div>
+                        <pre class="code-body"><code><span class="cmt">// 写出为对象列表</span>
+<span class="cls">List</span>&lt;<span class="cls">User</span>&gt; list = <span class="cls">Linq</span>.<span class="fn">from</span>(source)
+    .<span class="fn">orderByAsc</span>(<span class="cls">User</span>::getDate)
+    .<span class="fn">write</span>(<span class="cls">User</span>.<span class="kw">class</span>);
+
+<span class="cmt">// 写出单个对象</span>
+<span class="cls">User</span> one = <span class="cls">Linq</span>.<span class="fn">from</span>(source)
+    .<span class="fn">limit</span>(<span class="num">1</span>)
+    .<span class="fn">writeOne</span>(<span class="cls">User</span>.<span class="kw">class</span>);
+
+<span class="cmt">// 写出为 Map 列表</span>
+<span class="cls">List</span>&lt;<span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt;&gt; maps =
+    <span class="cls">Linq</span>.<span class="fn">from</span>(source).<span class="fn">writeMap</span>();
+
+<span class="cmt">// 写出单个 Map</span>
+<span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; map =
+    <span class="cls">Linq</span>.<span class="fn">from</span>(source).<span class="fn">writeMapOne</span>();</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section class="architecture" id="architecture">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">技术架构</span>
+                <h2 class="section-title">清晰的分层设计</h2>
+                <p class="section-desc">查询构建与执行引擎解耦，接口隔离，灵活可扩展</p>
+            </div>
+            <div class="arch-diagram">
+                <div class="arch-layer arch-layer-top">
+                    <div class="arch-label">链式 API 层</div>
+                    <div class="arch-items">
+                        <div class="arch-item">Select</div>
+                        <div class="arch-item">Join</div>
+                        <div class="arch-item">Where</div>
+                        <div class="arch-item">GroupBy</div>
+                        <div class="arch-item">OrderBy</div>
+                        <div class="arch-item">Write</div>
+                    </div>
+                </div>
+                <div class="arch-connector">
+                    <svg viewBox="0 0 40 30" width="40" height="30"><path d="M20 0 L20 30" stroke="currentColor" stroke-width="2" stroke-dasharray="4,3" fill="none"/><path d="M14 24 L20 30 L26 24" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                </div>
+                <div class="arch-layer arch-layer-mid">
+                    <div class="arch-label">查询模型层</div>
+                    <div class="arch-items">
+                        <div class="arch-item arch-item-core">Linq (门面)</div>
+                        <div class="arch-item">Dql (查询状态)</div>
+                        <div class="arch-item">Column / Row</div>
+                    </div>
+                </div>
+                <div class="arch-connector">
+                    <svg viewBox="0 0 40 30" width="40" height="30"><path d="M20 0 L20 30" stroke="currentColor" stroke-width="2" stroke-dasharray="4,3" fill="none"/><path d="M14 24 L20 30 L26 24" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                </div>
+                <div class="arch-layer arch-layer-bottom">
+                    <div class="arch-label">执行引擎层</div>
+                    <div class="arch-items">
+                        <div class="arch-item arch-item-core">Engine (抽象)</div>
+                        <div class="arch-item">EruptEngine (默认)</div>
+                        <div class="arch-item">Custom Engine</div>
+                    </div>
+                </div>
+                <div class="arch-connector">
+                    <svg viewBox="0 0 40 30" width="40" height="30"><path d="M20 0 L20 30" stroke="currentColor" stroke-width="2" stroke-dasharray="4,3" fill="none"/><path d="M14 24 L20 30 L26 24" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                </div>
+                <div class="arch-layer arch-layer-base">
+                    <div class="arch-label">Lambda 解析层</div>
+                    <div class="arch-items">
+                        <div class="arch-item">SFunction</div>
+                        <div class="arch-item">LambdaSee</div>
+                        <div class="arch-item">SerializedLambda</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scenarios Section -->
+    <section class="scenarios" id="scenarios">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">应用场景</span>
+                <h2 class="section-title">在哪里使用 Linq.J？</h2>
+                <p class="section-desc">分布式微服务、数据处理、报表生成… 无处不在</p>
+            </div>
+            <div class="scenarios-grid">
+                <div class="scenario-card" data-aos>
+                    <div class="scenario-number">01</div>
+                    <h3>RPC 结果关联</h3>
+                    <p>Feign / Dubbo / gRPC 等微服务调用返回的多个结果集，通过 Linq.J 在内存中进行 JOIN 关联，替代多次数据库查询。</p>
+                </div>
+                <div class="scenario-card" data-aos>
+                    <div class="scenario-number">02</div>
+                    <h3>异构数据计算</h3>
+                    <p>Redis、MongoDB、MySQL 等不同数据源的结果，统一加载到内存后，用 Linq.J 进行跨源查询与聚合。</p>
+                </div>
+                <div class="scenario-card" data-aos>
+                    <div class="scenario-number">03</div>
+                    <h3>SQL 结果再加工</h3>
+                    <p>数据库查询结果需要进一步排序、过滤、聚合？Linq.J 让代码替代复杂的二次 SQL，逻辑清晰可维护。</p>
+                </div>
+                <div class="scenario-card" data-aos>
+                    <div class="scenario-number">04</div>
+                    <h3>内存分页与排序</h3>
+                    <p>多结果合并后的排序聚合与内存分页，告别手写 for 循环和 if 分支，代码量减少 80%。</p>
+                </div>
+                <div class="scenario-card" data-aos>
+                    <div class="scenario-number">05</div>
+                    <h3>对象转换映射</h3>
+                    <p>语义化地完成对象转换与映射，代码即文档，团队协作更清晰敏捷。</p>
+                </div>
+                <div class="scenario-card" data-aos>
+                    <div class="scenario-number">06</div>
+                    <h3>跨数据源联邦查询</h3>
+                    <p>不同系统、不同存储的数据，通过 Linq.J 在应用层实现联邦访问，无需数据迁移。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Getting Started Section -->
+    <section class="start" id="start">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">快速开始</span>
+                <h2 class="section-title">三步上手 Linq.J</h2>
+                <p class="section-desc">零配置，即装即用</p>
+            </div>
+            <div class="steps">
+                <div class="step" data-aos>
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>添加 Maven 依赖</h3>
+                        <div class="code-window code-window-sm">
+                            <div class="code-header">
+                                <div class="code-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+                                <span class="code-filename">pom.xml</span>
+                                <button class="copy-btn" data-copy="dep">复制</button>
+                            </div>
+                            <pre class="code-body"><code id="dep"><span class="kw">&lt;dependency&gt;</span>
+    <span class="kw">&lt;groupId&gt;</span>xyz.erupt<span class="kw">&lt;/groupId&gt;</span>
+    <span class="kw">&lt;artifactId&gt;</span>linq.j<span class="kw">&lt;/artifactId&gt;</span>
+    <span class="kw">&lt;version&gt;</span>LATEST<span class="kw">&lt;/version&gt;</span>
+<span class="kw">&lt;/dependency&gt;</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="step" data-aos>
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>确保字段有 Getter</h3>
+                        <div class="code-window code-window-sm">
+                            <div class="code-header">
+                                <div class="code-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+                                <span class="code-filename">User.java</span>
+                            </div>
+                            <pre class="code-body"><code><span class="kw">@Getter</span>  <span class="cmt">// Lombok 注解</span>
+<span class="kw">public class</span> <span class="cls">User</span> {
+    <span class="kw">private</span> <span class="cls">Long</span> id;
+    <span class="kw">private</span> <span class="cls">String</span> name;
+    <span class="kw">private</span> <span class="cls">Integer</span> age;
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="step" data-aos>
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>开始查询</h3>
+                        <div class="code-window code-window-sm">
+                            <div class="code-header">
+                                <div class="code-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+                                <span class="code-filename">Main.java</span>
+                            </div>
+                            <pre class="code-body"><code><span class="cls">List</span>&lt;<span class="cls">User</span>&gt; adults = <span class="cls">Linq</span>.<span class="fn">from</span>(users)
+    .<span class="fn">where</span>(<span class="cls">User</span>::getAge, age <span class="kw">-></span> age >= <span class="num">18</span>)
+    .<span class="fn">select</span>(<span class="cls">User</span>::getName, <span class="cls">User</span>::getAge)
+    .<span class="fn">orderBy</span>(<span class="cls">User</span>::getAge)
+    .<span class="fn">write</span>(<span class="cls">User</span>.<span class="kw">class</span>);</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section class="comparison">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">对比</span>
+                <h2 class="section-title">传统写法 vs Linq.J</h2>
+            </div>
+            <div class="compare-grid">
+                <div class="compare-card compare-before">
+                    <div class="compare-label">传统 Java 写法</div>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <div class="code-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+                            <span class="code-filename">Traditional.java</span>
+                        </div>
+                        <pre class="code-body"><code><span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">List</span>&lt;<span class="cls">Order</span>&gt;&gt; grouped = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+<span class="kw">for</span> (<span class="cls">Order</span> o : orders) {
+    <span class="kw">if</span> (o.getAmount() > <span class="num">100</span>) {
+        grouped.<span class="fn">computeIfAbsent</span>(
+            o.getCategory(),
+            k <span class="kw">-></span> <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;()
+        ).<span class="fn">add</span>(o);
+    }
+}
+<span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Double</span>&gt; avgMap = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+<span class="kw">for</span> (<span class="kw">var</span> entry : grouped.<span class="fn">entrySet</span>()) {
+    <span class="kw">double</span> sum = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">var</span> o : entry.<span class="fn">getValue</span>()) {
+        sum += o.<span class="fn">getAmount</span>();
+    }
+    avgMap.<span class="fn">put</span>(entry.<span class="fn">getKey</span>(),
+        sum / entry.<span class="fn">getValue</span>().<span class="fn">size</span>());
+}
+<span class="cmt">// 还需要排序... 更多代码...</span></code></pre>
+                    </div>
+                </div>
+                <div class="compare-vs">VS</div>
+                <div class="compare-card compare-after">
+                    <div class="compare-label">Linq.J 写法</div>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <div class="code-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+                            <span class="code-filename">LinqWay.java</span>
+                        </div>
+                        <pre class="code-body"><code><span class="kw">var</span> result = <span class="cls">Linq</span>.<span class="fn">from</span>(orders)
+    .<span class="fn">where</span>(<span class="cls">Order</span>::getAmount,
+        a <span class="kw">-></span> a > <span class="num">100</span>)
+    .<span class="fn">groupBy</span>(<span class="cls">Order</span>::getCategory)
+    .<span class="fn">select</span>(
+        <span class="cls">Columns</span>.<span class="fn">of</span>(
+            <span class="cls">Order</span>::getCategory, <span class="str">"cat"</span>),
+        <span class="cls">Columns</span>.<span class="fn">avg</span>(
+            <span class="cls">Order</span>::getAmount, <span class="str">"avg"</span>),
+        <span class="cls">Columns</span>.<span class="fn">count</span>(<span class="str">"cnt"</span>)
+    )
+    .<span class="fn">orderByDesc</span>(<span class="cls">Order</span>::getAmount)
+    .<span class="fn">write</span>(<span class="cls">Stats</span>.<span class="kw">class</span>);
+
+<span class="cmt">// 清晰 · 简洁 · 高效</span></code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap Section -->
+    <section class="roadmap" id="roadmap">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">路线图</span>
+                <h2 class="section-title">持续进化中</h2>
+                <p class="section-desc">Linq.J 正在不断完善，更多强大特性即将到来</p>
+            </div>
+            <div class="roadmap-timeline">
+                <div class="roadmap-item done">
+                    <div class="roadmap-dot"></div>
+                    <div class="roadmap-card">
+                        <span class="roadmap-status">已完成</span>
+                        <h4>HAVING 支持</h4>
+                        <p>分组聚合后的条件过滤</p>
+                    </div>
+                </div>
+                <div class="roadmap-item done">
+                    <div class="roadmap-dot"></div>
+                    <div class="roadmap-card">
+                        <span class="roadmap-status">已完成</span>
+                        <h4>分组列格式化</h4>
+                        <p>支持 group by date(created_at) 等表达式</p>
+                    </div>
+                </div>
+                <div class="roadmap-item planned">
+                    <div class="roadmap-dot"></div>
+                    <div class="roadmap-card">
+                        <span class="roadmap-status">计划中</span>
+                        <h4>集合操作</h4>
+                        <p>UNION ALL、UNION、INTERSECT、EXCEPT、UNION BY NAME</p>
+                    </div>
+                </div>
+                <div class="roadmap-item planned">
+                    <div class="roadmap-dot"></div>
+                    <div class="roadmap-card">
+                        <span class="roadmap-status">计划中</span>
+                        <h4>窗口函数</h4>
+                        <p>ROW_NUMBER、RANK、DENSE_RANK 等分析函数</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <span class="logo-icon">λ</span>
+                    <span class="logo-text">Linq.J</span>
+                    <p class="footer-desc">基于内存的 Java 对象查询语言<br>灵感源自 C# LINQ</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <h4>资源</h4>
+                        <a href="https://github.com/erupts/linq.j" target="_blank">GitHub</a>
+                        <a href="https://mvnrepository.com/search?q=linq.j" target="_blank">Maven Central</a>
+                        <a href="https://gitee.com/erupt/linq" target="_blank">Gitee</a>
+                        <a href="https://gitcode.com/erupts/Linq.J" target="_blank">GitCode</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>相关</h4>
+                        <a href="https://www.erupt.xyz" target="_blank">Erupt Framework</a>
+                        <a href="https://learn.microsoft.com/zh-cn/dotnet/csharp/linq/" target="_blank">C# LINQ 参考</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>MIT License &copy; Linq.J</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/script.js"></script>
+</body>
+</html>

@@ -1,45 +1,58 @@
-# Linq.J A Memory-based Object Query language
-[中文](./README-zh.md) / English
+<div align="center">
 
-`Java uses Linq capabilities similar to C#` [C# Linq](https://learn.microsoft.com/zh-cn/dotnet/csharp/linq/)
+# Linq.J
+
+### A Lightweight, Zero-Dependency Object Query Language for Java
+
+**Query in-memory data the way you query a database — with SQL-like fluent API inspired by [C# LINQ](https://learn.microsoft.com/en-us/dotnet/csharp/linq/)**
 
 <p>
     <a href="https://www.erupt.xyz" target="_blank"><img src="https://img.shields.io/badge/Linq.J-brightgreen" alt="Erupt Framework" /></a>
     <a href="https://mvnrepository.com/search?q=linq.j"><img src="https://img.shields.io/maven-central/v/xyz.erupt/linq.j" alt="maven-central" /></a>
     <a href="https://www.oracle.com/technetwork/java/javase/downloads/index.html"><img src="https://img.shields.io/badge/JDK-8+-green.svg" alt="jdk 8+" /></a>
-    <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license Apache 2.0"></a>
-    <a href='https://gitcode.com/erupts/Linq.J'><img src='https://gitcode.com/erupts/linq.j/star/badge.svg' alt='GitCode star' /></a>
-    <a href='https://gitee.com/erupt/linq/stargazers'><img src='https://gitee.com/erupt/linq/badge/star.svg?theme=gray' alt='GitEE star' /></a>
+    <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license MIT"></a>
     <a href="https://github.com/erupts/linq.j"><img src="https://img.shields.io/github/stars/erupts/linq.j?style=social" alt="GitHub stars" /></a>
+    <a href='https://gitee.com/erupt/linq/stargazers'><img src='https://gitee.com/erupt/linq/badge/star.svg?theme=gray' alt='GitEE star' /></a>
+    <a href='https://gitcode.com/erupts/Linq.J'><img src='https://gitcode.com/erupts/linq.j/star/badge.svg' alt='GitCode star' /></a>
 </p>
 
-### Linq is Object oriented sql, linq is actually a query on the data in memory, enabling developers to write queries more easily. These query expressions look a lot like SQL
+[中文](./README-zh.md) / English
 
-> You can join, filter, sort, and group data sources with minimal code. These operations can be combined in a single query to obtain more complex results
+</div>
 
-#### allows you to write Java code that manipulates in-memory data in the same way that you query a database, for example
-- List, Array
-- SQL result data
-- CSV, XML, JSON document datasets
-- Stream, File stream
+---
 
-#### Application Scenarios
-- Result association for RPCS such as Feign/Dubbo during distributed development
-- In-memory computation of heterogeneous system data
-- Use code to organize SQL result data
-- Sorted aggregation of multiple result objects with in-memory paging
-- Semantic object transformation and mapping
-- Clean code, no need for loops and branches to manipulate data
-- Federated access across data sources
+## Highlights
 
-#### Operation syntax
-`From` `Select` `Distinct`、`Join`、`Where`、`Group By`、`Order By`、`Limit`、`Offset`、`...`
+- **Zero Runtime Dependencies** — pure JDK, no third-party libraries
+- **~50 KB** — minimal footprint, won't bloat your project
+- **JDK 8+** — works on Java 8 and above
+- **Type-Safe** — lambda method references for column operations, compile-time checked
+- **SQL-Like** — `SELECT`, `JOIN`, `WHERE`, `GROUP BY`, `HAVING`, `ORDER BY`, `LIMIT`, `OFFSET`, `DISTINCT`
+- **Pluggable Engine** — swap or extend the default `EruptEngine` with your own execution strategy
 
-#### Tips
-⚠️ Note: The object field must have a get method to facilitate lambda lookup. It is recommended to use the **Lombok** @Getter annotation to quickly create get access to the field
+## Why Linq.J?
 
-#### How to Use
-It has zero external dependencies and is only 50kb in size
+Java developers often need to join, filter, sort, and aggregate data from **in-memory collections** — results from RPCs, heterogeneous data sources, or post-SQL processing. Without Linq.J, this means verbose `for` loops, `if` branches, and scattered logic. Linq.J replaces all of that with a **single fluent chain** that reads like SQL.
+
+```java
+var result = Linq.from(employees)
+    .innerJoin(departments, Dept::getId, Emp::getDeptId)
+    .where(Emp::getSalary, salary -> salary > 5000)
+    .groupBy(Dept::getName)
+    .select(
+        Columns.of(Dept::getName, "department"),
+        Columns.avg(Emp::getSalary, "avgSalary"),
+        Columns.count("headcount")
+    )
+    .orderByDesc(Emp::getSalary)
+    .write(DeptStats.class);
+```
+
+## Getting Started
+
+### 1. Add the Dependency
+
 ```xml
 <dependency>
     <groupId>xyz.erupt</groupId>
@@ -48,143 +61,272 @@ It has zero external dependencies and is only 50kb in size
 </dependency>
 ```
 
-#### Example 1
-```javascript
-var strings = Linq.from("C", "A", "B", "B").gt(Th::is, "A").orderByDesc(Th::is).write(String.class);
-// [C, B, B]
+### 2. Ensure Fields Have Getters
 
-var integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(Th::is).write(Integer.class);
-// [1, 2, 3, 5, 6, 7]
+Linq.J resolves field names from **lambda method references** via `SerializedLambda`. Your data classes must have getter methods. Using [Lombok](https://projectlombok.org/) `@Getter` is recommended:
 
-var name = Linq.from(data)
-    // left join
-    .innerJoin(target, Target::getId, Data::getId)
-    // where like
-    .like(Data::getName, "a")
-    // select name
-    .select(Data::getName)
-    // distinct
-    .distinct()
-    // order by 
-    .orderBy(Data::getName)
-    .write(String.class);
-
-```
-
-#### Example 2
 ```java
-public class ObjectQuery{
-
-    private final List<TestSource> source = http.get("https://gw.alipayobjects.com/os/antfincdn/v6MvZBUBsQ/column-data.json");
-
-    private final List<TestSourceExt> target = mongodb.query("db.target.find()");
-    
-    /**
-     * select demo
-     */
-    public void select(){
-        // select *
-        Linq.from(source).select(TestSource.class);
-        // select a, b, c
-        Linq.from(source)
-                .select(TestSource::getName, TestSource::getDate, TestSource::getTags)
-                .select(TestSource::getTags, "tag2") // alias
-                .select(Columns.ofx(TestSource::getId, id -> id + "xxx")); // value convert
-        // select count(*), sum(id), max(id) 
-        Linq.from(source)
-                .select(Columns.count("count"))
-                .select(Columns.sum(TestSource::getId, "sum"))
-                .select(Columns.max(TestSource::getId, "max"));
-    }
-
-    
-    /**
-     * join demo
-     */
-    public void join(){
-        // left join
-        Linq.from(source).leftJoin(target, TestSourceExt::getId, TestSource::getId)
-                .select(TestSource.class)
-                .select(TestSourceExt::getName)
-                .select(TestSourceExt2::getValue);
-        // right join
-        Linq.from(source).rightJoin(target, TestSourceExt::getId, TestSource::getId);
-        // inner join
-        Linq.from(source).innerJoin(target, TestSourceExt::getId, TestSource::getId);
-        // full join
-        Linq.from(source).fullJoin(target, TestSourceExt::getId, TestSource::getId);
-    }
-
-    
-    /**
-     * where demo
-     */
-    public void where() {
-        // =
-        Linq.from(source).eq(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
-        // >=:lval and <=:rval
-        Linq.from(source).between(TestSource::getId, 1, 3);
-        // in (x,x,x)
-        Linq.from(source).in(TestSource::getId, 1, 2, 3);
-        // like '%x%'
-        Linq.from(source).like(TestSource::getName, "a");
-        // is null
-        Linq.from(source).isNull(TestSource::getId);
-        
-        // customer single field where
-        Linq.from(source).where(TestSource::getId, id -> id >= 5);
-        
-        // customer condition or multi field
-        Linq.from(source).where(data -> {
-            String name = data.get(TestSource::getName);
-            Integer age = (Integer)data.get(TestSource::getAge);
-            // name = 'xxx' or age > 10
-            return "xxx".equals(name) || age > 10;
-        });
-    }
-
-    
-    /**
-     * group by demo
-     */
-    public void groupBy(){
-        Linq.from(source)
-            .groupBy(TestSource::getName)
-            .select(
-                Columns.of(TestSource::getName, "name"),
-                Columns.min(TestSource::getDate, "min"),
-                Columns.avg(TestSource::getId, "avg"),
-                Columns.count("count"),
-                Columns.count(TestSource::getName, "countName"),
-                Columns.countDistinct(TestSource::getName, "countDistinct")
-            )
-            .having(row -> Integer.parseInt(row.get("avg").toString()) > 2)
-            .orderBy(TestSource::getAge);
-    }
-
-    
-    /**
-     * result write demo
-     */
-    public void write(){
-        // write List<Object>
-        List<TestSource> list = Linq.from(source).orderByAsc(TestSource::getDate).write(TestSource.class);
-        // write Object
-        TestSource obj = Linq.from(source).limit(3).writeOne(TestSource.class);
-        // write List<Map>
-        List<Map<String, Object>> map = Linq.from(source).writeMap();
-        // write Map
-        Map<String, Object> mapOne = Linq.from(source).writeMapOne();
-    }
-    
+@Getter
+public class User {
+    private Long id;
+    private String name;
+    private Integer age;
 }
-
 ```
 
-#### Next iteration plan
+### 3. Start Querying
 
-- [ ] Supports combining multiple query result sets: UNION ALL, UNION, INTERSECT, EXCEPT, UNION BY NAME
-- [ ] Supports window functions
-- [ ] Support Nested loop join
-- [x] supports having
-- [x] Support group column format group by date(created_at)
+```java
+List<User> adults = Linq.from(users)
+    .where(User::getAge, age -> age >= 18)
+    .select(User::getName, User::getAge)
+    .orderBy(User::getAge)
+    .write(User.class);
+```
+
+## Supported Data Sources
+
+Linq.J operates on any **in-memory collection**. Feed it data from anywhere:
+
+| Source | Example |
+|--------|---------|
+| List / Array | `Linq.from(list)` or `Linq.from("A", "B", "C")` |
+| SQL Result | Load via JDBC / MyBatis / JPA, then query with Linq |
+| CSV / XML / JSON | Parse into objects, then query with Linq |
+| Redis / MongoDB | Fetch results, then query with Linq |
+| Stream / File | Collect into a list, then query with Linq |
+| RPC Response | Feign / Dubbo / gRPC results, then query with Linq |
+
+## API Reference
+
+### Select
+
+```java
+// Select all fields
+Linq.from(source).select(User.class);
+
+// Select specific fields
+Linq.from(source).select(User::getName, User::getDate, User::getTags);
+
+// Select with alias
+Linq.from(source).select(User::getTags, "tagAlias");
+
+// Select with value transformation
+Linq.from(source).select(Columns.ofx(User::getId, id -> id + "-suffix"));
+
+// Aggregate functions
+Linq.from(source).select(
+    Columns.count("count"),
+    Columns.sum(User::getId, "sum"),
+    Columns.max(User::getId, "max"),
+    Columns.min(User::getId, "min"),
+    Columns.avg(User::getId, "avg"),
+    Columns.countDistinct(User::getName, "uniqueNames")
+);
+```
+
+### Join
+
+Four standard join types are supported, powered by a Hash Join engine for performance:
+
+```java
+// Left Join
+Linq.from(source).leftJoin(target, Target::getId, Source::getId);
+
+// Right Join
+Linq.from(source).rightJoin(target, Target::getId, Source::getId);
+
+// Inner Join
+Linq.from(source).innerJoin(target, Target::getId, Source::getId);
+
+// Full Join
+Linq.from(source).fullJoin(target, Target::getId, Source::getId);
+
+// Join + multi-table select
+Linq.from(source)
+    .leftJoin(target, Target::getId, Source::getId)
+    .select(Source.class)
+    .select(Target::getName)
+    .write(Result.class);
+```
+
+### Where
+
+```java
+// Equals
+Linq.from(source).eq(User::getName, "Thanos");
+
+// Between (inclusive)
+Linq.from(source).between(User::getId, 1, 100);
+
+// In
+Linq.from(source).in(User::getId, 1, 2, 3);
+
+// Like (contains)
+Linq.from(source).like(User::getName, "admin");
+
+// Is Null
+Linq.from(source).isNull(User::getId);
+
+// Greater than / Less than
+Linq.from(source).gt(User::getAge, 18);
+
+// Custom single-field condition
+Linq.from(source).where(User::getId, id -> id >= 5);
+
+// Custom multi-field condition
+Linq.from(source).where(row -> {
+    String name = row.get(User::getName);
+    Integer age = (Integer) row.get(User::getAge);
+    return "admin".equals(name) || age > 18;
+});
+```
+
+### Group By & Having
+
+```java
+Linq.from(orders)
+    .groupBy(Order::getCategory)
+    .select(
+        Columns.of(Order::getCategory, "name"),
+        Columns.min(Order::getDate, "earliest"),
+        Columns.avg(Order::getPrice, "avgPrice"),
+        Columns.count("total"),
+        Columns.countDistinct(Order::getBuyer, "uniqueBuyers")
+    )
+    .having(row -> Integer.parseInt(row.get("total").toString()) > 10)
+    .orderBy(Order::getPrice)
+    .write(CategoryStats.class);
+```
+
+### Order By, Limit & Offset
+
+```java
+Linq.from(source)
+    .orderBy(User::getName)          // ascending
+    .orderByDesc(User::getAge)       // descending
+    .offset(10)                      // skip first 10
+    .limit(20)                       // take 20 records
+    .write(User.class);
+```
+
+### Result Output
+
+```java
+// Write to List<T>
+List<User> list = Linq.from(source).write(User.class);
+
+// Write to single object
+User one = Linq.from(source).limit(1).writeOne(User.class);
+
+// Write to List<Map<String, Object>>
+List<Map<String, Object>> maps = Linq.from(source).writeMap();
+
+// Write to single Map<String, Object>
+Map<String, Object> map = Linq.from(source).writeMapOne();
+```
+
+## Architecture
+
+Linq.J follows a clean **layered architecture** with separation between query building and execution:
+
+```
+┌─────────────────────────────────────────────────────┐
+│                  Fluent API Layer                    │
+│   Select · Join · Where · GroupBy · OrderBy · Write  │
+├─────────────────────────────────────────────────────┤
+│                  Query Model Layer                   │
+│        Linq (Facade) · Dql (State) · Column · Row    │
+├─────────────────────────────────────────────────────┤
+│                 Execution Engine Layer                │
+│       Engine (Abstract) → EruptEngine (Default)      │
+├─────────────────────────────────────────────────────┤
+│                Lambda Resolution Layer               │
+│     SFunction · LambdaSee · SerializedLambda         │
+└─────────────────────────────────────────────────────┘
+```
+
+**Pluggable Engine**: Replace the default `EruptEngine` with a custom implementation:
+
+```java
+Linq.setEngine(new MyCustomEngine());
+```
+
+## Use Cases
+
+| Scenario | Description |
+|----------|-------------|
+| **RPC Result Association** | Join results from Feign / Dubbo / gRPC calls in memory instead of multiple DB roundtrips |
+| **Heterogeneous Data** | Unify and query data from Redis, MongoDB, MySQL in one place |
+| **Post-SQL Processing** | Further filter, sort, and aggregate database query results in code |
+| **In-Memory Pagination** | Merge multiple result sets, then sort, aggregate, and paginate |
+| **Object Mapping** | Semantic, readable object transformation and projection |
+| **Cross-Source Federation** | Federated queries across different data sources at the application layer |
+
+## Before & After
+
+<table>
+<tr>
+<td width="50%">
+
+**Traditional Java**
+
+```java
+Map<String, List<Order>> grouped = new HashMap<>();
+for (Order o : orders) {
+    if (o.getAmount() > 100) {
+        grouped.computeIfAbsent(
+            o.getCategory(),
+            k -> new ArrayList<>()
+        ).add(o);
+    }
+}
+Map<String, Double> avgMap = new HashMap<>();
+for (var entry : grouped.entrySet()) {
+    double sum = 0;
+    for (var o : entry.getValue()) {
+        sum += o.getAmount();
+    }
+    avgMap.put(entry.getKey(),
+        sum / entry.getValue().size());
+}
+// Still need sorting... more code...
+```
+
+</td>
+<td width="50%">
+
+**With Linq.J**
+
+```java
+var result = Linq.from(orders)
+    .where(Order::getAmount, a -> a > 100)
+    .groupBy(Order::getCategory)
+    .select(
+        Columns.of(Order::getCategory, "cat"),
+        Columns.avg(Order::getAmount, "avg"),
+        Columns.count("cnt")
+    )
+    .orderByDesc(Order::getAmount)
+    .write(Stats.class);
+```
+
+</td>
+</tr>
+</table>
+
+## Roadmap
+
+- [x] HAVING clause support
+- [x] Group column formatting (`group by date(created_at)`)
+- [ ] Set operations: UNION ALL, UNION, INTERSECT, EXCEPT, UNION BY NAME
+- [ ] Window functions (ROW_NUMBER, RANK, DENSE_RANK, ...)
+- [ ] Nested Loop Join strategy
+
+## Contributing
+
+Contributions are welcome! Feel free to open issues and pull requests.
+
+## License
+
+[MIT](./LICENSE)
