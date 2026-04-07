@@ -41,47 +41,56 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-grid"></div>
-            <div class="hero-glow"></div>
-            <div class="hero-glow-2"></div>
-            <div class="hero-orb hero-orb-1"></div>
-            <div class="hero-orb hero-orb-2"></div>
-            <div class="hero-orb hero-orb-3"></div>
-        </div>
-        <div class="hero-content">
-            <div class="hero-badge">
-                <span class="badge-dot"></span>
-                零依赖 · 50KB · JDK 8+ · MIT 开源
-            </div>
-            <h1 class="hero-title">
-                <span class="hero-title-line">用 <span class="gradient-text shimmer">SQL 思维</span></span>
-                <span class="hero-title-line">查询 Java 内存数据</span>
-            </h1>
-            <p class="hero-desc">
-                Linq.J 将 C# LINQ 的强大能力带入 Java 世界。通过优雅的链式 API，<br>
-                像写 SQL 一样对 List、Array、Stream 等内存数据进行关联、筛选、排序和聚合。
-            </p>
-            <div class="hero-actions">
-                <a href="#start" class="btn btn-primary">
-                    快速开始
-                    <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-                </a>
-                <a href="#examples" class="btn btn-secondary">查看示例</a>
-            </div>
-            <div class="hero-code">
-                <div class="hero-code-glow"></div>
-                <div class="code-window hero-code-window">
-                    <div class="code-header">
-                        <div class="code-dots">
-                            <span class="dot dot-red"></span>
-                            <span class="dot dot-yellow"></span>
-                            <span class="dot dot-green"></span>
-                        </div>
-                        <span class="code-filename">QueryDemo.java</span>
-                        <div class="code-tag">LIVE EXAMPLE</div>
+        <div class="container">
+            <div class="hero-split">
+                <!-- Left: Copy -->
+                <div class="hero-copy">
+                    <a href="https://github.com/erupts/linq.j" target="_blank" class="hero-badge">
+                        <span class="badge-dot"></span>
+                        v0.1.X 已发布 · 查看 GitHub →
+                    </a>
+                    <h1 class="hero-title">
+                        不写 for 循环，<br>
+                        用&nbsp;<span class="hero-sql-word">SQL</span>&nbsp;思维<br>
+                        查询内存数据
+                    </h1>
+                    <p class="hero-desc">
+                        Linq.J 让 Java 集合查询变得像写 SQL 一样直观。
+                        JOIN、WHERE、GROUP BY、ORDER BY，链式一行搞定，代码即文档。
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#start" class="btn btn-primary">
+                            快速开始
+                            <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                        </a>
+                        <a href="#examples" class="btn btn-secondary">查看示例</a>
                     </div>
-                    <pre class="code-body"><code><span class="kw">var</span> result = <span class="cls">Linq</span>.<span class="fn">from</span>(employees)
+                    <div class="hero-pills">
+                        <span class="hero-pill">零外部依赖</span>
+                        <span class="hero-pill">50 KB</span>
+                        <span class="hero-pill">JDK 8+</span>
+                        <span class="hero-pill">MIT 开源</span>
+                    </div>
+                </div>
+                <!-- Right: Code -->
+                <div class="hero-visual">
+                    <div class="code-window hero-code-window">
+                        <div class="code-header">
+                            <div class="code-dots">
+                                <span class="dot dot-red"></span>
+                                <span class="dot dot-yellow"></span>
+                                <span class="dot dot-green"></span>
+                            </div>
+                            <span class="code-filename">QueryDemo.java</span>
+                            <div class="code-tag">LIVE EXAMPLE</div>
+                        </div>
+                        <pre class="code-body"><code><span class="cmt">// SELECT dept.name, AVG(salary), COUNT(*)</span>
+<span class="cmt">// FROM employees INNER JOIN departments</span>
+<span class="cmt">//   ON dept.id = emp.deptId</span>
+<span class="cmt">// WHERE salary > 5000</span>
+<span class="cmt">// GROUP BY dept.name ORDER BY salary DESC</span>
+
+<span class="kw">var</span> result = <span class="cls">Linq</span>.<span class="fn">from</span>(employees)
     .<span class="fn">innerJoin</span>(departments, <span class="cls">Dept</span>::getId, <span class="cls">Emp</span>::getDeptId)
     .<span class="fn">where</span>(<span class="cls">Emp</span>::getSalary, salary <span class="kw">-></span> salary > <span class="num">5000</span>)
     .<span class="fn">groupBy</span>(<span class="cls">Dept</span>::getName)
@@ -92,12 +101,7 @@
     )
     .<span class="fn">orderByDesc</span>(<span class="cls">Emp</span>::getSalary)
     .<span class="fn">write</span>(<span class="cls">DeptStats</span>.<span class="kw">class</span>);</code></pre>
-                </div>
-                <div class="hero-code-labels">
-                    <span class="hero-label"><span class="hero-label-dot" style="background:#ff7b72"></span>Java 8+</span>
-                    <span class="hero-label"><span class="hero-label-dot" style="background:#79c0ff"></span>类型安全</span>
-                    <span class="hero-label"><span class="hero-label-dot" style="background:#d2a8ff"></span>链式调用</span>
-                    <span class="hero-label"><span class="hero-label-dot" style="background:#a5d6ff"></span>零依赖</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -678,10 +682,8 @@
         a <span class="kw">-></span> a > <span class="num">100</span>)
     .<span class="fn">groupBy</span>(<span class="cls">Order</span>::getCategory)
     .<span class="fn">select</span>(
-        <span class="cls">Columns</span>.<span class="fn">of</span>(
-            <span class="cls">Order</span>::getCategory, <span class="str">"cat"</span>),
-        <span class="cls">Columns</span>.<span class="fn">avg</span>(
-            <span class="cls">Order</span>::getAmount, <span class="str">"avg"</span>),
+        <span class="cls">Columns</span>.<span class="fn">of</span>(<span class="cls">Order</span>::getCategory, <span class="str">"cat"</span>),
+        <span class="cls">Columns</span>.<span class="fn">avg</span>(<span class="cls">Order</span>::getAmount, <span class="str">"avg"</span>),
         <span class="cls">Columns</span>.<span class="fn">count</span>(<span class="str">"cnt"</span>)
     )
     .<span class="fn">orderByDesc</span>(<span class="cls">Order</span>::getAmount)
