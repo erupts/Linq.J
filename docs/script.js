@@ -67,8 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
             navigator.clipboard.writeText(text).then(() => {
                 const orig = btn.textContent;
                 btn.textContent = '已复制!';
-                btn.style.color = 'var(--accent)';
-                btn.style.borderColor = 'var(--accent)';
+                btn.style.color = 'rgba(255,255,255,0.8)';
+                btn.style.borderColor = 'rgba(255,255,255,0.3)';
                 setTimeout(() => {
                     btn.textContent = orig;
                     btn.style.color = '';
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     a.style.color = '';
                     a.style.background = '';
                     if (a.getAttribute('href') === '#' + id) {
-                        a.style.color = 'var(--accent)';
+                        a.style.color = 'var(--black)';
                     }
                 });
             }
