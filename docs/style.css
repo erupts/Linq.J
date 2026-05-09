@@ -161,6 +161,20 @@ img { max-width: 100%; }
     transition: opacity 0.15s;
 }
 .btn-maven:hover { opacity: 0.82; }
+.btn-lang {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: none;
+    color: var(--gray-500);
+    border: 1px solid var(--gray-100);
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+}
+.btn-lang:hover { color: var(--black); background: var(--gray-50); border-color: var(--gray-100); }
 
 .nav-toggle {
     display: none;
