@@ -27,12 +27,14 @@ public class LambdaSee {
     }
 
     public static <T, R> LambdaInfo info(SFunction<T, R> func) {
+        // A non-capturing method reference (Class::method) is a call-site singleton, so the
+        // cache hits on repeated calls from the same site and its size is bounded by the number
+        // of distinct call sites. computeIfAbsent gives us a single atomic lookup + parse.
+        return S_FUNCTION_CACHE.computeIfAbsent(func, LambdaSee::parse);
+    }
+
+    private static LambdaInfo parse(SFunction<?, ?> func) {
         try {
-            if (S_FUNCTION_CACHE.containsKey(func)) {
-                return S_FUNCTION_CACHE.get(func);
-            } else synchronized (LambdaSee.class) {
-                if (S_FUNCTION_CACHE.containsKey(func)) return S_FUNCTION_CACHE.get(func);
-            }
             if (!func.getClass().isSynthetic())
                 throw new LinqException("Synthetic classes produced by non-lambda expressions");
             Method method = func.getClass().getDeclaredMethod(WRITE_REPLACE);
@@ -42,9 +44,7 @@ public class LambdaSee {
             if (!matcher.find() || matcher.groupCount() != 1)
                 throw new RuntimeException("Failed to get Lambda information");
             Class<?> clazz = Class.forName(matcher.group(1).replace("/", "."));
-            LambdaInfo lambdaInfo = getserializedLambdaInfo(serializedLambda, clazz);
-            S_FUNCTION_CACHE.put(func, lambdaInfo);
-            return lambdaInfo;
+            return getserializedLambdaInfo(serializedLambda, clazz);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
