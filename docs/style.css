@@ -905,7 +905,7 @@ a { color: inherit; text-decoration: none; }
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 0;
-    align-items: start;
+    align-items: stretch;
     border-bottom: 1px solid var(--border);
 }
 .footer-brand {
