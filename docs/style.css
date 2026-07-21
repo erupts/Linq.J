@@ -77,19 +77,10 @@ a { color: inherit; }
     flex: 0 0 auto;
 }
 
-.logo-icon {
-    display: grid;
-    place-items: center;
+.logo-img {
     width: 30px;
     height: 30px;
-    font-family: var(--mono);
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--black);
-    background: var(--pink);
-    border: 2px solid var(--line);
-    box-shadow: 2px 2px 0 var(--line);
-    transform: rotate(-4deg);
+    display: block;
 }
 
 .logo-text {

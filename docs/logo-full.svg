@@ -1,0 +1,26 @@
+<svg width="440" height="140" viewBox="0 0 440 140" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Linq.J — in-memory object query for Java">
+  <!-- ===== mark ===== -->
+  <g transform="translate(8 10) rotate(-4 60 60)">
+    <rect x="26" y="33" width="70" height="70" rx="3" fill="#14120B"/>
+    <rect x="20" y="27" width="70" height="70" rx="3" fill="#4FC8EC" stroke="#14120B" stroke-width="5"/>
+    <g stroke="#14120B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M40 89 L61 41"/>
+      <path d="M52 64 L74 89"/>
+    </g>
+    <circle cx="61" cy="41" r="6" fill="#F585B4" stroke="#14120B" stroke-width="3.5"/>
+  </g>
+
+  <!-- ===== wordmark ===== -->
+  <g font-family="'Inter','PingFang SC','Segoe UI',system-ui,sans-serif" font-weight="900">
+    <text x="150" y="76" font-size="52" fill="#14120B" letter-spacing="-1.5">Linq</text>
+    <!-- .J on a candy sticker chip -->
+    <g transform="rotate(-3 322 60)">
+      <rect x="288" y="34" width="70" height="52" rx="3" fill="#F585B4" stroke="#14120B" stroke-width="4"/>
+      <text x="299" y="74" font-size="40" fill="#14120B">.J</text>
+    </g>
+  </g>
+
+  <!-- ===== tagline ===== -->
+  <text x="150" y="108" font-family="'JetBrains Mono',ui-monospace,SFMono-Regular,Consolas,monospace"
+        font-size="12.5" font-weight="700" letter-spacing="1.5" fill="#5C5647">SQL FOR JAVA OBJECTS</text>
+</svg>
