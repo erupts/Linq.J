@@ -1,23 +1,28 @@
 package xyz.erupt.linq.schema;
 
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class WhereSchema {
 
-    private Function<Row, Boolean> condition;
+    private Predicate<Row> condition;
 
     private Column relationColumn;
 
-    public WhereSchema(Function<Row, Boolean> condition, Column relationColumn) {
+    // Pushdown form of a typed where: applied to the raw column value read straight off the
+    // source object, letting the engine filter BEFORE row materialization. Null for row-level
+    // conditions, which can only run after materialization.
+    private Predicate<Object> valueCondition;
+
+    public WhereSchema(Predicate<Row> condition, Column relationColumn) {
         this.condition = condition;
         this.relationColumn = relationColumn;
     }
 
-    public Function<Row, Boolean> getCondition() {
+    public Predicate<Row> getCondition() {
         return condition;
     }
 
-    public void setCondition(Function<Row, Boolean> condition) {
+    public void setCondition(Predicate<Row> condition) {
         this.condition = condition;
     }
 
@@ -27,5 +32,13 @@ public class WhereSchema {
 
     public void setRelationColumn(Column relationColumn) {
         this.relationColumn = relationColumn;
+    }
+
+    public Predicate<Object> getValueCondition() {
+        return valueCondition;
+    }
+
+    public void setValueCondition(Predicate<Object> valueCondition) {
+        this.valueCondition = valueCondition;
     }
 }

@@ -31,35 +31,6 @@ public class Columns {
         return of(fun, LambdaSee.field(alias));
     }
 
-    @Deprecated
-    public static <R, S> Column ofx(SFunction<R, S> fun, Function<S, Object> convert, String alias) {
-        Column column = Columns.of(fun);
-        column.setAlias(alias);
-        column.setRowConvert(row -> convert.apply(row.get(fun)));
-        return column;
-    }
-
-    @Deprecated
-    public static <R, S> Column ofx(SFunction<R, S> fun, Function<S, Object> convert) {
-        return ofx(fun, convert, LambdaSee.field(fun));
-    }
-
-    @Deprecated
-    public static Column ofs(Function<Row, ?> fun, String alias) {
-        Column column = new Column();
-        column.setTable(VirtualColumn.class);
-        column.setField(VirtualColumn.lambdaColumn().getField());
-        column.setAlias(alias);
-        column.setRowConvert(fun);
-        return column;
-    }
-
-    @Deprecated
-    public static <A> Column ofs(Function<Row, ?> fun, SFunction<A, ?> alias) {
-        return ofs(fun, LambdaSee.field(alias));
-    }
-
-
     public static Column count(String alias) {
         Column column = new Column(VirtualColumn.class, VirtualColumn.lambdaColumn().getField(), alias);
         column.setGroupByFun(it -> BigDecimal.valueOf(it.size()));
@@ -71,7 +42,7 @@ public class Columns {
     }
 
     public static <R> Column count(SFunction<R, ?> fun, String alias) {
-        return groupByProcess(fun, alias, (column, list) -> {
+        return aggregate(fun, alias, (column, list) -> {
             int i = 0;
             for (Row row : list) {
                 if (null != row.get(column)) i++;
@@ -85,7 +56,7 @@ public class Columns {
     }
 
     public static <R> Column countDistinct(SFunction<R, ?> fun, String alias) {
-        return groupByProcess(fun, alias, (column, list) -> {
+        return aggregate(fun, alias, (column, list) -> {
             Map<Object, Void> distinctMap = new HashMap<>();
             for (Row row : list) {
                 Optional.ofNullable(row.get(column)).ifPresent(it -> distinctMap.put(it, null));
@@ -99,7 +70,7 @@ public class Columns {
     }
 
     public static <R> Column max(SFunction<R, ?> fun, String alias) {
-        return groupByProcess(fun, alias, (column, list) -> {
+        return aggregate(fun, alias, (column, list) -> {
             Object result = null;
             for (Row row : list) {
                 Object val = row.get(column);
@@ -120,7 +91,7 @@ public class Columns {
     }
 
     public static <R> Column min(SFunction<R, ?> fun, String alias) {
-        return groupByProcess(fun, alias, (column, list) -> {
+        return aggregate(fun, alias, (column, list) -> {
             Object result = null;
             for (Row row : list) {
                 Object val = row.get(column);
@@ -140,17 +111,13 @@ public class Columns {
     }
 
     public static <R> Column avg(SFunction<R, ?> fun, String alias) {
-        return groupByProcess(fun, alias, (column, list) -> {
-            BigDecimal bigDecimal = new BigDecimal(0);
-            int count = 0;
+        return aggregate(fun, alias, (column, list) -> {
+            NumberAccumulator acc = new NumberAccumulator();
             for (Row row : list) {
                 Object val = row.get(column);
-                if (val instanceof Number) {
-                    bigDecimal = bigDecimal.add(new BigDecimal(String.valueOf(val)));
-                    count++;
-                }
+                if (val instanceof Number) acc.add((Number) val);
             }
-            return count > 0 ? BigDecimal.valueOf(bigDecimal.doubleValue() / count) : BigDecimal.valueOf(0);
+            return acc.avg();
         });
     }
 
@@ -159,16 +126,52 @@ public class Columns {
     }
 
     public static <R> Column sum(SFunction<R, ?> fun, String alias) {
-        return groupByProcess(fun, alias, (column, list) -> {
-            BigDecimal bigDecimal = new BigDecimal(0);
+        return aggregate(fun, alias, (column, list) -> {
+            NumberAccumulator acc = new NumberAccumulator();
             for (Row row : list) {
                 Object val = row.get(column);
-                if (val instanceof Number) {
-                    bigDecimal = bigDecimal.add(new BigDecimal(String.valueOf(val)));
-                }
+                if (val instanceof Number) acc.add((Number) val);
             }
-            return bigDecimal;
+            return acc.sum();
         });
+    }
+
+    /**
+     * Streaming numeric accumulator. Integral inputs ride a primitive {@code long} (with
+     * overflow demotion); floating point and BigDecimal inputs demote to an exact BigDecimal
+     * sum, matching the previous per-element BigDecimal semantics without its allocation cost.
+     */
+    private static final class NumberAccumulator {
+        private long longSum;
+        private BigDecimal bigSum; // non-null once demoted from the long fast path
+        private int count;
+
+        void add(Number n) {
+            count++;
+            if (null == bigSum && (n instanceof Integer || n instanceof Long || n instanceof Short || n instanceof Byte)) {
+                long v = n.longValue();
+                long r = longSum + v;
+                if (((longSum ^ r) & (v ^ r)) < 0) { // overflow -> demote to BigDecimal
+                    bigSum = BigDecimal.valueOf(longSum).add(BigDecimal.valueOf(v));
+                } else {
+                    longSum = r;
+                }
+            } else {
+                if (null == bigSum) bigSum = BigDecimal.valueOf(longSum);
+                // toString parse keeps the exact decimal semantics of the previous implementation
+                bigSum = bigSum.add(n instanceof BigDecimal ? (BigDecimal) n : new BigDecimal(n.toString()));
+            }
+        }
+
+        BigDecimal sum() {
+            return null == bigSum ? BigDecimal.valueOf(longSum) : bigSum;
+        }
+
+        BigDecimal avg() {
+            if (count == 0) return BigDecimal.valueOf(0);
+            double total = null == bigSum ? (double) longSum : bigSum.doubleValue();
+            return BigDecimal.valueOf(total / count);
+        }
     }
 
     public static <R, A> Column sum(SFunction<R, ?> fun, SFunction<A, ?> alias) {
@@ -177,7 +180,7 @@ public class Columns {
 
     // select object[]
     public static <R> Column groupArray(SFunction<R, ?> fun, String alias) {
-        return groupByProcess(fun, alias, (column, list) -> {
+        return aggregate(fun, alias, (column, list) -> {
             List<Object> result = new ArrayList<>();
             for (Row row : list) {
                 Optional.ofNullable(row.get(column)).ifPresent(result::add);
@@ -190,10 +193,10 @@ public class Columns {
         return groupArray(fun, LambdaSee.field(alias));
     }
 
-    // custom group by logic
-    public static <R> Column groupByProcess(SFunction<R, ?> fun, String alias, BiFunction<Column, List<Row>, Object> groupByProcess) {
+    // custom aggregation logic
+    public static <R> Column aggregate(SFunction<R, ?> fun, String alias, BiFunction<Column, List<Row>, Object> process) {
         Column column = Columns.of(fun, alias);
-        column.setGroupByFun(it -> groupByProcess.apply(column.getRawColumn(), it));
+        column.setGroupByFun(it -> process.apply(column.getRawColumn(), it));
         return column;
     }
 

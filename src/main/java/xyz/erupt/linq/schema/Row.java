@@ -164,6 +164,19 @@ public class Row extends AbstractMap<Column, Object> {
         return size;
     }
 
+    /**
+     * Direct positional access to the backing arrays. Lets hot consumers
+     * (e.g. object materialization) iterate a Row without allocating an
+     * Entry object per column, as entrySet()'s iterator does.
+     */
+    public Column columnAt(int index) {
+        return columns[index];
+    }
+
+    public Object valueAt(int index) {
+        return values[index];
+    }
+
     @Override
     public boolean containsKey(Object key) {
         if (key instanceof Column) {

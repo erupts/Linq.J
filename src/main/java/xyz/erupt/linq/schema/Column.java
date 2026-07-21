@@ -80,12 +80,19 @@ public class Column {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Column column = (Column) o;
-        return Objects.equals(table.getName(), column.table.getName()) && Objects.equals(field, column.field) && Objects.equals(alias, column.alias);
+        // Class instances are unique per classloader, so identity comparison is both
+        // correct and far cheaper than comparing table.getName() strings on every call.
+        return table == column.table && Objects.equals(field, column.field) && Objects.equals(alias, column.alias);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(table.getName(), field, alias);
+        // Manual computation avoids the Object[] allocation that Objects.hash() performs
+        // on every call — this method is hit hard by Row lookups and HashMap operations.
+        int result = table == null ? 0 : table.hashCode();
+        result = 31 * result + (field == null ? 0 : field.hashCode());
+        result = 31 * result + (alias == null ? 0 : alias.hashCode());
+        return result;
     }
 
     @Override

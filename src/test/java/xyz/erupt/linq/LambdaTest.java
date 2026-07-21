@@ -3,7 +3,7 @@ package xyz.erupt.linq;
 import org.junit.Test;
 import xyz.erupt.linq.data.source.TestSource;
 import xyz.erupt.linq.lambda.LambdaSee;
-import xyz.erupt.linq.lambda.Th;
+import xyz.erupt.linq.lambda.It;
 
 import java.math.BigDecimal;
 
@@ -14,8 +14,8 @@ public class LambdaTest {
         assert "id".equals(LambdaSee.info(TestSource::getId).getField());
         assert "name".equals(LambdaSee.info(TestSource::getName).getField());
         assert "getName".equals(LambdaSee.info(TestSource::getName).getMethod());
-        assert "is".equals(LambdaSee.info(Th::is).getField());
-        assert "is".equals(LambdaSee.info(Th::is).getMethod());
+        assert "self".equals(LambdaSee.info(It::self).getField());
+        assert "self".equals(LambdaSee.info(It::self).getMethod());
         assert TestSource.class == LambdaSee.info(TestSource::getName).getClazz();
     }
 

@@ -29,7 +29,7 @@
         </div>
         <div class="nav-actions">
             <button id="langToggle" class="btn-lang" aria-label="Switch language">EN</button>
-            <a href="https://www.erupt.xyz" target="_blank" class="btn-erupt" aria-label="Erupt Framework">erupt.xyz</a>
+            <a href="https://www.erupt.xyz" target="_blank" class="btn-erupt" aria-label="Erupt">erupt.xyz</a>
             <a href="https://github.com/erupts/linq.j" target="_blank" class="btn-github" aria-label="GitHub">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
             </a>
@@ -101,7 +101,7 @@
         <span class="cls">Columns</span>.<span class="fn">count</span>(<span class="str">"headcount"</span>)
     )
     .<span class="fn">orderByDesc</span>(<span class="cls">Emp</span>::getSalary)
-    .<span class="fn">write</span>(<span class="cls">DeptStats</span>.<span class="kw">class</span>);</code></pre>
+    .<span class="fn">toList</span>(<span class="cls">DeptStats</span>.<span class="kw">class</span>);</code></pre>
             </div>
         </div>
     </div>
@@ -259,10 +259,13 @@
                     <span class="syntax-card-title" data-i18n="syntax.write.title">结果写出</span>
                 </div>
                 <div class="syntax-card-items">
-                    <code>write(Class)</code>
-                    <code>writeOne(Class)</code>
-                    <code>writeMap()</code>
-                    <code>writeMapOne()</code>
+                    <code>toList(Class)</code>
+                    <code>one(Class)</code>
+                    <code>first(Class)</code>
+                    <code>toMaps()</code>
+                    <code>toMap()</code>
+                    <code>count()</code>
+                    <code>exists()</code>
                 </div>
             </div>
         </div>
@@ -304,15 +307,15 @@
                         </div>
                         <pre class="code-body"><code><span class="cmt" data-i18n="code.basic.cmt1">// 字符串排序过滤</span>
 <span class="kw">var</span> strings = <span class="cls">Linq</span>.<span class="fn">from</span>(<span class="str">"C"</span>, <span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"B"</span>)
-    .<span class="fn">gt</span>(<span class="cls">Th</span>::is, <span class="str">"A"</span>)
-    .<span class="fn">orderByDesc</span>(<span class="cls">Th</span>::is)
-    .<span class="fn">write</span>(<span class="cls">String</span>.<span class="kw">class</span>);
+    .<span class="fn">gt</span>(<span class="cls">It</span>::self, <span class="str">"A"</span>)
+    .<span class="fn">orderByDesc</span>(<span class="cls">It</span>::self)
+    .<span class="fn">toList</span>(<span class="cls">String</span>.<span class="kw">class</span>);
 <span class="cmt" data-i18n="code.basic.cmt2">// 结果: [C, B, B]</span>
 
 <span class="cmt" data-i18n="code.basic.cmt3">// 数字排序</span>
 <span class="kw">var</span> integers = <span class="cls">Linq</span>.<span class="fn">from</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">7</span>, <span class="num">6</span>, <span class="num">5</span>)
-    .<span class="fn">orderBy</span>(<span class="cls">Th</span>::is)
-    .<span class="fn">write</span>(<span class="cls">Integer</span>.<span class="kw">class</span>);
+    .<span class="fn">orderBy</span>(<span class="cls">It</span>::self)
+    .<span class="fn">toList</span>(<span class="cls">Integer</span>.<span class="kw">class</span>);
 <span class="cmt" data-i18n="code.basic.cmt4">// 结果: [1, 2, 3, 5, 6, 7]</span></code></pre>
                     </div>
                 </div>
@@ -341,7 +344,7 @@
     .<span class="fn">leftJoin</span>(target, <span class="cls">Target</span>::getId, <span class="cls">Source</span>::getId)
     .<span class="fn">select</span>(<span class="cls">Source</span>.<span class="kw">class</span>)
     .<span class="fn">select</span>(<span class="cls">Target</span>::getName)
-    .<span class="fn">write</span>(<span class="cls">Result</span>.<span class="kw">class</span>);
+    .<span class="fn">toList</span>(<span class="cls">Result</span>.<span class="kw">class</span>);
 
 <span class="cmt" data-i18n="code.join.cmt2">// Inner Join + Where + Distinct</span>
 <span class="kw">var</span> names = <span class="cls">Linq</span>.<span class="fn">from</span>(data)
@@ -350,7 +353,7 @@
     .<span class="fn">select</span>(<span class="cls">Data</span>::getName)
     .<span class="fn">distinct</span>()
     .<span class="fn">orderBy</span>(<span class="cls">Data</span>::getName)
-    .<span class="fn">write</span>(<span class="cls">String</span>.<span class="kw">class</span>);</code></pre>
+    .<span class="fn">toList</span>(<span class="cls">String</span>.<span class="kw">class</span>);</code></pre>
                     </div>
                 </div>
             </div>
@@ -427,7 +430,7 @@
         ) > <span class="num">10</span>
     )
     .<span class="fn">orderBy</span>(<span class="cls">Order</span>::getPrice)
-    .<span class="fn">write</span>(<span class="cls">CategoryStats</span>.<span class="kw">class</span>);</code></pre>
+    .<span class="fn">toList</span>(<span class="cls">CategoryStats</span>.<span class="kw">class</span>);</code></pre>
                     </div>
                 </div>
             </div>
@@ -439,10 +442,10 @@
                     <h3 data-i18n="examples.write.title">灵活的结果写出</h3>
                     <p data-i18n="examples.write.desc">查询结果可以映射为 Java 对象、List、Map 或单个值，满足不同场景需求。</p>
                     <ul class="example-points">
-                        <li data-i18n="examples.write.li1">write() → List&lt;T&gt;</li>
-                        <li data-i18n="examples.write.li2">writeOne() → T</li>
-                        <li data-i18n="examples.write.li3">writeMap() → List&lt;Map&gt;</li>
-                        <li data-i18n="examples.write.li4">writeMapOne() → Map</li>
+                        <li data-i18n="examples.write.li1">toList() → List&lt;T&gt;</li>
+                        <li data-i18n="examples.write.li2">one() → T</li>
+                        <li data-i18n="examples.write.li3">toMaps() → List&lt;Map&gt;</li>
+                        <li data-i18n="examples.write.li4">toMap() → Map</li>
                     </ul>
                 </div>
                 <div class="example-code">
@@ -454,20 +457,20 @@
                         <pre class="code-body"><code><span class="cmt" data-i18n="code.write.cmt1">// 写出为对象列表</span>
 <span class="cls">List</span>&lt;<span class="cls">User</span>&gt; list = <span class="cls">Linq</span>.<span class="fn">from</span>(source)
     .<span class="fn">orderByAsc</span>(<span class="cls">User</span>::getDate)
-    .<span class="fn">write</span>(<span class="cls">User</span>.<span class="kw">class</span>);
+    .<span class="fn">toList</span>(<span class="cls">User</span>.<span class="kw">class</span>);
 
 <span class="cmt" data-i18n="code.write.cmt2">// 写出单个对象</span>
 <span class="cls">User</span> one = <span class="cls">Linq</span>.<span class="fn">from</span>(source)
     .<span class="fn">limit</span>(<span class="num">1</span>)
-    .<span class="fn">writeOne</span>(<span class="cls">User</span>.<span class="kw">class</span>);
+    .<span class="fn">one</span>(<span class="cls">User</span>.<span class="kw">class</span>);
 
 <span class="cmt" data-i18n="code.write.cmt3">// 写出为 Map 列表</span>
 <span class="cls">List</span>&lt;<span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt;&gt; maps =
-    <span class="cls">Linq</span>.<span class="fn">from</span>(source).<span class="fn">writeMap</span>();
+    <span class="cls">Linq</span>.<span class="fn">from</span>(source).<span class="fn">toMaps</span>();
 
 <span class="cmt" data-i18n="code.write.cmt4">// 写出单个 Map</span>
 <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Object</span>&gt; map =
-    <span class="cls">Linq</span>.<span class="fn">from</span>(source).<span class="fn">writeMapOne</span>();</code></pre>
+    <span class="cls">Linq</span>.<span class="fn">from</span>(source).<span class="fn">toMap</span>();</code></pre>
                     </div>
                 </div>
             </div>
@@ -628,7 +631,7 @@
     .<span class="fn">where</span>(<span class="cls">User</span>::getAge, age <span class="kw">-></span> age >= <span class="num">18</span>)
     .<span class="fn">select</span>(<span class="cls">User</span>::getName, <span class="cls">User</span>::getAge)
     .<span class="fn">orderBy</span>(<span class="cls">User</span>::getAge)
-    .<span class="fn">write</span>(<span class="cls">User</span>.<span class="kw">class</span>);</code></pre>
+    .<span class="fn">toList</span>(<span class="cls">User</span>.<span class="kw">class</span>);</code></pre>
                 </div>
             </div>
         </div>
@@ -689,7 +692,7 @@
         <span class="cls">Columns</span>.<span class="fn">count</span>(<span class="str">"cnt"</span>)
     )
     .<span class="fn">orderByDesc</span>(<span class="cls">Order</span>::getAmount)
-    .<span class="fn">write</span>(<span class="cls">Stats</span>.<span class="kw">class</span>);
+    .<span class="fn">toList</span>(<span class="cls">Stats</span>.<span class="kw">class</span>);
 
 <span class="cmt" data-i18n="code.compare.cmt2">// 清晰 · 简洁 · 高效</span></code></pre>
                 </div>
@@ -759,7 +762,7 @@
             </div>
             <div class="footer-col">
                 <h4 data-i18n="footer.related">相关</h4>
-                <a href="https://www.erupt.xyz" target="_blank">Erupt Framework</a>
+                <a href="https://www.erupt.xyz" target="_blank">Erupt</a>
                 <a href="https://learn.microsoft.com/zh-cn/dotnet/csharp/linq/" target="_blank" data-i18n="footer.csharp">C# LINQ 参考</a>
             </div>
         </div>

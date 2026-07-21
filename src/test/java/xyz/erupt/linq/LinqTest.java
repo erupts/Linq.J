@@ -7,7 +7,7 @@ import xyz.erupt.linq.data.source.TestSource;
 import xyz.erupt.linq.data.source.TestSourceExt;
 import xyz.erupt.linq.data.source.TestSourceExt2;
 import xyz.erupt.linq.data.source.TestSourceGroupByVo;
-import xyz.erupt.linq.lambda.Th;
+import xyz.erupt.linq.lambda.It;
 import xyz.erupt.linq.util.Columns;
 
 import java.util.*;
@@ -42,15 +42,15 @@ public class LinqTest {
 
     @Test
     public void selectId() {
-        List<Long> longs = Linq.from(source).select(TestSource::getId).write(Long.class);
+        List<Long> longs = Linq.from(source).select(TestSource::getId).toList(Long.class);
         System.out.println(longs);
     }
 
     @Test
     public void fromSingletonObject() {
         TestSource source = new TestSource(1, "Thanos", new Date(), new String[]{"x", "y", "z"});
-        String name = Linq.from(source).select(TestSource::getName).writeOne(String.class);
-        TestSource testSourceResult = Linq.from(source).select(TestSource.class).writeOne(TestSource.class);
+        String name = Linq.from(source).select(TestSource::getName).one(String.class);
+        TestSource testSourceResult = Linq.from(source).select(TestSource.class).one(TestSource.class);
         assert "Thanos".equals(name);
         assert source.getId().equals(testSourceResult.getId());
         assert source.getName().equals(testSourceResult.getName());
@@ -60,18 +60,18 @@ public class LinqTest {
 
     @Test
     public void fromSimpleClass() {
-        List<String> strings = Linq.from("C", "A", "B", "B").gt(Th::is, "A").orderByDesc(Th::is).write(String.class);
-        List<Integer> integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(Th::is).write(Integer.class);
+        List<String> strings = Linq.from("C", "A", "B", "B").gt(It::self, "A").orderByDesc(It::self).toList(String.class);
+        List<Integer> integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(It::self).toList(Integer.class);
         System.out.println(strings);
         System.out.println(integers);
     }
 
     @Test
     public void writeSimpleType() {
-        List<String[]> arrays = Linq.from(source).select(TestSource::getTags).write(String[].class);
-        List<Date> dates = Linq.from(source).select(TestSource::getId).write(Date.class);
-        List<Integer> integers = Linq.from(source).select(TestSource::getId).write(Integer.class);
-        List<String> strings = Linq.from(source).select(TestSource::getName).write(String.class);
+        List<String[]> arrays = Linq.from(source).select(TestSource::getTags).toList(String[].class);
+        List<Date> dates = Linq.from(source).select(TestSource::getId).toList(Date.class);
+        List<Integer> integers = Linq.from(source).select(TestSource::getId).toList(Integer.class);
+        List<String> strings = Linq.from(source).select(TestSource::getName).toList(String.class);
         assert !arrays.isEmpty() && !dates.isEmpty() && !integers.isEmpty() && !strings.isEmpty();
     }
 
@@ -82,7 +82,7 @@ public class LinqTest {
                 .selectAs(TestSource::getTags, "tag2")
                 .select(TestSource::getId, (row, id) -> id + "xxxx")
                 .select(TestSource::getId, (row, id) -> id + "xxx2")
-                .writeMap();
+                .toMaps();
         assert Objects.equals(source.get(0).getDate().toString(), list.get(0).get("date").toString());
         assert Objects.equals(list.get(0).get("tags"), list.get(0).get("tag2"));
     }
@@ -94,7 +94,7 @@ public class LinqTest {
                 .select(Columns.sum(TestSource::getId, "sum"))
                 .groupBy(TestSource::getId, (row, id) -> id)
                 .having(row -> Integer.parseInt(row.get("sum").toString()) > 4)
-                .writeMap();
+                .toMaps();
         System.out.println(list);
     }
 
@@ -108,7 +108,7 @@ public class LinqTest {
                 .select(Columns.max(TestSource::getId, "max"))
                 .select(Columns.min(TestSource::getId, "min"))
                 .select(Columns.avg(TestSource::getId, "avg"))
-                .writeMapOne();
+                .toMap();
         assert Integer.parseInt(map.get("count").toString()) == source.size();
         assert Integer.parseInt(map.get("countDistinct").toString()) == source.stream().map(TestSource::getName).distinct().count();
         assert Integer.parseInt(map.get("sum").toString()) == source.stream().filter(it -> null != it.getId()).mapToInt(TestSource::getId).sum();
@@ -119,7 +119,7 @@ public class LinqTest {
 
     @Test
     public void customerSelect() {
-        List<String> result = Linq.from(source).selectRowAs(it -> it.get(TestSource::getName) + " Borg", "Hello").write(String.class);
+        List<String> result = Linq.from(source).selectExpr(it -> it.get(TestSource::getName) + " Borg", "Hello").toList(String.class);
         for (int i = 0; i < result.size(); i++) {
             assert (source.get(i).getName() + " Borg").equals(result.get(i));
         }
@@ -131,7 +131,7 @@ public class LinqTest {
                 .leftJoin(target2, TestSourceExt2::getValue, TestSource::getName)
                 .select(TestSource.class)
                 .select(TestSourceExt2::getValue)
-                .writeMap();
+                .toMaps();
         System.out.println(join);
     }
 
@@ -141,21 +141,21 @@ public class LinqTest {
                 .leftJoin(target, TestSourceExt::getId, TestSource::getId)
                 .select(TestSource.class)
                 .selectAs(TestSourceExt::getName, "name2")
-                .writeMap();
+                .toMaps();
         assert source.size() == leftJoinRes.size();
 
         List<Map<String, Object>> rightJoinRes = Linq.from(source)
                 .rightJoin(target, TestSourceExt::getId, TestSource::getId)
                 .select(TestSource.class)
                 .selectAs(TestSourceExt::getName, "name2")
-                .writeMap();
+                .toMaps();
         assert target.size() == rightJoinRes.size();
 
         List<Map<String, Object>> innerJoin = Linq.from(source)
                 .innerJoin(target, TestSourceExt::getId, TestSource::getTags)
                 .select(TestSource.class)
                 .selectAs(TestSourceExt::getName, "name2")
-                .writeMap();
+                .toMaps();
         assert innerJoin.isEmpty();
     }
 
@@ -168,28 +168,28 @@ public class LinqTest {
                 .select(TestSourceExt2::getValue)
                 .select(TestSourceExt::getName)
                 .select(TestSource::getName)
-                .writeMap();
+                .toMaps();
         assert testSourceInfo.size() > source.size();
     }
 
     @Test
     public void whereTest() {
         String countAlias = "count";
-        Integer eq = Linq.from(source).eq(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer ne = Linq.from(source).ne(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer gt = Linq.from(source).gt(TestSource::getId, 2).select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer lt = Linq.from(source).lt(TestSource::getId, 2).select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer gte = Linq.from(source).gte(TestSource::getId, 2).select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer lte = Linq.from(source).lte(TestSource::getId, 2).select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer between = Linq.from(source).between(TestSource::getId, 1, 3).select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer in = Linq.from(source).in(TestSource::getId, 1, 2, null).select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer notIn = Linq.from(source).notIn(TestSource::getId, 1, 2, null).select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer like = Linq.from(source).like(TestSource::getName, "a").select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer isNull = Linq.from(source).isNull(TestSource::getId).select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer isNotNull = Linq.from(source).isNotNull(TestSource::getId).select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer blank = Linq.from(source).isBlank(TestSource::getName).select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer notBlank = Linq.from(source).isNotBlank(TestSource::getName).select(Columns.count(countAlias)).writeOne(Integer.class);
-        Integer fieldWhere = Linq.from(source).where(TestSource::getId, id -> null != id && id >= 5).select(Columns.count(countAlias)).writeOne(Integer.class);
+        Integer eq = Linq.from(source).eq(TestSource::getName, "Thanos").select(Columns.count(countAlias)).one(Integer.class);
+        Integer ne = Linq.from(source).ne(TestSource::getName, "Thanos").select(Columns.count(countAlias)).one(Integer.class);
+        Integer gt = Linq.from(source).gt(TestSource::getId, 2).select(Columns.count(countAlias)).one(Integer.class);
+        Integer lt = Linq.from(source).lt(TestSource::getId, 2).select(Columns.count(countAlias)).one(Integer.class);
+        Integer gte = Linq.from(source).gte(TestSource::getId, 2).select(Columns.count(countAlias)).one(Integer.class);
+        Integer lte = Linq.from(source).lte(TestSource::getId, 2).select(Columns.count(countAlias)).one(Integer.class);
+        Integer between = Linq.from(source).between(TestSource::getId, 1, 3).select(Columns.count(countAlias)).one(Integer.class);
+        Integer in = Linq.from(source).in(TestSource::getId, 1, 2, null).select(Columns.count(countAlias)).one(Integer.class);
+        Integer notIn = Linq.from(source).notIn(TestSource::getId, 1, 2, null).select(Columns.count(countAlias)).one(Integer.class);
+        Integer like = Linq.from(source).like(TestSource::getName, "a").select(Columns.count(countAlias)).one(Integer.class);
+        Integer isNull = Linq.from(source).isNull(TestSource::getId).select(Columns.count(countAlias)).one(Integer.class);
+        Integer isNotNull = Linq.from(source).isNotNull(TestSource::getId).select(Columns.count(countAlias)).one(Integer.class);
+        Integer blank = Linq.from(source).isBlank(TestSource::getName).select(Columns.count(countAlias)).one(Integer.class);
+        Integer notBlank = Linq.from(source).isNotBlank(TestSource::getName).select(Columns.count(countAlias)).one(Integer.class);
+        Integer fieldWhere = Linq.from(source).where(TestSource::getId, id -> null != id && id >= 5).select(Columns.count(countAlias)).one(Integer.class);
         assert eq == source.stream().filter(it -> it.getName().equals("Thanos")).count();
         assert ne == source.stream().filter(it -> !it.getName().equals("Thanos")).count();
         assert gt == source.stream().filter(it -> null != it.getId() && it.getId() > 2).count();
@@ -220,7 +220,7 @@ public class LinqTest {
                         return name.equals("Thanos") || id == 4;
                     }
                     return false;
-                }).writeMap();
+                }).toMaps();
         assert res.size() == 3;
     }
 
@@ -239,7 +239,7 @@ public class LinqTest {
                         Columns.count(TestSourceGroupByVo::getCount)
                 )
                 .having(TestSourceGroupByVo::getAvg, avg -> avg >= 1)
-                .orderBy(TestSource::getName).write(TestSourceGroupByVo.class);
+                .orderBy(TestSource::getName).toList(TestSourceGroupByVo.class);
         System.out.println(result);
     }
 
@@ -250,7 +250,7 @@ public class LinqTest {
                 .selectExclude(TestSource::getTags, TestSource::getName)
                 .orderBy(TestSource::getId, OrderByDirection.DESC)
                 .orderBy(TestSource::getName)
-                .write(TestSource.class);
+                .toList(TestSource.class);
         source.sort((a, b) -> a.getId() == null || b.getId() == null ? 0 : b.getId() - a.getId());
         assert Objects.equals(result.get(0).getId(), source.get(0).getId());
     }
@@ -260,7 +260,7 @@ public class LinqTest {
         List<String> names = Linq.from(source)
                 .select(TestSource::getName)
                 .distinct()
-                .write(String.class);
+                .toList(String.class);
         assert names.size() == source.stream().map(TestSource::getName).distinct().count();
     }
 
@@ -271,7 +271,7 @@ public class LinqTest {
                 .select(TestSource::getName)
                 .distinct()
                 .limit(1).offset(offset)
-                .writeOne(String.class);
+                .one(String.class);
         for (int i = 0; i < source.size(); i++) {
             assert i != offset || name.equals(source.get(i).getName());
         }

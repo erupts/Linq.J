@@ -1,6 +1,6 @@
 package xyz.erupt.linq.consts;
 
-public enum JoinMethod {
+public enum JoinType {
 
     LEFT,
     RIGHT,

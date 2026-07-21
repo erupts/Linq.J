@@ -1,7 +1,7 @@
 package xyz.erupt.linq.util;
 
 import xyz.erupt.linq.exception.LinqException;
-import xyz.erupt.linq.lambda.Th;
+import xyz.erupt.linq.lambda.It;
 import xyz.erupt.linq.schema.Column;
 import xyz.erupt.linq.schema.Row;
 
@@ -22,6 +22,15 @@ public class RowUtil {
     };
 
     public static List<Row> listToTable(List<?> objects) {
+        return listToTable(objects, false);
+    }
+
+    /**
+     * @param parallel materialize rows across the common ForkJoinPool. Only worthwhile for
+     *                 large datasets; encounter order is preserved so downstream stages behave
+     *                 identically to the sequential path.
+     */
+    public static List<Row> listToTable(List<?> objects, boolean parallel) {
         int size = objects.size();
         List<Row> list = new ArrayList<>(Math.min(size, 10000));
         if (size == 0) {
@@ -46,20 +55,13 @@ public class RowUtil {
 
         Class<?> clazz = firstObj.getClass();
         List<Field> fields = ReflectField.getFields(clazz);
-        // Optimize: check simple class using faster method
-        boolean simpleClass = false;
-        for (Class<?> aClass : SIMPLE_CLASS) {
-            if (aClass.isAssignableFrom(clazz)) {
-                simpleClass = true;
-                break;
-            }
-        }
+        boolean simpleClass = isSimpleClass(clazz);
 
         // Pre-create Column objects and set fields accessible
         Map<String, Column> columnCache = null;
         Column simpleColumn = null;
         if (simpleClass) {
-            simpleColumn = Columns.of(Th::is);
+            simpleColumn = Columns.of(It::self);
         } else {
             columnCache = new java.util.HashMap<>(fields.size());
             for (Field field : fields) {
@@ -80,54 +82,97 @@ public class RowUtil {
                 }
             }
         } else {
-            // Optimization: for large datasets, use a more memory-efficient approach
-            // Instead of creating HashMap for each Row, we can delay Row creation
-            // or use a more compact data structure
             int fieldCount = fields.size();
             Column[] columnArray = new Column[fieldCount];
             Field[] fieldArray = fields.toArray(new Field[fieldCount]);
+            // LambdaMetafactory-generated getters (JIT-inlinable). null entry -> reflect that field.
+            @SuppressWarnings("unchecked")
+            java.util.function.Function<Object, Object>[] getters = new java.util.function.Function[fieldCount];
             for (int i = 0; i < fieldCount; i++) {
                 columnArray[i] = columnCache.get(fieldArray[i].getName());
+                getters[i] = Accessors.getter(clazz, fieldArray[i].getName(), fieldArray[i].getType());
             }
 
-            // For very large datasets, create Row objects but optimize HashMap initialization
-            // Use smaller initial capacity to reduce memory overhead
-            try {
-                for (int i = 0; i < size; i++) {
-                    Object obj = objects.get(i);
-                    if (obj != null) {
-                        // Create Row with exact capacity to avoid HashMap resizing
-                        Row row = new Row(fieldCount);
-                        // Batch put operations - use putDirect for performance (no duplicate check needed)
-                        for (int j = 0; j < fieldCount; j++) {
-                            Field field = fieldArray[j];
-                            Object value = field.get(obj);
-                            if (null != value) {
-                                row.putDirect(columnArray[j], value);
-                            }
-                        }
-                        list.add(row);
-                    }
-                }
-            } catch (IllegalAccessException e) {
-                throw new LinqException(e);
+            if (parallel) {
+                // Encounter order preserved -> result is identical to the sequential path.
+                return java.util.stream.IntStream.range(0, size).parallel()
+                        .mapToObj(i -> buildRow(objects.get(i), fieldCount, columnArray, fieldArray, getters))
+                        .filter(java.util.Objects::nonNull)
+                        .collect(Collectors.toList());
+            }
+            for (int i = 0; i < size; i++) {
+                Row row = buildRow(objects.get(i), fieldCount, columnArray, fieldArray, getters);
+                if (row != null) list.add(row);
             }
         }
         return list;
     }
 
-    // Cache for field maps to avoid repeated creation
-    private static final Map<Class<?>, Map<String, Field>> FIELD_MAP_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+    private static Row buildRow(Object obj, int fieldCount, Column[] columns, Field[] fields,
+                                java.util.function.Function<Object, Object>[] getters) {
+        if (obj == null) return null;
+        // Row with exact capacity to avoid resizing
+        Row row = new Row(fieldCount);
+        for (int j = 0; j < fieldCount; j++) {
+            Object value;
+            if (getters[j] != null) {
+                value = getters[j].apply(obj);
+            } else {
+                try {
+                    value = fields[j].get(obj);
+                } catch (IllegalAccessException e) {
+                    throw new LinqException(e);
+                }
+            }
+            if (null != value) {
+                row.putDirect(columns[j], value);
+            }
+        }
+        return row;
+    }
+
+    public static boolean isSimpleClass(Class<?> clazz) {
+        for (Class<?> aClass : SIMPLE_CLASS) {
+            if (aClass.isAssignableFrom(clazz)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Per-target-class write plan: no-arg constructor, writable fields and (when a public
+     * setter exists) LambdaMetafactory-generated setters — resolved once, reused per row.
+     */
+    private static final class WriteMeta {
+        final java.lang.reflect.Constructor<?> ctor;
+        final Map<String, Field> fieldMap;
+        final Map<String, java.util.function.BiConsumer<Object, Object>> setters;
+
+        WriteMeta(Class<?> clazz) {
+            try {
+                this.ctor = clazz.getDeclaredConstructor();
+            } catch (NoSuchMethodException e) {
+                throw new LinqException(e);
+            }
+            if (!this.ctor.isAccessible()) this.ctor.setAccessible(true);
+            List<Field> fields = ReflectField.getFields(clazz);
+            this.fieldMap = new java.util.HashMap<>(fields.size());
+            this.setters = new java.util.HashMap<>(fields.size());
+            for (Field field : fields) {
+                if (!field.isAccessible()) field.setAccessible(true);
+                this.fieldMap.put(field.getName(), field);
+                java.util.function.BiConsumer<Object, Object> setter = Accessors.setter(clazz, field.getName(), field.getType());
+                if (null != setter) this.setters.put(field.getName(), setter);
+            }
+        }
+    }
+
+    private static final Map<Class<?>, WriteMeta> WRITE_META_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
 
     public static <T> T rowToObject(Row row, Class<T> clazz) {
         int rowSize = row.size();
         if (rowSize == 1) {
-            // Optimize: get first entry directly - avoid iterator creation
-            Object firstVal = null;
-            for (Map.Entry<Column, Object> entry : row.entrySet()) {
-                firstVal = entry.getValue();
-                break; // Only need first entry
-            }
+            // Single-column result: value maps straight through, no reflection needed
+            Object firstVal = row.valueAt(0);
             if (firstVal != null && clazz == firstVal.getClass()) return (T) firstVal;
             // Use array access for better performance
             for (Class<?> simpleClass : SIMPLE_CLASS) {
@@ -137,27 +182,27 @@ public class RowUtil {
             }
         }
         try {
-            T instance = clazz.getDeclaredConstructor().newInstance();
-            // Cache field map to avoid repeated creation
-            Map<String, Field> fieldMap = FIELD_MAP_CACHE.computeIfAbsent(clazz, k -> ReflectField.getFields(k).stream()
-                    .peek(field -> {
-                        if (!field.isAccessible()) field.setAccessible(true);
-                    })
-                    .collect(Collectors.toMap(Field::getName, it -> it)));
-            // Optimize: iterate once and check both conditions
-            // Pre-check BigDecimal to avoid repeated instanceof
-            for (Map.Entry<Column, Object> entry : row.entrySet()) {
-                Field field = fieldMap.get(entry.getKey().getAlias());
+            WriteMeta meta = WRITE_META_CACHE.computeIfAbsent(clazz, WriteMeta::new);
+            @SuppressWarnings("unchecked")
+            T instance = (T) meta.ctor.newInstance();
+            // Positional iteration avoids allocating an Entry object per column
+            for (int i = 0; i < rowSize; i++) {
+                String alias = row.columnAt(i).getAlias();
+                Field field = meta.fieldMap.get(alias);
                 if (field != null) {
-                    Object value = entry.getValue();
-                    try {
-                        if (value instanceof BigDecimal) {
-                            field.set(instance, bigDecimalConvert((BigDecimal) value, field.getType()));
-                        } else {
+                    Object value = row.valueAt(i);
+                    if (value instanceof BigDecimal) {
+                        value = bigDecimalConvert((BigDecimal) value, field.getType());
+                    }
+                    java.util.function.BiConsumer<Object, Object> setter = meta.setters.get(alias);
+                    if (null != setter) {
+                        setter.accept(instance, value);
+                    } else {
+                        try {
                             field.set(instance, value);
+                        } catch (IllegalAccessException e) {
+                            throw new LinqException(e);
                         }
-                    } catch (IllegalAccessException e) {
-                        throw new LinqException(e);
                     }
                 }
             }

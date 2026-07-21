@@ -46,7 +46,7 @@ var result = Linq.from(employees)
         Columns.count("headcount")
     )
     .orderByDesc(Emp::getSalary)
-    .write(DeptStats.class);
+    .toList(DeptStats.class);
 ```
 
 ## Getting Started
@@ -81,7 +81,7 @@ List<User> adults = Linq.from(users)
     .where(User::getAge, age -> age >= 18)
     .select(User::getName, User::getAge)
     .orderBy(User::getAge)
-    .write(User.class);
+    .toList(User.class);
 ```
 
 ## Supported Data Sources
@@ -109,10 +109,10 @@ Linq.from(source).select(User.class);
 Linq.from(source).select(User::getName, User::getDate, User::getTags);
 
 // Select with alias
-Linq.from(source).select(User::getTags, "tagAlias");
+Linq.from(source).selectAs(User::getTags, "tagAlias");
 
 // Select with value transformation
-Linq.from(source).select(Columns.ofx(User::getId, id -> id + "-suffix"));
+Linq.from(source).select(User::getId, (row, id) -> id + "-suffix");
 
 // Aggregate functions
 Linq.from(source).select(
@@ -147,7 +147,7 @@ Linq.from(source)
     .leftJoin(target, Target::getId, Source::getId)
     .select(Source.class)
     .select(Target::getName)
-    .write(Result.class);
+    .toList(Result.class);
 ```
 
 ### Where
@@ -196,7 +196,7 @@ Linq.from(orders)
     )
     .having(row -> Integer.parseInt(row.get("total").toString()) > 10)
     .orderBy(Order::getPrice)
-    .write(CategoryStats.class);
+    .toList(CategoryStats.class);
 ```
 
 ### Order By, Limit & Offset
@@ -207,23 +207,23 @@ Linq.from(source)
     .orderByDesc(User::getAge)       // descending
     .offset(10)                      // skip first 10
     .limit(20)                       // take 20 records
-    .write(User.class);
+    .toList(User.class);
 ```
 
 ### Result Output
 
 ```java
 // Write to List<T>
-List<User> list = Linq.from(source).write(User.class);
+List<User> list = Linq.from(source).toList(User.class);
 
 // Write to single object
-User one = Linq.from(source).limit(1).writeOne(User.class);
+User one = Linq.from(source).limit(1).one(User.class);
 
 // Write to List<Map<String, Object>>
-List<Map<String, Object>> maps = Linq.from(source).writeMap();
+List<Map<String, Object>> maps = Linq.from(source).toMaps();
 
 // Write to single Map<String, Object>
-Map<String, Object> map = Linq.from(source).writeMapOne();
+Map<String, Object> map = Linq.from(source).toMap();
 ```
 
 ## Architecture
@@ -308,7 +308,7 @@ var result = Linq.from(orders)
         Columns.count("cnt")
     )
     .orderByDesc(Order::getAmount)
-    .write(Stats.class);
+    .toList(Stats.class);
 ```
 
 </td>

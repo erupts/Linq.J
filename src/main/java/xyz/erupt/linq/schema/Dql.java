@@ -2,7 +2,7 @@ package xyz.erupt.linq.schema;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class Dql {
 
@@ -23,13 +23,13 @@ public class Dql {
     private final List<JoinSchema<?>> joinSchemas = new ArrayList<>();
 
     // where definition
-    private final List<Function<Row, Boolean>> wheres = new ArrayList<>();
+    private final List<WhereSchema> wheres = new ArrayList<>();
 
     // group by definition
     private final List<Column> groupBys = new ArrayList<>();
 
     // having definition
-    private final List<Function<Row, Boolean>> having = new ArrayList<>();
+    private final List<Predicate<Row>> having = new ArrayList<>();
 
     // order by definition
     private final List<OrderBySchema> orderBys = new ArrayList<>();
@@ -60,7 +60,7 @@ public class Dql {
         return columns;
     }
 
-    public List<Function<Row, Boolean>> getWheres() {
+    public List<WhereSchema> getWheres() {
         return wheres;
     }
 
@@ -72,7 +72,7 @@ public class Dql {
         return groupBys;
     }
 
-    public List<Function<Row, Boolean>> getHaving() {
+    public List<Predicate<Row>> getHaving() {
         return having;
     }
 
