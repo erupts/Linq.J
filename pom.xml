@@ -6,8 +6,8 @@
 
     <groupId>xyz.erupt</groupId>
     <artifactId>linq.j</artifactId>
-    <version>1.0.0</version>
-    <name>Linq.j</name>
+    <version>1.1.0</version>
+    <name>Linq.J</name>
 
     <description>Linq.J in Java , Lambda Language Integrated Query library</description>
     <url>https://github.com/erupts/Linq.J</url>
@@ -57,7 +57,7 @@
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.7.0</version>
+                <version>0.8.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
