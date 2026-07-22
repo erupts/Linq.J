@@ -32,16 +32,16 @@ mvn clean install                              # Install locally
 | `grammar/` | Six SQL-like interfaces: `Select`, `Join`, `Where`, `GroupBy`, `OrderBy`, `Write` |
 | `schema/` | DQL data structures: `Dql` (full query), `Row`, `Column`, `JoinSchema`, `WhereSchema`, `OrderBySchema` |
 | `engine/` | `Engine` (abstract) + `EruptEngine` (executes the `Dql`, handles joins, filtering, grouping, sorting) |
-| `lambda/` | Lambda parsing: `SFunction` (serializable function), `LambdaSee` (extracts field names from lambdas), `Th` (identity helper) |
+| `lambda/` | Lambda parsing: `SFunction` (serializable function), `LambdaSee` (extracts field names from lambdas), `It` (self reference for simple-typed sources) |
 | `util/` | `Columns` (aggregation: sum/avg/min/max/count), `RowUtil`, `ReflectField`, `CompareUtil` |
-| `consts/` | Enums: `JoinMethod`, `OrderByDirection`, `CompareSymbol`, `JoinExchange` |
+| `consts/` | Enums: `JoinType`, `OrderByDirection`, `CompareSymbol`, `JoinStrategy` |
 
 ### Key design decisions
 
 - `Linq.java` implements all six grammar interfaces; methods mutate a `Dql` instance, returning `this` for chaining.
 - Lambda expressions are serialized and parsed at runtime by `LambdaSee` using `SerializedLambda` reflection to extract field names — this is why the `-parameters` compiler flag is required (set in `pom.xml`).
 - `EruptEngine` uses hash-based join optimization; columns are represented as `Map<Column, Object>` internally (the `Row` type).
-- Results are materialized via `write(Class<T>)`, `writeMap()`, or `writeOne(Class<T>)`.
+- Results are materialized via `toList(Class<T>)`, `toMaps()`, or `one(Class<T>)`.
 - Objects must expose getter methods (Lombok `@Getter` recommended).
 
 ### Planned features (not yet implemented)

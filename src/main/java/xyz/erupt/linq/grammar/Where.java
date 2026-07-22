@@ -3,15 +3,13 @@ package xyz.erupt.linq.grammar;
 import xyz.erupt.linq.Linq;
 import xyz.erupt.linq.consts.CompareSymbol;
 import xyz.erupt.linq.lambda.SFunction;
-import xyz.erupt.linq.schema.Column;
 import xyz.erupt.linq.schema.Row;
-import xyz.erupt.linq.util.Columns;
 import xyz.erupt.linq.util.CompareUtil;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 public interface Where {
 
@@ -25,11 +23,10 @@ public interface Where {
         return where(column, f -> null != value && !value.equals(f));
     }
 
-
     // :val >= start and :val <= end
     default <R> Linq between(SFunction<R, ?> column, Object start, Object end) {
-        return where(column, row -> CompareUtil.compare(row, start, CompareSymbol.GTE) &&
-                CompareUtil.compare(row, end, CompareSymbol.LTE));
+        return where(column, value -> CompareUtil.compare(value, start, CompareSymbol.GTE) &&
+                CompareUtil.compare(value, end, CompareSymbol.LTE));
     }
 
     // >
@@ -60,7 +57,7 @@ public interface Where {
         return where(column, f -> f != null && Arrays.stream(value).anyMatch(it -> null != it && it.equals(f)));
     }
 
-    default <R> Linq in(SFunction<R, ?> column, List<Object> value) {
+    default <R> Linq in(SFunction<R, ?> column, Collection<?> value) {
         return in(column, value.toArray());
     }
 
@@ -68,10 +65,9 @@ public interface Where {
         return where(column, f -> f != null && Arrays.stream(value).noneMatch(it -> null != it && it.equals(f)));
     }
 
-    default <R> Linq notIn(SFunction<R, ?> column, List<Object> value) {
+    default <R> Linq notIn(SFunction<R, ?> column, Collection<?> value) {
         return notIn(column, value.toArray());
     }
-
 
     default <R> Linq isNull(SFunction<R, ?> column) {
         return where(column, Objects::isNull);
@@ -89,10 +85,8 @@ public interface Where {
         return where(column, f -> f != null && !f.toString().trim().isEmpty());
     }
 
-    default <R, S> Linq where(SFunction<R, S> column, Function<S, Boolean> process) {
-        return where(f -> process.apply(f.get(column)));
-    }
+    <R, S> Linq where(SFunction<R, S> column, Predicate<S> condition);
 
-    Linq where(Function<Row, Boolean> fun);
+    Linq where(Predicate<Row> condition);
 
 }

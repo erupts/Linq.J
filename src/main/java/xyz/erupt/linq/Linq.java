@@ -1,12 +1,12 @@
 package xyz.erupt.linq;
 
-import xyz.erupt.linq.consts.JoinMethod;
+import xyz.erupt.linq.consts.JoinType;
 import xyz.erupt.linq.engine.Engine;
 import xyz.erupt.linq.engine.EruptEngine;
+import xyz.erupt.linq.engine.ParallelEruptEngine;
 import xyz.erupt.linq.grammar.*;
 import xyz.erupt.linq.lambda.LambdaSee;
 import xyz.erupt.linq.lambda.SFunction;
-import xyz.erupt.linq.lambda.Th;
 import xyz.erupt.linq.schema.*;
 import xyz.erupt.linq.util.Columns;
 import xyz.erupt.linq.util.ReflectField;
@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
@@ -40,42 +41,6 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
         return Linq.from(Arrays.stream(data).collect(Collectors.toList()));
     }
 
-    public static Linq from(Boolean... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
-    }
-
-    public static Linq from(Byte... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
-    }
-
-    public static Linq from(Character... table) {
-        return Linq.from(Arrays.stream(table).collect(Collectors.toList())).select(Th::is);
-    }
-
-    public static Linq from(String... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
-    }
-
-    public static Linq from(Short... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
-    }
-
-    public static Linq from(Integer... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
-    }
-
-    public static Linq from(Long... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
-    }
-
-    public static Linq from(Float... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
-    }
-
-
-    public static Linq from(Double... data) {
-        return Linq.from(Arrays.stream(data).collect(Collectors.toList())).select(Th::is);
-    }
 
     @Override
     public Linq distinct() {
@@ -158,7 +123,7 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public Linq selectRowAs(Function<Row, Object> convert, String alias) {
+    public Linq selectExpr(Function<Row, Object> convert, String alias) {
         Column column = Columns.of(VirtualColumn::col, alias);
         column.setRowConvert(convert);
         this.dql.getColumns().add(column);
@@ -166,8 +131,8 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public <A> Linq selectRowAs(Function<Row, Object> convert, SFunction<A, ?> alias) {
-        return selectRowAs(convert, LambdaSee.field(alias));
+    public <A> Linq selectExpr(Function<Row, Object> convert, SFunction<A, ?> alias) {
+        return selectExpr(convert, LambdaSee.field(alias));
     }
 
     @Override
@@ -177,8 +142,8 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public <T, S> Linq join(JoinMethod joinMethod, List<T> target, SFunction<T, Object> onL, SFunction<S, Object> onR) {
-        this.dql.getJoinSchemas().add(new JoinSchema<>(joinMethod, target, onL, onR));
+    public <T, S> Linq join(JoinType joinType, List<T> target, SFunction<T, ?> targetOn, SFunction<S, ?> sourceOn) {
+        this.dql.getJoinSchemas().add(new JoinSchema<>(joinType, target, targetOn, sourceOn));
         return this;
     }
 
@@ -189,8 +154,19 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public Linq where(Function<Row, Boolean> fun) {
-        this.dql.getWheres().add(fun);
+    public Linq where(Predicate<Row> condition) {
+        this.dql.getWheres().add(new WhereSchema(condition, null));
+        return this;
+    }
+
+    // Typed where: besides the row-level condition, record the column + value predicate so the
+    // engine can push the filter down to the source objects before row materialization.
+    @SuppressWarnings("unchecked")
+    @Override
+    public <R, S> Linq where(SFunction<R, S> column, Predicate<S> condition) {
+        WhereSchema schema = new WhereSchema(row -> condition.test(row.get(column)), Columns.of(column));
+        schema.setValueCondition(value -> condition.test((S) value));
+        this.dql.getWheres().add(schema);
         return this;
     }
 
@@ -220,8 +196,20 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public Linq having(Function<Row, Boolean> condition) {
+    public Linq having(Predicate<Row> condition) {
         this.dql.getHaving().add(condition);
+        return this;
+    }
+
+    // Materialize the source list in parallel (opt-in). Only kicks in above the engine's
+    // threshold; results are order-preserving and identical to the sequential path.
+    public Linq parallel() {
+        this.engine = new ParallelEruptEngine();
+        return this;
+    }
+
+    public Linq parallel(int threshold) {
+        this.engine = new ParallelEruptEngine(threshold);
         return this;
     }
 
@@ -240,13 +228,13 @@ public class Linq implements Select, Join, Where, GroupBy, OrderBy, Write {
     }
 
     @Override
-    public Engine wEngine() {
+    public Engine engine() {
         if (null == this.engine) return new EruptEngine();
         return this.engine;
     }
 
     @Override
-    public Dql wDQL() {
+    public Dql dql() {
         return this.dql;
     }
 

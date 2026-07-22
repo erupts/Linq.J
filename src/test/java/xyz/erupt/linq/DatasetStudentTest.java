@@ -55,7 +55,7 @@ public class DatasetStudentTest {
                 .selectAs(Student::getName, (row, name) -> name + row.get(Student::getAge), StudentVo::getName)
                 .selectAs(StudentSubject::getName, StudentVo::getSubjectName)
                 .selectAs(StudentScore::getScore, StudentVo::getScore)
-                .write(StudentVo.class);
+                .toList(StudentVo.class);
         assert studentScores.size() == studentVos.size();
     }
 
@@ -73,7 +73,7 @@ public class DatasetStudentTest {
                         Columns.sum(StudentScore::getScore, StudentScoreAnalysis::getTotalScore),
                         Columns.count(StudentScoreAnalysis::getSubjectCount)
                 )
-                .write(StudentScoreAnalysis.class);
+                .toList(StudentScoreAnalysis.class);
     }
 
     @Test
@@ -81,7 +81,7 @@ public class DatasetStudentTest {
         Integer r = Linq.from(students)
                 .innerJoin(studentScores, StudentScore::getStudentId, Student::getId)
                 .select(Columns.count(StudentScoreAnalysis::getSubjectCount))
-                .writeOne(Integer.class);
+                .one(Integer.class);
         System.out.println(r);
     }
 
@@ -91,7 +91,7 @@ public class DatasetStudentTest {
                 .orderBy(Student::getAge, OrderByDirection.DESC)
                 .orderBy(Student::getId, OrderByDirection.DESC)
                 .select(Student.class)
-                .writeMap();
+                .toMaps();
     }
 
 }

@@ -49,10 +49,10 @@
 
 #### Example 1
 ```javascript
-var strings = Linq.from("C", "A", "B", "B").gt(Th::is, "A").orderByDesc(Th::is).write(String.class);
+var strings = Linq.from("C", "A", "B", "B").gt(It::self, "A").orderByDesc(It::self).toList(String.class);
 // [C, B, B]
 
-var integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(Th::is).write(Integer.class);
+var integers = Linq.from(1, 2, 3, 7, 6, 5).orderBy(It::self).toList(Integer.class);
 // [1, 2, 3, 5, 6, 7]
 
 var name = Linq.from(data)
@@ -66,7 +66,7 @@ var name = Linq.from(data)
     .distinct()
     // order by 
     .orderBy(Data::getName)
-    .write(String.class);
+    .toList(String.class);
 
 ```
 
@@ -87,8 +87,8 @@ public class ObjectQuery{
         // select a, b, c
         Linq.from(source)
                 .select(TestSource::getName, TestSource::getDate, TestSource::getTags)
-                .select(TestSource::getTags, "tag2") // alias
-                .select(Columns.ofx(TestSource::getId, id -> id + "xxx")); // value convert
+                .selectAs(TestSource::getTags, "tag2") // alias
+                .select(TestSource::getId, (row, id) -> id + "xxx"); // value convert
         // select count(*), sum(id), max(id) 
         Linq.from(source)
                 .select(Columns.count("count"))
@@ -120,7 +120,7 @@ public class ObjectQuery{
      */
     public void where() {
         // =
-        Linq.from(source).eq(TestSource::getName, "Thanos").select(Columns.count(countAlias)).writeOne(Integer.class);
+        Linq.from(source).eq(TestSource::getName, "Thanos").select(Columns.count(countAlias)).one(Integer.class);
         // >=:lval and <=:rval
         Linq.from(source).between(TestSource::getId, 1, 3);
         // in (x,x,x)
@@ -167,13 +167,13 @@ public class ObjectQuery{
      */
     public void write(){
         // write List<Object>
-        List<TestSource> list = Linq.from(source).orderByAsc(TestSource::getDate).write(TestSource.class);
+        List<TestSource> list = Linq.from(source).orderByAsc(TestSource::getDate).toList(TestSource.class);
         // write Object
-        TestSource obj = Linq.from(source).limit(3).writeOne(TestSource.class);
+        TestSource obj = Linq.from(source).limit(3).one(TestSource.class);
         // write List<Map>
-        List<Map<String, Object>> map = Linq.from(source).writeMap();
+        List<Map<String, Object>> map = Linq.from(source).toMaps();
         // write Map
-        Map<String, Object> mapOne = Linq.from(source).writeMapOne();
+        Map<String, Object> mapOne = Linq.from(source).toMap();
     }
     
 }

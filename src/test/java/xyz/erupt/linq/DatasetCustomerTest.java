@@ -38,7 +38,7 @@ public class DatasetCustomerTest {
     public void allData() {
         List<Map<String, Object>> result = Linq.from(dataset)
                 .select(CustomerChurnModel::getAge, CustomerChurnModel::getGender)
-                .writeMap();
+                .toMaps();
         System.out.println(result.size());
     }
 
@@ -54,7 +54,7 @@ public class DatasetCustomerTest {
                 .eq(CustomerChurnModel::getExited, true)
                 .groupBy(CustomerChurnModel::getAge, CustomerChurnModel::getGender)
                 .orderBy(CustomerChurnModel::getAge)
-                .writeMap();
+                .toMaps();
         System.out.println("result size " + result.size());
     }
 

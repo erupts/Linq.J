@@ -1,0 +1,16 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Linq.J">
+  <!-- erupt-raft house style: cream paper, 2px ink borders, hard offset shadow, candy accent, sticker tilt -->
+  <g transform="rotate(-4 64 64)">
+    <!-- hard offset shadow -->
+    <rect x="30" y="35" width="74" height="74" rx="3" fill="#14120B"/>
+    <!-- card -->
+    <rect x="24" y="29" width="74" height="74" rx="3" fill="#4FC8EC" stroke="#14120B" stroke-width="5"/>
+    <!-- lambda: functional core of Linq.J -->
+    <g stroke="#14120B" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M45 93 L67 43"/>
+      <path d="M57 67 L80 93"/>
+    </g>
+    <!-- chain dot: the fluent query chain, candy pink registration mark -->
+    <circle cx="67" cy="43" r="6.5" fill="#F585B4" stroke="#14120B" stroke-width="4"/>
+  </g>
+</svg>

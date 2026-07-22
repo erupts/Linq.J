@@ -1,54 +1,44 @@
 package xyz.erupt.linq.schema;
 
-import xyz.erupt.linq.consts.JoinExchange;
-import xyz.erupt.linq.consts.JoinMethod;
+import xyz.erupt.linq.consts.JoinStrategy;
+import xyz.erupt.linq.consts.JoinType;
 import xyz.erupt.linq.lambda.LambdaSee;
 import xyz.erupt.linq.lambda.SFunction;
 
 import java.util.List;
-import java.util.function.BiFunction;
 
 public class JoinSchema<T> {
 
-    private final JoinMethod joinMethod;
+    private final JoinType joinType;
 
-    private final JoinExchange joinExchange;
+    private final JoinStrategy joinStrategy;
 
     private final List<T> target;
 
     private final Class<T> clazz;
 
-    private BiFunction<T, Row, Boolean> on;
+    // join key on the target (joined-in) table
+    private final SFunction<T, ?> targetOn;
 
-    private SFunction<T, ?> lon;
+    // join key on the source (driving) table
+    private final SFunction<?, ?> sourceOn;
 
-
-    private SFunction<?, ?> ron;
-
-
-    public JoinSchema(JoinMethod joinMethod, List<T> target, SFunction<T, ?> lon, SFunction<?, ?> ron) {
-        this.joinMethod = joinMethod;
+    @SuppressWarnings("unchecked")
+    public JoinSchema(JoinType joinType, List<T> target, SFunction<T, ?> targetOn, SFunction<?, ?> sourceOn) {
+        this.joinType = joinType;
         this.target = target;
-        this.lon = lon;
-        this.ron = ron;
-        this.clazz = (Class<T>) LambdaSee.info(lon).getClazz();
-        this.joinExchange = JoinExchange.HASH;
+        this.targetOn = targetOn;
+        this.sourceOn = sourceOn;
+        this.clazz = (Class<T>) LambdaSee.info(targetOn).getClazz();
+        this.joinStrategy = JoinStrategy.HASH;
     }
 
-    public JoinSchema(JoinMethod joinMethod, List<T> target, BiFunction<T, Row, Boolean> on) {
-        this.joinMethod = joinMethod;
-        this.target = target;
-        this.on = on;
-        this.clazz = (Class<T>) target.getClass().getGenericSuperclass().getClass();
-        this.joinExchange = JoinExchange.NESTED_LOOP;
+    public JoinType getJoinType() {
+        return joinType;
     }
 
-    public JoinMethod getJoinMethod() {
-        return joinMethod;
-    }
-
-    public JoinExchange getJoinExchange() {
-        return joinExchange;
+    public JoinStrategy getJoinStrategy() {
+        return joinStrategy;
     }
 
     public List<T> getTarget() {
@@ -59,12 +49,12 @@ public class JoinSchema<T> {
         return clazz;
     }
 
-    public SFunction<T, ?> getLon() {
-        return lon;
+    public SFunction<T, ?> getTargetOn() {
+        return targetOn;
     }
 
-    public SFunction<?, ?> getRon() {
-        return ron;
+    public SFunction<?, ?> getSourceOn() {
+        return sourceOn;
     }
 
 }

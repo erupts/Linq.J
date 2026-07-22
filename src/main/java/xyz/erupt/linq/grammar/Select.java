@@ -35,9 +35,10 @@ public interface Select {
     // select fn(x) as fun
     <T, A, F> Linq selectAs(SFunction<T, F> column, BiFunction<Row, F, Object> convert, SFunction<A, ?> alias);
 
-    Linq selectRowAs(Function<Row, Object> convert, String alias);
+    // select expr(row) as alias — computed column from the whole row
+    Linq selectExpr(Function<Row, Object> convert, String alias);
 
-    <A> Linq selectRowAs(Function<Row, Object> convert, SFunction<A, ?> alias);
+    <A> Linq selectExpr(Function<Row, Object> convert, SFunction<A, ?> alias);
 
     <T> Linq selectExclude(SFunction<T, ?>... columns);
 
