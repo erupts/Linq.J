@@ -204,83 +204,128 @@ a { color: inherit; }
 }
 
 /* ==========================================================================
-   Hero
+   Hero — Doris-style layout, cream neo-brutalist palette
    ========================================================================== */
 
 .hero {
-    padding: calc(var(--nav-h) + 64px) 32px 72px;
+    position: relative;
+    padding: calc(var(--nav-h) + 88px) 32px 96px;
+    background: var(--bg);
+    overflow: hidden;
+}
+
+/* faint dotted grid backdrop — tech feel, but stays cream/ink */
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(20, 18, 11, 0.12) 1px, transparent 1px);
+    background-size: 22px 22px;
+    -webkit-mask-image: radial-gradient(ellipse at 50% 42%, rgba(0, 0, 0, 0.55), transparent 68%);
+    mask-image: radial-gradient(ellipse at 50% 42%, rgba(0, 0, 0, 0.55), transparent 68%);
+    pointer-events: none;
+}
+
+/* soft candy glows behind the visual — brand color, low opacity */
+.hero::after {
+    content: "";
+    position: absolute;
+    top: 20%;
+    right: -8%;
+    width: 520px;
+    height: 520px;
+    background:
+        radial-gradient(circle at 30% 30%, rgba(79, 200, 236, 0.22), transparent 60%),
+        radial-gradient(circle at 70% 70%, rgba(188, 160, 242, 0.18), transparent 60%);
+    filter: blur(30px);
+    pointer-events: none;
 }
 
 .hero-cols {
+    position: relative;
+    z-index: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    gap: 56px;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 64px;
     align-items: center;
     max-width: 1200px;
     margin: 0 auto;
 }
 
 .hero-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     font-family: var(--mono);
     font-size: 11.5px;
     font-weight: 700;
     letter-spacing: .08em;
     color: var(--black);
-    background: var(--cyan);
+    background: var(--paper);
     border: 2px solid var(--line);
     box-shadow: 3px 3px 0 var(--line);
-    padding: 4px 12px;
-    margin-bottom: 24px;
+    border-radius: 999px;
+    padding: 5px 14px;
+    margin-bottom: 26px;
     text-decoration: none;
-    transform: rotate(-1deg);
-    transition: transform .15s ease;
+    transform: none;
+    transition: transform .15s ease, box-shadow .15s ease;
 }
 
-.hero-badge:hover { transform: rotate(-1deg) translate(-1px, -1px); }
+.hero-badge:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--line);
+}
 
 .badge-dot {
     display: inline-block;
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--green);
     border: 1.5px solid var(--line);
-    margin-right: 7px;
+    margin-right: 4px;
     vertical-align: 1px;
+    animation: pulse-dot 2.2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(147, 214, 85, 0.6); }
+    50%      { box-shadow: 0 0 0 6px rgba(147, 214, 85, 0); }
 }
 
 .hero-title {
-    font-size: clamp(38px, 4.4vw, 60px);
+    font-size: clamp(40px, 4.8vw, 64px);
     font-weight: 900;
-    line-height: 1.16;
-    letter-spacing: -.01em;
-    margin-bottom: 20px;
+    line-height: 1.14;
+    letter-spacing: -.02em;
+    color: var(--ink);
+    margin-bottom: 24px;
 }
 
 .hero-sql-word {
     display: inline-block;
     background: var(--cyan);
     color: var(--black);
-    padding: 0 12px 3px;
-    transform: rotate(-1.5deg);
-    box-shadow: 4px 4px 0 var(--line);
+    padding: 0 14px 4px;
     border: 2px solid var(--line);
+    box-shadow: 4px 4px 0 var(--line);
+    transform: none;
 }
 
 .hero-desc {
-    font-size: 15px;
-    line-height: 1.85;
+    font-size: 16px;
+    line-height: 1.8;
     color: var(--txt2);
-    max-width: 460px;
-    margin-bottom: 26px;
+    max-width: 500px;
+    margin-bottom: 32px;
 }
 
 .hero-actions {
     display: flex;
     gap: 14px;
     flex-wrap: wrap;
-    margin-bottom: 28px;
+    margin-bottom: 30px;
 }
 
 .hero-pills {
@@ -301,9 +346,13 @@ a { color: inherit; }
     padding: 4px 12px;
 }
 
-/* ---- hero board (tilted code window + stickers) ---- */
+/* ---- hero visual: code window (upright, softer landing) ---- */
 
-.hero-visual { position: relative; padding: 12px 8px; }
+.hero-visual {
+    position: relative;
+    padding: 12px 8px;
+    z-index: 1;
+}
 
 .hero-sticker {
     position: absolute;
@@ -320,11 +369,11 @@ a { color: inherit; }
     box-shadow: 3px 3px 0 var(--line);
 }
 
-.hero-sticker-1 { top: -26px; right: -12px; transform: rotate(8deg); }
-.hero-sticker-2 { bottom: -10px; left: 0; background: var(--purple); transform: rotate(-7deg); }
+.hero-sticker-1 { top: -22px; right: -12px; transform: rotate(6deg); }
+.hero-sticker-2 { bottom: -14px; left: -8px; background: var(--purple); transform: rotate(-5deg); }
 
 .hero-visual .code-window {
-    transform: rotate(-1.2deg);
+    transform: none;
 }
 
 /* ==========================================================================
